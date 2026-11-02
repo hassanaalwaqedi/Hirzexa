@@ -5,7 +5,7 @@ import { RiskBadge } from "@/components/dashboard/risk-badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState, ErrorState, LoadingState } from "@/components/layout/states";
 import { formatDecimal, formatOperatorLabel, formatOperatorList, formatPercent, getTrackBehaviors } from "@/lib/data-format";
-import { useCameraDetectionsQuery } from "@/hooks/use-aegis-api";
+import { useCameraDetectionsQuery } from "@/hooks/use-hirzexa-api";
 import type { Camera } from "@/types";
 
 export function CameraDetections({ camera }: { camera?: Camera }) {

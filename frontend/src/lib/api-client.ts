@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { appConfig } from "@/lib/config";
-import { AegisClientError } from "@/lib/errors";
+import { HirzexaClientError } from "@/lib/errors";
 import {
   browserFrameResponseSchema,
   alertCountResponseSchema,
@@ -77,11 +77,11 @@ async function parseJson(response: Response) {
   try {
     return await response.json();
   } catch {
-    throw new AegisClientError("Backend returned a non-JSON response.", "INVALID_RESPONSE_SCHEMA", response.status);
+    throw new HirzexaClientError("Backend returned a non-JSON response.", "INVALID_RESPONSE_SCHEMA", response.status);
   }
 }
 
-class AegisApiClient {
+class HirzexaApiClient {
   private async request<TSchema extends z.ZodTypeAny>(
     path: string,
     schema: TSchema,
@@ -103,7 +103,7 @@ class AegisApiClient {
       });
 
       if (response.status === 401 || response.status === 403) {
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           "Unauthorized request. Check public dashboard auth configuration or backend session authentication.",
           "UNAUTHORIZED",
           response.status
@@ -111,7 +111,7 @@ class AegisApiClient {
       }
 
       if (response.status === 404 || response.status === 405 || response.status === 501) {
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           `Endpoint ${path} is not implemented by the backend.`,
           "ENDPOINT_NOT_IMPLEMENTED",
           response.status
@@ -133,7 +133,7 @@ class AegisApiClient {
           detail = "";
         }
 
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           detail ? `Backend request failed with HTTP ${response.status}: ${detail}` : `Backend request failed with HTTP ${response.status}.`,
           "UNKNOWN_API_ERROR",
           response.status
@@ -144,7 +144,7 @@ class AegisApiClient {
       const parsed = schema.safeParse(json);
 
       if (!parsed.success) {
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           `Invalid response schema from ${path}.`,
           "INVALID_RESPONSE_SCHEMA",
           response.status,
@@ -154,13 +154,13 @@ class AegisApiClient {
 
       return parsed.data;
     } catch (error) {
-      if (error instanceof AegisClientError) throw error;
+      if (error instanceof HirzexaClientError) throw error;
 
       if (error instanceof DOMException && error.name === "AbortError") {
-        throw new AegisClientError(`Request to ${path} timed out.`, "REQUEST_TIMEOUT");
+        throw new HirzexaClientError(`Request to ${path} timed out.`, "REQUEST_TIMEOUT");
       }
 
-      throw new AegisClientError(
+      throw new HirzexaClientError(
         `Backend unavailable at ${appConfig.apiUrl}.`,
         "BACKEND_UNAVAILABLE",
         undefined,
@@ -190,7 +190,7 @@ class AegisApiClient {
       });
 
       if (response.status === 401 || response.status === 403) {
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           "Unauthorized request. Check public dashboard auth configuration or backend session authentication.",
           "UNAUTHORIZED",
           response.status
@@ -198,7 +198,7 @@ class AegisApiClient {
       }
 
       if (response.status === 404 || response.status === 405 || response.status === 501) {
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           `Endpoint ${path} is not implemented by the backend.`,
           "ENDPOINT_NOT_IMPLEMENTED",
           response.status
@@ -206,7 +206,7 @@ class AegisApiClient {
       }
 
       if (!response.ok) {
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           `Backend upload failed with HTTP ${response.status}.`,
           "UNKNOWN_API_ERROR",
           response.status
@@ -217,7 +217,7 @@ class AegisApiClient {
       const parsed = schema.safeParse(json);
 
       if (!parsed.success) {
-        throw new AegisClientError(
+        throw new HirzexaClientError(
           `Invalid response schema from ${path}.`,
           "INVALID_RESPONSE_SCHEMA",
           response.status,
@@ -227,13 +227,13 @@ class AegisApiClient {
 
       return parsed.data;
     } catch (error) {
-      if (error instanceof AegisClientError) throw error;
+      if (error instanceof HirzexaClientError) throw error;
 
       if (error instanceof DOMException && error.name === "AbortError") {
-        throw new AegisClientError(`Request to ${path} timed out.`, "REQUEST_TIMEOUT");
+        throw new HirzexaClientError(`Request to ${path} timed out.`, "REQUEST_TIMEOUT");
       }
 
-      throw new AegisClientError(
+      throw new HirzexaClientError(
         `Backend unavailable at ${appConfig.apiUrl}.`,
         "BACKEND_UNAVAILABLE",
         undefined,
@@ -392,4 +392,4 @@ class AegisApiClient {
   }
 }
 
-export const aegisApiClient = new AegisApiClient();
+export const hirzexaApiClient = new HirzexaApiClient();

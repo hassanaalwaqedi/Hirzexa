@@ -2,8 +2,8 @@ import numpy as np
 from pathlib import Path
 from types import SimpleNamespace
 
-from aegis.camera import youtube_source
-from aegis.camera.types import CameraConfig, CameraSourceType
+from hirzexa.camera import youtube_source
+from hirzexa.camera.types import CameraConfig, CameraSourceType
 
 
 class _FakeCapture:

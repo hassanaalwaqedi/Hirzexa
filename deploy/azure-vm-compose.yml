@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
-    container_name: aegis_api
+    container_name: hirzexa_api
     env_file:
       - ${AZURE_VM_ENV_FILE:-./azure-vm.env}
     ports:

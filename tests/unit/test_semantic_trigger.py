@@ -1,5 +1,5 @@
 """
-AegisAI - Semantic Trigger Unit Tests
+Hirzexa - Semantic Trigger Unit Tests
 
 Tests for semantic trigger logic ensuring DINO is only
 invoked under correct conditions.
@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 from unittest.mock import MagicMock, patch
 
-from aegis.semantic.semantic_trigger import (
+from hirzexa.semantic.semantic_trigger import (
     SemanticTrigger,
     TriggerEvent,
     TriggerType

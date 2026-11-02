@@ -1,5 +1,5 @@
 """
-AegisAI - Test Configuration and Fixtures
+Hirzexa - Test Configuration and Fixtures
 
 Provides pytest fixtures for unit and integration testing.
 
@@ -12,8 +12,8 @@ import pytest
 from unittest.mock import MagicMock
 
 # Set test environment
-os.environ["AEGIS_DEBUG"] = "true"
-os.environ["AEGIS_API_KEY"] = "test-api-key-12345"
+os.environ["HIRZEXA_DEBUG"] = "true"
+os.environ["HIRZEXA_API_KEY"] = "test-api-key-12345"
 
 
 # ═══════════════════════════════════════════════════════════
@@ -54,7 +54,7 @@ def sample_tracks():
 @pytest.fixture
 def motion_state():
     """Create a sample motion state."""
-    from aegis.analysis import MotionState
+    from hirzexa.analysis import MotionState
     return MotionState(
         speed=5.0,
         smoothed_speed=4.5,
@@ -68,7 +68,7 @@ def motion_state():
 @pytest.fixture
 def behavior_flags():
     """Create sample behavior flags."""
-    from aegis.analysis import BehaviorFlags, BehaviorType
+    from hirzexa.analysis import BehaviorFlags, BehaviorType
     return BehaviorFlags(
         is_stationary=False,
         is_loitering=True,
@@ -84,7 +84,7 @@ def behavior_flags():
 @pytest.fixture
 def crowd_metrics():
     """Create sample crowd metrics."""
-    from aegis.analysis import CrowdMetrics
+    from hirzexa.analysis import CrowdMetrics
     return CrowdMetrics(
         person_count=10,
         vehicle_count=2,
@@ -97,7 +97,7 @@ def crowd_metrics():
 @pytest.fixture
 def track_analysis(motion_state, behavior_flags):
     """Create a sample track analysis."""
-    from aegis.analysis import TrackAnalysis
+    from hirzexa.analysis import TrackAnalysis
     return TrackAnalysis(
         track_id=1,
         class_id=0,
@@ -118,7 +118,7 @@ def track_analysis(motion_state, behavior_flags):
 @pytest.fixture
 def risk_weights():
     """Create risk weights for testing."""
-    from aegis.risk import RiskWeights
+    from hirzexa.risk import RiskWeights
     return RiskWeights(
         loitering=0.25,
         speed_anomaly=0.18,
@@ -132,7 +132,7 @@ def risk_weights():
 @pytest.fixture
 def risk_thresholds():
     """Create risk thresholds for testing."""
-    from aegis.risk import RiskThresholds
+    from hirzexa.risk import RiskThresholds
     return RiskThresholds(
         medium=0.25,
         high=0.50,
@@ -143,7 +143,7 @@ def risk_thresholds():
 @pytest.fixture
 def risk_engine_config(risk_weights, risk_thresholds):
     """Create a risk engine config for testing."""
-    from aegis.risk import RiskEngineConfig, TemporalConfig
+    from hirzexa.risk import RiskEngineConfig, TemporalConfig
     return RiskEngineConfig(
         weights=risk_weights,
         thresholds=risk_thresholds,
@@ -156,7 +156,7 @@ def risk_engine_config(risk_weights, risk_thresholds):
 @pytest.fixture
 def risk_engine(risk_engine_config):
     """Create a risk engine for testing."""
-    from aegis.risk import RiskEngine
+    from hirzexa.risk import RiskEngine
     return RiskEngine(config=risk_engine_config)
 
 
@@ -167,7 +167,7 @@ def risk_engine(risk_engine_config):
 @pytest.fixture
 def alert_manager_config():
     """Create alert manager config for testing."""
-    from aegis.alerts import AlertManagerConfig, AlertLevel
+    from hirzexa.alerts import AlertManagerConfig, AlertLevel
     return AlertManagerConfig(
         enabled=True,
         min_level=AlertLevel.HIGH,
@@ -179,7 +179,7 @@ def alert_manager_config():
 @pytest.fixture
 def alert_manager(alert_manager_config):
     """Create an alert manager for testing."""
-    from aegis.alerts import AlertManager
+    from hirzexa.alerts import AlertManager
     return AlertManager(config=alert_manager_config)
 
 
@@ -191,7 +191,7 @@ def alert_manager(alert_manager_config):
 def api_client():
     """Create a test client for the API."""
     from fastapi.testclient import TestClient
-    from aegis.api.app import create_app
+    from hirzexa.api.app import create_app
     
     app = create_app()
     return TestClient(app)
@@ -203,4 +203,4 @@ def api_headers():
     # Some isolated API smoke tests set their own process-level test key at
     # collection time.  Read the active value so integration fixtures remain
     # authenticated regardless of collection order.
-    return {"X-API-Key": os.environ["AEGIS_API_KEY"]}
+    return {"X-API-Key": os.environ["HIRZEXA_API_KEY"]}

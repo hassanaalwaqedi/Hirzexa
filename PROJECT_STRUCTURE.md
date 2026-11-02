@@ -1,4 +1,4 @@
-# AegisAI – Project Structure Documentation
+# Hirzexa – Project Structure Documentation
 
 **Document Type:** Technical Architecture Guide  
 **Version:** 5.0.0  
@@ -12,8 +12,8 @@
 ### 1.1 Directory Hierarchy
 
 ```
-AegisAI/
-├── aegis/                    # Core Python package (all AI/ML logic)
+Hirzexa/
+├── hirzexa/                    # Core Python package (all AI/ML logic)
 │   ├── detection/            # Phase 1: YOLOv8 object detection
 │   ├── tracking/             # Phase 1: DeepSORT multi-object tracking
 │   ├── analysis/             # Phase 2: Motion, behavior, crowd analysis
@@ -53,9 +53,9 @@ AegisAI/
 
 ### 1.3 Scalability & Maintainability
 
-- **New features** → Add new directory under `aegis/`
+- **New features** → Add new directory under `hirzexa/`
 - **New model** → Implement interface in existing detection/semantic module
-- **New output** → Add router in `aegis/api/routes/`
+- **New output** → Add router in `hirzexa/api/routes/`
 - **Configuration** → Add dataclass in `config.py`
 
 ---
@@ -101,13 +101,13 @@ main()                 # Entry point
 - `APIConfig` - Server configuration
 - `SemanticConfig` - Grounding DINO settings
 - `DatabaseConfig` - Persistence settings
-- `AegisConfig` - Master container
+- `HirzexaConfig` - Master container
 
 ---
 
 ## 3. Core Modules Breakdown
 
-### 3.1 aegis/detection/
+### 3.1 hirzexa/detection/
 
 **Responsibility**: Object detection using YOLOv8.
 
@@ -119,9 +119,9 @@ main()                 # Entry point
 **Inputs**: Video frames (numpy arrays)  
 **Outputs**: `List[Detection]` with bbox, confidence, class_name
 
-**Communication**: Outputs consumed by `aegis/tracking/`
+**Communication**: Outputs consumed by `hirzexa/tracking/`
 
-### 3.2 aegis/tracking/
+### 3.2 hirzexa/tracking/
 
 **Responsibility**: Multi-object tracking with persistent IDs.
 
@@ -133,9 +133,9 @@ main()                 # Entry point
 **Inputs**: `List[Detection]` from detection module  
 **Outputs**: `List[Track]` with stable `track_id`
 
-**Communication**: Outputs consumed by `aegis/analysis/`
+**Communication**: Outputs consumed by `hirzexa/analysis/`
 
-### 3.3 aegis/analysis/
+### 3.3 hirzexa/analysis/
 
 **Responsibility**: Behavioral analysis of tracked objects.
 
@@ -151,9 +151,9 @@ main()                 # Entry point
 **Inputs**: `List[Track]` from tracking module  
 **Outputs**: `List[TrackAnalysis]` with motion state and behaviors
 
-**Communication**: Outputs consumed by `aegis/risk/`
+**Communication**: Outputs consumed by `hirzexa/risk/`
 
-### 3.4 aegis/risk/
+### 3.4 hirzexa/risk/
 
 **Responsibility**: Context-aware, explainable risk scoring.
 
@@ -168,9 +168,9 @@ main()                 # Entry point
 **Inputs**: `List[TrackAnalysis]`, `CrowdMetrics`  
 **Outputs**: `FrameRiskSummary` with per-track `RiskScore`
 
-**Communication**: Outputs consumed by `aegis/alerts/` and `aegis/api/`
+**Communication**: Outputs consumed by `hirzexa/alerts/` and `hirzexa/api/`
 
-### 3.5 aegis/alerts/
+### 3.5 hirzexa/alerts/
 
 **Responsibility**: Alert generation with cooldowns and deduplication.
 
@@ -183,7 +183,7 @@ main()                 # Entry point
 **Inputs**: `FrameRiskSummary` from risk module  
 **Outputs**: `List[Alert]` dispatched to console/file/API
 
-### 3.6 aegis/api/
+### 3.6 hirzexa/api/
 
 **Responsibility**: REST API and WebSocket endpoints.
 
@@ -206,7 +206,7 @@ main()                 # Entry point
 | `/semantic/query` | POST | Submit semantic prompt |
 | `/semantic/results` | GET | Get semantic matches |
 
-### 3.7 aegis/semantic/
+### 3.7 hirzexa/semantic/
 
 **Responsibility**: Language-guided detection using Grounding DINO.
 
@@ -221,7 +221,7 @@ main()                 # Entry point
 
 **Key Design**: DINO runs only on-demand (not per-frame) to preserve real-time FPS.
 
-### 3.8 aegis/db/
+### 3.8 hirzexa/db/
 
 **Responsibility**: Database persistence for events and alerts.
 
@@ -232,7 +232,7 @@ main()                 # Entry point
 | `models.py` | ORM models (Event, Alert, TrackSnapshot) |
 | `repository.py` | CRUD operations with auto-cleanup |
 
-### 3.9 aegis/video/
+### 3.9 hirzexa/video/
 
 **Responsibility**: Video input/output abstraction.
 
@@ -242,7 +242,7 @@ main()                 # Entry point
 | `source.py` | VideoSource (file/camera abstraction) |
 | `writer.py` | VideoWriter with codec handling |
 
-### 3.10 aegis/visualization/
+### 3.10 hirzexa/visualization/
 
 **Responsibility**: Rendering annotations on frames.
 
@@ -258,7 +258,7 @@ main()                 # Entry point
 ### 4.1 Where YOLO is Loaded
 
 ```
-aegis/detection/yolo_detector.py
+hirzexa/detection/yolo_detector.py
 └── YOLODetector._load_model()
     └── ultralytics.YOLO(model_path)
 ```
@@ -268,7 +268,7 @@ aegis/detection/yolo_detector.py
 ### 4.2 Where Grounding DINO is Integrated
 
 ```
-aegis/semantic/dino_engine.py
+hirzexa/semantic/dino_engine.py
 └── DinoEngine._load_model()
     └── groundingdino.load_model()
 ```
@@ -311,7 +311,7 @@ python main.py --input 0 --output out.mp4 --enable-risk --enable-api
     parse_arguments()
         │
         ▼
-    build_config()  →  AegisConfig
+    build_config()  →  HirzexaConfig
         │
         ▼
     run_perception_pipeline()
@@ -377,11 +377,11 @@ python main.py --input 0 --output out.mp4 --enable-risk --enable-api
 
 | Variable | Purpose | Default |
 |----------|---------|---------|
-| `AEGIS_API_KEY` | API authentication | Required |
-| `AEGIS_API_HOST` | Server bind address | `127.0.0.1` |
-| `AEGIS_API_PORT` | Server port | `8080` |
-| `AEGIS_DEBUG` | Enable debug mode | `false` |
-| `DATABASE_URL` | Database connection | `sqlite:///data/aegis.db` |
+| `HIRZEXA_API_KEY` | API authentication | Required |
+| `HIRZEXA_API_HOST` | Server bind address | `127.0.0.1` |
+| `HIRZEXA_API_PORT` | Server port | `8080` |
+| `HIRZEXA_DEBUG` | Enable debug mode | `false` |
+| `DATABASE_URL` | Database connection | `sqlite:///data/hirzexa.db` |
 | `SEMANTIC_ENABLED` | Enable DINO | `false` |
 
 ### 6.2 Configuration Hierarchy
@@ -403,11 +403,11 @@ Dataclass Defaults (lowest priority)
 python main.py --confidence 0.6 --enable-semantic
 
 # Via environment
-export AEGIS_API_KEY="new-key"
+export HIRZEXA_API_KEY="new-key"
 export SEMANTIC_ENABLED=true
 
 # Via .env file
-echo "AEGIS_DEBUG=true" >> .env
+echo "HIRZEXA_DEBUG=true" >> .env
 ```
 
 ---
@@ -416,29 +416,29 @@ echo "AEGIS_DEBUG=true" >> .env
 
 ### 7.1 Adding a New Model
 
-1. Create wrapper in `aegis/<module>/new_model.py`
+1. Create wrapper in `hirzexa/<module>/new_model.py`
 2. Implement standard interface returning dataclass
-3. Add to `aegis/<module>/__init__.py` exports
+3. Add to `hirzexa/<module>/__init__.py` exports
 4. Add config dataclass in `config.py`
 5. Add CLI argument in `main.py` if needed
 
 ### 7.2 Adding a New Risk Rule
 
-1. Edit `aegis/risk/risk_engine.py`
+1. Edit `hirzexa/risk/risk_engine.py`
 2. Add signal to `_calculate_base_score()`
 3. Add weight to `RiskWeights` dataclass
 4. Add to explanation generation
 
 ### 7.3 Adding a New Output
 
-1. Create route in `aegis/api/routes/new_route.py`
-2. Add router to `aegis/api/routes/__init__.py`
-3. Register in `aegis/api/app.py`
+1. Create route in `hirzexa/api/routes/new_route.py`
+2. Add router to `hirzexa/api/routes/__init__.py`
+3. Register in `hirzexa/api/app.py`
 4. Update API documentation
 
 ### 7.4 Adding a New Trigger for Semantic Layer
 
-1. Edit `aegis/semantic/semantic_trigger.py`
+1. Edit `hirzexa/semantic/semantic_trigger.py`
 2. Add new `TriggerType` enum value
 3. Implement check in `check_triggers()`
 
@@ -450,16 +450,16 @@ echo "AEGIS_DEBUG=true" >> .env
 |-------------|----------------|-------------|
 | `main.py` | Entry point, CLI, orchestration | Critical |
 | `config.py` | All configuration dataclasses | Critical |
-| `aegis/detection/` | YOLOv8 object detection | Critical |
-| `aegis/tracking/` | DeepSORT multi-object tracking | Critical |
-| `aegis/analysis/` | Motion and behavior analysis | High |
-| `aegis/risk/` | Explainable risk scoring | High |
-| `aegis/alerts/` | Alert generation | Medium |
-| `aegis/api/` | REST API and WebSocket | High |
-| `aegis/semantic/` | Grounding DINO integration | Medium |
-| `aegis/db/` | Database persistence | Medium |
-| `aegis/video/` | Video I/O | High |
-| `aegis/visualization/` | Rendering | Medium |
+| `hirzexa/detection/` | YOLOv8 object detection | Critical |
+| `hirzexa/tracking/` | DeepSORT multi-object tracking | Critical |
+| `hirzexa/analysis/` | Motion and behavior analysis | High |
+| `hirzexa/risk/` | Explainable risk scoring | High |
+| `hirzexa/alerts/` | Alert generation | Medium |
+| `hirzexa/api/` | REST API and WebSocket | High |
+| `hirzexa/semantic/` | Grounding DINO integration | Medium |
+| `hirzexa/db/` | Database persistence | Medium |
+| `hirzexa/video/` | Video I/O | High |
+| `hirzexa/visualization/` | Rendering | Medium |
 | `frontend/` | Next.js dashboard | Medium |
 | `tests/` | Test suite | High |
 | `deploy/` | Production configs | Medium |
@@ -511,28 +511,28 @@ echo "AEGIS_DEBUG=true" >> .env
          ┌─────────────┼─────────────┐
          │             │             │
          ▼             ▼             ▼
-    config.py    aegis/video    aegis/visualization
+    config.py    hirzexa/video    hirzexa/visualization
          │             │             │
          └──────┬──────┘             │
                 │                    │
                 ▼                    │
-         aegis/detection ────────────┤
+         hirzexa/detection ────────────┤
                 │                    │
                 ▼                    │
-         aegis/tracking ─────────────┤
+         hirzexa/tracking ─────────────┤
                 │                    │
                 ▼                    │
-         aegis/analysis ─────────────┤
+         hirzexa/analysis ─────────────┤
                 │                    │
                 ▼                    │
-           aegis/risk ───────────────┤
+           hirzexa/risk ───────────────┤
                 │                    │
          ┌──────┴──────┐             │
          ▼             ▼             │
-    aegis/alerts   aegis/api ────────┘
+    hirzexa/alerts   hirzexa/api ────────┘
          │             │
          ▼             ▼
-      aegis/db    aegis/semantic
+      hirzexa/db    hirzexa/semantic
 ```
 
 ---

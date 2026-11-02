@@ -3,9 +3,9 @@ from pathlib import Path
 import numpy as np
 
 from config import DetectionConfig
-from aegis.detection.multi_model_detector import MultiModelDetector
-from aegis.detection.yolo_detector import Detection
-from aegis.detection.yoloe_threat_detector import YOLOEThreatDetector
+from hirzexa.detection.multi_model_detector import MultiModelDetector
+from hirzexa.detection.yolo_detector import Detection
+from hirzexa.detection.yoloe_threat_detector import YOLOEThreatDetector
 
 
 PROMPTS = ("handgun", "pistol", "knife")
@@ -83,7 +83,7 @@ def _config(tmp_path: Path, **overrides):
 
 
 def test_yoloe_binds_persisted_embeddings_once_without_text_encoder_initialization(monkeypatch, tmp_path):
-    monkeypatch.setattr("aegis.detection.yoloe_threat_detector.YOLOE", _YOLOE)
+    monkeypatch.setattr("hirzexa.detection.yoloe_threat_detector.YOLOE", _YOLOE)
     detector = YOLOEThreatDetector(detection_config=_config(tmp_path))
 
     detector.preload()
@@ -101,7 +101,7 @@ def test_yoloe_binds_persisted_embeddings_once_without_text_encoder_initializati
 
 
 def test_yoloe_normalizes_candidate_with_provenance_and_keeps_risk_flag_false(monkeypatch, tmp_path):
-    monkeypatch.setattr("aegis.detection.yoloe_threat_detector.YOLOE", _YOLOE)
+    monkeypatch.setattr("hirzexa.detection.yoloe_threat_detector.YOLOE", _YOLOE)
     detector = YOLOEThreatDetector(detection_config=_config(tmp_path))
 
     detections = detector.detect(np.zeros((48, 48, 3), dtype=np.uint8))
@@ -118,7 +118,7 @@ def test_yoloe_normalizes_candidate_with_provenance_and_keeps_risk_flag_false(mo
 
 
 def test_yoloe_missing_embedding_is_truthful_degraded_state(monkeypatch, tmp_path):
-    monkeypatch.setattr("aegis.detection.yoloe_threat_detector.YOLOE", _YOLOE)
+    monkeypatch.setattr("hirzexa.detection.yoloe_threat_detector.YOLOE", _YOLOE)
     config = _config(tmp_path)
     Path(config.threat_prompt_embeddings_path).unlink()
     detector = YOLOEThreatDetector(detection_config=config)

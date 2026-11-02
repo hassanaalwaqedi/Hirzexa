@@ -9,7 +9,7 @@ import { executeOperatorCommand } from "@/lib/operator-api";
 import messages from "../../../../messages/en.json";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
-vi.mock("@/hooks/use-aegis-api", () => ({
+vi.mock("@/hooks/use-hirzexa-api", () => ({
   useEvidenceSearchStatusQuery: () => ({ data: { state: "ready", indexed_evidence: 42, pending_evidence: 0 } }),
 }));
 vi.mock("@/lib/operator-api", async (importOriginal) => {
@@ -49,10 +49,10 @@ function renderCenter() {
 
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 
-describe("Aegis Intelligence operator", () => {
+describe("Hirzexa Intelligence operator", () => {
   it("renders only values supplied by the intelligence contracts", () => {
     renderCenter();
-    expect(screen.getByRole("heading", { name: "Aegis AI Operator" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Hirzexa Operator" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Cameras\. 1\/2 live\./ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Evidence\. 42 indexed\./ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Events\. 1 recent\./ })).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe("Aegis Intelligence operator", () => {
     fireEvent.click(screen.getByRole("button", { name: /Risk\. 1 active\./ }));
     await waitFor(() => expect(executeOperatorCommand).toHaveBeenCalledWith("Show high-risk events", expect.anything(), expect.anything()));
     expect(await screen.findByText("Found 1 verified event record.")).toBeInTheDocument();
-    await waitFor(() => expect(document.querySelector(".operator-webgl-stage")).toHaveAttribute("data-operator-target", "risk"));
+    await waitFor(() => expect(document.querySelector(".cinematic-core")).toHaveAttribute("data-intent", "risk"));
   });
 
   it("keeps text as a hidden fallback and executes it through the authenticated operator API", async () => {
@@ -79,11 +79,11 @@ describe("Aegis Intelligence operator", () => {
       trace: [{ key: "understood", label: "Request understood", status: "completed" }], response_language: "English", error: null,
     });
     renderCenter();
-    expect(screen.queryByRole("textbox", { name: "Type a command for Aegis" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Type a command for Hirzexa" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Show high-risk events from the last hour" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Use text instead" }));
-    fireEvent.change(screen.getByRole("textbox", { name: "Type a command for Aegis" }), { target: { value: "Show high-risk events from the last hour" } });
-    fireEvent.click(screen.getByRole("button", { name: "Execute" }));
+    fireEvent.click(screen.getByRole("button", { name: "Type your request..." }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Type a command for Hirzexa" }), { target: { value: "Show high-risk events from the last hour" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
     await waitFor(() => expect(executeOperatorCommand).toHaveBeenCalled());
     expect(await screen.findByText("Found 1 verified event record.")).toBeInTheDocument();
     expect(screen.getByText("Request understood")).toBeInTheDocument();

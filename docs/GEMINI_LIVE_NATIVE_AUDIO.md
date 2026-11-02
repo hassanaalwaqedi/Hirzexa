@@ -9,7 +9,7 @@ synthesis and Web Speech text-to-speech are not used.
 
 The browser never receives a Gemini API key, provider model identifier, voice
 identifier, or upstream provider WebSocket URL. It communicates only with the
-Aegis session API and the Aegis WebSocket gateway.
+Hirzexa session API and the Hirzexa WebSocket gateway.
 
 ## Required backend configuration
 
@@ -38,11 +38,11 @@ browser TTS fallback.
    The response has a one-time connection token in a WebSocket subprotocol,
    not in a URL or permanent credential.
 2. The browser connects to `WS /ws/intelligence/live/{sessionId}` using
-   `aegis-live-v1` plus that short-lived token.
+   `hirzexa-live-v1` plus that short-lived token.
 3. Browser microphone chunks are JSON envelopes only while voice mode is
    explicitly enabled. They contain base64 signed 16-bit mono PCM using
    `inputSampleRate`. They remain in memory and are not logged or persisted.
-4. Aegis emits `session_ready`, `state`, `transcript`, `tool_activity`,
+4. Hirzexa emits `session_ready`, `state`, `transcript`, `tool_activity`,
    `citations`, `turn_complete`, `interrupted`, and `error` JSON events.
 5. Gemini output is sent as binary WebSocket frames: signed 16-bit mono PCM at
    `outputSampleRate`. The frame belongs to the one authenticated voice
@@ -58,7 +58,7 @@ and marks the interface as speaking only after playback has been scheduled.
 - Stop, Escape, route exit, unmount, permission denial, connection failure,
   and provider failure stop capture, output playback, buffers, tracks, and
   the short-lived session.
-- Speaking over Aegis stops local queued output after a short sustained
+- Speaking over Hirzexa stops local queued output after a short sustained
   microphone-activity window. Silent hands-free PCM frames cannot cancel
   playback. A typed `interrupt` event precedes the new microphone audio over
   the existing session; Gemini Live VAD handles provider-side interruption.
@@ -74,10 +74,10 @@ and marks the interface as speaking only after playback has been scheduled.
 2. Enable voice, grant microphone permission, and ask: "How many cameras are
    online right now?"
 3. Confirm a binary PCM frame reaches the browser WebSocket, native audio is
-   heard without another play action, and the state becomes `Aegis speaking`.
+   heard without another play action, and the state becomes `Hirzexa speaking`.
 4. Confirm the transcript and evidence citation identify the actual camera
    runtime source.
-5. Speak while Aegis is responding. Audio must stop immediately and the core
+5. Speak while Hirzexa is responding. Audio must stop immediately and the core
    must return to listening for the new request.
 6. Press Escape. Confirm microphone access, playback, and WebSocket activity
    stop immediately.

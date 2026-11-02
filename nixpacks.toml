@@ -1,4 +1,4 @@
-# AegisAI Backend - Nixpacks Configuration
+# Hirzexa Backend - Nixpacks Configuration
 
 [phases.setup]
 nixPkgs = ["python312", "ffmpeg"]

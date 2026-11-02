@@ -1,8 +1,8 @@
 from types import SimpleNamespace
 
-from aegis.explain import EvidenceExplainer
-from aegis.risk.person_weapon_association import PersonWeaponAssociationEngine
-from aegis.video.camera_sources import FrameIngestionService
+from hirzexa.explain import EvidenceExplainer
+from hirzexa.risk.person_weapon_association import PersonWeaponAssociationEngine
+from hirzexa.video.camera_sources import FrameIngestionService
 
 
 def _track(track_id, class_name, bbox, confidence=0.9, is_person=False, is_weapon=False, is_vehicle=False):

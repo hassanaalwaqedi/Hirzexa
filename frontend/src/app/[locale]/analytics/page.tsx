@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { RiskAnalyticsWorkspace } from "@/components/analytics/risk-analytics-workspace";
 import { AppShell } from "@/components/layout/app-shell";
 import { useTranslations } from "next-intl";
-import { useAlertCountQuery, useAlertsQuery, useCamerasQuery, usePersistedEvidenceQuery, useStatisticsQuery } from "@/hooks/use-aegis-api";
+import { useAlertCountQuery, useAlertsQuery, useCamerasQuery, usePersistedEvidenceQuery, useStatisticsQuery } from "@/hooks/use-hirzexa-api";
 
 export default function AnalyticsPage() {
   const t = useTranslations("analytics");

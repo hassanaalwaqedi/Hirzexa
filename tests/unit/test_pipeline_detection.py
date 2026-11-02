@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import pytest
 
-from aegis.pipeline.detection import DetectionStage
+from hirzexa.pipeline.detection import DetectionStage
 
 
 def test_preload_model_uses_the_stage_configuration_and_loads_real_weights_boundary(monkeypatch):
-    import aegis.detection.multi_model_detector as detector_module
+    import hirzexa.detection.multi_model_detector as detector_module
 
     captured = {}
 
     class FakeDetector:
-        def __init__(self, *, detection_config):
+        def __init__(self, *, detection_config, **kwargs):
             captured["config"] = detection_config
             self.person_detector = self
             self.weapon_detector = self
@@ -42,10 +42,10 @@ def test_preload_model_uses_the_stage_configuration_and_loads_real_weights_bound
 
 
 def test_preload_model_retains_a_truthful_failure_reason(monkeypatch):
-    import aegis.detection.multi_model_detector as detector_module
+    import hirzexa.detection.multi_model_detector as detector_module
 
     class FailingDetector:
-        def __init__(self, *, detection_config):
+        def __init__(self, *, detection_config, **kwargs):
             del detection_config
             self.person_detector = self
             self.weapon_detector = self

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AegisAI API Server Start Script
+Hirzexa API Server Start Script
 
 Entry point for starting the API server with uvicorn.
 """
@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 if __name__ == "__main__":
     import uvicorn
-    from aegis.api.app import create_app
+    from hirzexa.api.app import create_app
 
     # Nested Pydantic settings read process environment values. Load the
     # repository's server-only .env before the application constructs them so
@@ -27,13 +27,13 @@ if __name__ == "__main__":
     if "--enable-semantic" in sys.argv:
         os.environ["SEMANTIC_ENABLED"] = "true"
 
-    host = os.getenv("AEGIS_API_HOST", "127.0.0.1")
-    port = int(os.getenv("AEGIS_API_PORT", "8080"))
-    debug = os.getenv("AEGIS_DEBUG", "false").lower() == "true"
+    host = os.getenv("HIRZEXA_API_HOST", "127.0.0.1")
+    port = int(os.getenv("HIRZEXA_API_PORT", "8080"))
+    debug = os.getenv("HIRZEXA_DEBUG", "false").lower() == "true"
 
-    print(f"Starting AegisAI API on http://{host}:{port}")
+    print(f"Starting Hirzexa API on http://{host}:{port}")
     if debug:
-        uvicorn.run("aegis.api.app:create_app", host=host, port=port, reload=True, factory=True)
+        uvicorn.run("hirzexa.api.app:create_app", host=host, port=port, reload=True, factory=True)
     else:
         app = create_app()
         uvicorn.run(app, host=host, port=port, reload=False)

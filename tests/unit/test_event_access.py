@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from types import SimpleNamespace
 
-from aegis.intelligence.event_access import merge_event_records, persisted_event_record
+from hirzexa.intelligence.event_access import merge_event_records, persisted_event_record
 
 
 def test_merge_event_records_deduplicates_by_public_event_id_and_keeps_runtime_fields() -> None:

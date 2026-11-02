@@ -1,4 +1,4 @@
-"""Controlled local benchmark for Aegis general-detection checkpoints.
+"""Controlled local benchmark for Hirzexa general-detection checkpoints.
 
 This is an explicit operator tool, not part of application startup. It uses
 only local checkpoint paths and never provisions/downloads model weights.

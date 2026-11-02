@@ -1,5 +1,5 @@
 """
-AegisAI - Security Tests: CORS
+Hirzexa - Security Tests: CORS
 
 Tests for Cross-Origin Resource Sharing configuration.
 """
@@ -15,7 +15,7 @@ class TestCORS:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
-        from aegis.api.app import create_app
+        from hirzexa.api.app import create_app
         
         app = create_app()
         return TestClient(app)

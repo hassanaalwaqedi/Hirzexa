@@ -51,7 +51,7 @@ The active operational path was traced as:
 
 ```text
 MultiCameraPipelineManager -> FrameIngestionService -> APIState
-                                             -> aegis.database repositories
+                                             -> hirzexa.database repositories
 ```
 
 The detection-model health check follows this active camera-ingestion path when
@@ -59,13 +59,13 @@ it has created a detector. The separate Redis worker pipeline remains a worker
 health check; an intentionally idle worker detector cannot override a loaded
 camera-ingestion detector.
 
-`aegis.database` is therefore the one persistence stack used by the context,
-the camera ingestion flow, and `AlertingStage`. The overlapping `aegis.db` and
-the legacy singular `aegis.database.repository` path were not merged into the
+`hirzexa.database` is therefore the one persistence stack used by the context,
+the camera ingestion flow, and `AlertingStage`. The overlapping `hirzexa.db` and
+the legacy singular `hirzexa.database.repository` path were not merged into the
 new context; they are not active sources for this view.
 
 The alert persistence call now enters `get_db_session()` and calls the active
-`EventRepository.create(...)` method. `aegis.ai.tools.get_recent_events` also
+`EventRepository.create(...)` method. `hirzexa.ai.tools.get_recent_events` also
 enters its context-managed database session before constructing a repository.
 Write attempts are recorded in process-local persistence telemetry. A failed
 write remains non-blocking for frame processing but appears as a timed,
@@ -99,7 +99,7 @@ non-interactive and visibly planned/unavailable with a reason.
 
 The browser no longer reads a privileged `NEXT_PUBLIC_*` API key. Browser API
 calls go through `frontend/src/app/api/backend/[...path]/route.ts`; that
-server-side route reads only `AEGIS_API_URL` and `AEGIS_API_KEY`. The frontend
+server-side route reads only `HIRZEXA_API_URL` and `HIRZEXA_API_KEY`. The frontend
 and root environment examples and the README document those server-only names.
 
 This proxy prevents key bundling but is not a replacement for a production
@@ -133,10 +133,10 @@ No schema migration is required for an existing Phase 0 database: the SQL
 column name remains `events.metadata`. Code using the active ORM model must use
 `Event.event_metadata` as its Python attribute. A fresh database does require
 one explicit initialization because no initial Alembic migration for the active
-`aegis.database` schema is currently supplied:
+`hirzexa.database` schema is currently supplied:
 
 ```powershell
-python -c "from aegis.database.connection import create_tables; create_tables()"
+python -c "from hirzexa.database.connection import create_tables; create_tables()"
 ```
 
 Run this after setting `DATABASE_URL` and before starting a deployment that

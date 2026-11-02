@@ -329,7 +329,7 @@ export function CameraPreview({ camera, status }: { camera: Camera; status: Came
   return (
     <div ref={elementRef} className="absolute inset-0 bg-black">
       {visible && canPreview && !previewFailed ? <>
-        {/* eslint-disable-next-line @next/next/no-img-element -- authenticated Aegis snapshot endpoint refreshes at a controlled cadence. */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- authenticated Hirzexa snapshot endpoint refreshes at a controlled cadence. */}
         <img src={snapshotUrl(camera, generation)} alt="" className="h-full w-full object-cover" loading="lazy" onError={() => setFailedGeneration(generation)} />
       </> : null}
       {(!visible || !canPreview || previewFailed) ? <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 camera-preview-empty text-center text-xs text-slate-400"><Video className="h-6 w-6 text-slate-600" aria-hidden />{message}</div> : null}

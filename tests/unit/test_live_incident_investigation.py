@@ -9,25 +9,25 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.database.connection import Base
-from aegis.database.models import Event, Incident, IncidentVerification
-from aegis.database.repositories import (
+from hirzexa.database.connection import Base
+from hirzexa.database.models import Event, Incident, IncidentVerification
+from hirzexa.database.repositories import (
     EventRepository,
     IncidentRepository,
     IncidentVerificationRepository,
     ObservationRepository,
     RiskAssessmentRepository,
 )
-from aegis.intelligence.context_schemas import Availability
-from aegis.intelligence.incident_investigation import (
+from hirzexa.intelligence.context_schemas import Availability
+from hirzexa.intelligence.incident_investigation import (
     generate_incident_report,
     get_incident,
     get_incident_evidence,
     get_incident_timeline,
     get_track_trajectory,
 )
-from aegis.intelligence.live_tools import LiveToolRegistry
-from aegis.intelligence.live_schemas import UICommandKind
+from hirzexa.intelligence.live_tools import LiveToolRegistry
+from hirzexa.intelligence.live_schemas import UICommandKind
 
 
 NOW = datetime.now(timezone.utc).replace(microsecond=0)
@@ -41,9 +41,9 @@ def investigation_db(tmp_path, monkeypatch):
     engine = create_engine(f"sqlite:///{tmp_path / 'investigation.db'}")
     Base.metadata.create_all(engine)
     session_factory = sessionmaker(bind=engine, expire_on_commit=False)
-    monkeypatch.setattr("aegis.database.connection._SessionLocal", session_factory)
+    monkeypatch.setattr("hirzexa.database.connection._SessionLocal", session_factory)
     audit_records = []
-    monkeypatch.setattr("aegis.audit.record_audit", lambda action, **kwargs: audit_records.append((action, kwargs)) or True)
+    monkeypatch.setattr("hirzexa.audit.record_audit", lambda action, **kwargs: audit_records.append((action, kwargs)) or True)
     with session_factory.begin() as session:
         incident = Incident(
             incident_id=INCIDENT_ID,
@@ -218,7 +218,7 @@ def test_persisted_track_trajectory_and_derived_pixel_speed(investigation_db):
 
 
 def test_available_saved_snapshot_is_metadata_only_and_opens_through_authorized_tool(investigation_db, tmp_path, monkeypatch):
-    import aegis.intelligence.incident_investigation as investigation
+    import hirzexa.intelligence.incident_investigation as investigation
 
     session_factory, _ = investigation_db
     approved_snapshot_root = tmp_path / "approved-snapshots"
@@ -273,7 +273,7 @@ def test_existing_gpu_usage_tool_reads_pytorch_total_memory(monkeypatch):
         get_device_properties=lambda _index: SimpleNamespace(total_memory=4 * 1024 * 1024 * 1024),
     )
     monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=fake_cuda))
-    from aegis.ai.tools import get_gpu_usage
+    from hirzexa.ai.tools import get_gpu_usage
 
     result = get_gpu_usage()
     assert result["available"] is True
@@ -304,7 +304,7 @@ def test_report_preserves_vlm_states_as_a_secondary_source(investigation_db, com
     ],
 )
 def test_on_demand_vlm_uses_privacy_gate_before_reading_evidence(investigation_db, monkeypatch, enabled, camera_allowed, expected_code):
-    from aegis.intelligence import vlm_verifier
+    from hirzexa.intelligence import vlm_verifier
 
     class GateService:
         settings = SimpleNamespace(enabled=enabled, allows_camera=lambda _camera_id: camera_allowed)

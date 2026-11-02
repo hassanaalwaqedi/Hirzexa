@@ -1,4 +1,4 @@
-# Aegis AI: event-intelligence audit and proposed architecture
+# Hirzexa: event-intelligence audit and proposed architecture
 
 Date: 2026-09-16. Scope: Phase 1, audit and design only. Deployment target: Hassan's local PC first.
 
@@ -13,13 +13,13 @@ Date: 2026-09-16. Scope: Phase 1, audit and design only. Deployment target: Hass
 
 ## Executive conclusion
 
-Aegis already has tracking, temporal heuristics, object-person association, persistent evidence, operational alerts, and an incident correlation service. It is not simply a knife detector. However, the primary camera path decides risk and dispatches alerts **before** persistent incident correlation. Incidents currently summarize selected, already-scored events; they are not the authority that determines risk.
+Hirzexa already has tracking, temporal heuristics, object-person association, persistent evidence, operational alerts, and an incident correlation service. It is not simply a knife detector. However, the primary camera path decides risk and dispatches alerts **before** persistent incident correlation. Incidents currently summarize selected, already-scored events; they are not the authority that determines risk.
 
 Production readiness is **not established**. Highest-priority findings:
 
 1. Strong geometric weapon association can produce HIGH in one analyzed frame; persistent containment alone can produce CRITICAL. Neither establishes violent intent. See `FrameIngestionService._build_evidence` and `WeaponAggressionEngine` below.
 2. Alert cooldown suppresses severity escalation and, in the camera path, prevents the suppressed frame from updating durable evidence/incidents. See `AlertManager.process_risk` and `FrameIngestionService._maybe_generate_alert`.
-3. Several execution paths implement different risk policies. The Redis pipeline passes process-local objects that its serializer cannot encode. See `aegis/pipeline/*` and `aegis/core/events.py`.
+3. Several execution paths implement different risk policies. The Redis pipeline passes process-local objects that its serializer cannot encode. See `hirzexa/pipeline/*` and `hirzexa/core/events.py`.
 4. Persistence and dispatch are not one durable transaction/outbox. Database/queue failures can leave notifications without durable evidence or lose delivery. See `FrameIngestionService._persist_event`, `_maybe_generate_alert`, and `AlertManager.persist_alert`.
 5. Blank-database migrations fail. An isolated in-memory SQLite migration run failed with `no such table: events` in `20260802_02_persistent_evidence.upgrade`.
 6. The frontend backend-proxy injects privileged credentials without authenticating its caller. The optional cloud analysis server accepts an API-key header without validating it. Keep these services off untrusted networks pending hardening.
@@ -37,7 +37,7 @@ Verification performed:
 - 54 existing focused tests passed, with 83 warnings, in 5.43 seconds. Modules are listed in section 15. Passing these tests establishes current behavior, not that the encoded policy meets the requested safety requirements.
 - Isolated, model-free probe: a person and a far-away knife passed repeatedly to `ProximityRiskEngine.assess` produced HIGH, HIGH, HIGH, HIGH, CRITICAL. This is the alternate proximity engine, not proof that the fully gated camera path emits those alerts.
 - Isolated alert probe: HIGH followed immediately by CRITICAL with the same cooldown identity created the HIGH alert and suppressed the CRITICAL alert.
-- Isolated serialization probe: `aegis.core.events._serialize` rejected a dictionary containing a NumPy frame with `TypeError`.
+- Isolated serialization probe: `hirzexa.core.events._serialize` rejected a dictionary containing a NumPy frame with `TypeError`.
 - `alembic upgrade head` against `sqlite:///:memory:` failed at revision `20260802_02`, attempting to alter a missing `events` table. No saved database was migrated.
 
 Not found / not verified: real-video precision/recall, model calibration, installed weights' accuracy or provenance, sustained GPU/CPU throughput, end-to-end latency distributions, live Redis recovery, PostgreSQL migration execution, deployment penetration testing, full test suite, frontend test execution, browser verification, or production certification. Numeric defaults below are code defaults, not measured installation settings.
@@ -63,18 +63,18 @@ Camera source / browser frame / uploaded video
   -> dashboard polling / camera sockets / operator presentation
 ```
 
-Ordinary detection events branch into in-memory history without the serious-alert persistence path. Sources: [camera manager](../aegis/camera/manager.py), [FrameIngestionService](../aegis/video/camera_sources.py), [incident correlation](../aegis/intelligence/incident_correlation.py), [alert manager](../aegis/alerts/alert_manager.py).
+Ordinary detection events branch into in-memory history without the serious-alert persistence path. Sources: [camera manager](../hirzexa/camera/manager.py), [FrameIngestionService](../hirzexa/video/camera_sources.py), [incident correlation](../hirzexa/intelligence/incident_correlation.py), [alert manager](../hirzexa/alerts/alert_manager.py).
 
 ### Other paths that must not be mistaken for that path
 
-- `aegis/pipeline/startup.py:create_pipeline` constructs threaded Detection, Tracking, RiskScoring, and Alerting stages over `EventBus`. `aegis/api/app.py:create_app` initializes this pipeline. A producer wiring active camera frames to `Streams.FRAMES` was **Not found / not verified**; camera ingestion calls its own service directly. Initializing stage threads does not prove frames traverse them.
-- `aegis/api/routes/analyze.py:analyze_frame` uses its own detector/tracker and `ProximityRiskEngine`; its semantics are not the camera evidence policy.
-- `aegis/edge/edge_pipeline.py:EdgePipeline.process_frame` uses YOLO, ByteTrack, proximity scoring, and optional cloud escalation.
-- `aegis/pipeline/ai_pipeline.py:AICameraPipeline` and `aegis/edge/edge_risk_filter.py:EdgeRiskFilter` provide another edge/cloud route.
+- `hirzexa/pipeline/startup.py:create_pipeline` constructs threaded Detection, Tracking, RiskScoring, and Alerting stages over `EventBus`. `hirzexa/api/app.py:create_app` initializes this pipeline. A producer wiring active camera frames to `Streams.FRAMES` was **Not found / not verified**; camera ingestion calls its own service directly. Initializing stage threads does not prove frames traverse them.
+- `hirzexa/api/routes/analyze.py:analyze_frame` uses its own detector/tracker and `ProximityRiskEngine`; its semantics are not the camera evidence policy.
+- `hirzexa/edge/edge_pipeline.py:EdgePipeline.process_frame` uses YOLO, ByteTrack, proximity scoring, and optional cloud escalation.
+- `hirzexa/pipeline/ai_pipeline.py:AICameraPipeline` and `hirzexa/edge/edge_risk_filter.py:EdgeRiskFilter` provide another edge/cloud route.
 - `main.py:run_perception_pipeline` is the CLI perception/analysis/risk route, with optional Grounding DINO semantic execution. It is not evidence that the REST camera path uses DINO.
-- `aegis/video/camera_sources.py` still contains an older `MultiCameraPipelineManager`; API routes import the newer manager from `aegis.camera`.
+- `hirzexa/video/camera_sources.py` still contains an older `MultiCameraPipelineManager`; API routes import the newer manager from `hirzexa.camera`.
 
-Redis Streams and an in-memory fallback exist in `aegis/core/events.py:EventBus`. Kafka/Celery infrastructure in the inspected execution paths: **Not found / not verified**.
+Redis Streams and an in-memory fallback exist in `hirzexa/core/events.py:EventBus`. Kafka/Celery infrastructure in the inspected execution paths: **Not found / not verified**.
 
 ## 2. Exact current event flow
 
@@ -97,30 +97,30 @@ Paths are repository-relative. Every row names the implementation and its commun
 
 | Stage and implementation | Input -> output | Communication / persistence | Failure behavior or limit |
 | --- | --- | --- | --- |
-| `aegis/api/routes/cameras.py:get_camera_manager`; `aegis/camera/manager.py:MultiCameraPipelineManager` | Camera configuration -> registered source | API calls; camera registry JSON, separated credential file | Restoration errors produce unavailable-source state; configuration changes reset analysis state |
-| `aegis/camera/base.py:OpenCVLoopCameraSource._capture_loop`; `aegis/camera/sources.py` | USB/RTSP/HTTP/file -> BGR NumPy frame | Capture thread callback; latest full frame and JPEG preview in memory | Open retries back off from 1 to 20 seconds; configured retry limit; five failed live reads trigger reconnect; finite video ends as stopped |
+| `hirzexa/api/routes/cameras.py:get_camera_manager`; `hirzexa/camera/manager.py:MultiCameraPipelineManager` | Camera configuration -> registered source | API calls; camera registry JSON, separated credential file | Restoration errors produce unavailable-source state; configuration changes reset analysis state |
+| `hirzexa/camera/base.py:OpenCVLoopCameraSource._capture_loop`; `hirzexa/camera/sources.py` | USB/RTSP/HTTP/file -> BGR NumPy frame | Capture thread callback; latest full frame and JPEG preview in memory | Open retries back off from 1 to 20 seconds; configured retry limit; five failed live reads trigger reconnect; finite video ends as stopped |
 | `MultiCameraPipelineManager._handle_frame` | Frame -> inference task | ThreadPoolExecutor, configured 1-4 workers, default 1 | Per-camera busy flag and 0.2-second submission interval skip frames; skips are not all counted as capture drops |
-| `ingest_browser_frame`; `aegis/camera/utils.py:decode_base64_frame` | Base64 image -> frame -> ingestion result | Synchronous call from browser-frame route | Decode errors rejected; no decoded-pixel cap found; this path bypasses the executor and can block its async request handler |
-| `aegis/detection/multi_model_detector.py:MultiModelDetector.detect`; `yolo_detector.py:YOLODetector`; `weapon_detector.py:WeaponDetector` | Frame -> `Detection` objects: xyxy bbox, class, confidence, source, flags | Direct model calls; no detection table | Base-model load/inference failures propagate to caller; optional weapon model can disable itself and return no detections |
-| `aegis/tracking/bytetrack_tracker.py:ByteTrackTracker` | Detections -> tracks with IDs and detection attributes | Per-camera in-process tracker | Empty frames advance tracker; reset loses identity; no durable identity epoch |
-| `aegis/analysis/track_history.py:TrackHistoryManager`; `motion_analyzer.py`; behavior/crowd analyzers | Tracks -> trajectory, displacement, behavior, density | In-memory history | Sample/frame-rate dependent; history bounded and stale tracks removed; no persistent observation trajectory found |
-| `aegis/risk/risk_engine.py:RiskEngine.compute_risk`; association/aggression engines; `FrameIngestionService._build_evidence` | Track analyses -> scores, reasons, association, confirmation | Direct calls, per-camera memory | Multiple override layers; missing model signals are not positive evidence; confidence and geometry can nevertheless escalate severity |
+| `ingest_browser_frame`; `hirzexa/camera/utils.py:decode_base64_frame` | Base64 image -> frame -> ingestion result | Synchronous call from browser-frame route | Decode errors rejected; no decoded-pixel cap found; this path bypasses the executor and can block its async request handler |
+| `hirzexa/detection/multi_model_detector.py:MultiModelDetector.detect`; `yolo_detector.py:YOLODetector`; `weapon_detector.py:WeaponDetector` | Frame -> `Detection` objects: xyxy bbox, class, confidence, source, flags | Direct model calls; no detection table | Base-model load/inference failures propagate to caller; optional weapon model can disable itself and return no detections |
+| `hirzexa/tracking/bytetrack_tracker.py:ByteTrackTracker` | Detections -> tracks with IDs and detection attributes | Per-camera in-process tracker | Empty frames advance tracker; reset loses identity; no durable identity epoch |
+| `hirzexa/analysis/track_history.py:TrackHistoryManager`; `motion_analyzer.py`; behavior/crowd analyzers | Tracks -> trajectory, displacement, behavior, density | In-memory history | Sample/frame-rate dependent; history bounded and stale tracks removed; no persistent observation trajectory found |
+| `hirzexa/risk/risk_engine.py:RiskEngine.compute_risk`; association/aggression engines; `FrameIngestionService._build_evidence` | Track analyses -> scores, reasons, association, confirmation | Direct calls, per-camera memory | Multiple override layers; missing model signals are not positive evidence; confidence and geometry can nevertheless escalate severity |
 | `FrameIngestionService._maybe_generate_detection_event` | Verified/candidate track state -> detection event dictionary | Runtime deque and `APIState` | Lifetime dedup set grows until reset; low-level history is lost on restart |
-| `aegis/alerts/alert_manager.py:AlertManager.process_risk` | Track risk + cooldown key -> Alert or None | Console/file/API queue; in-memory history, persisted cooldown lookup | Queue capacity 100 by default; suppression precedes incident update; no escalation bypass; no durable delivery retry worker found |
-| `FrameIngestionService._persist_event`; `aegis/database/repositories.py:EventRepository` | Event dictionary + image -> `Event` row / snapshot | Filesystem JPEG plus SQLAlchemy transaction | Snapshot and database can fail independently; no atomic file/database transaction or durable recovery protocol |
-| `aegis/intelligence/incident_correlation.py:IncidentCorrelationService.correlate_event` | Existing Event -> new/updated Incident | SQLAlchemy, same-camera candidate lookup | Best-effort attachment; matching can be coarse; no scheduled expiration worker found |
-| `aegis/api/routes/events.py`, `alerts.py`; `aegis/api/state.py:APIState` | Stored/runtime objects -> API JSON | REST; runtime event deque max 100 | Some endpoints fall back to runtime data after database errors; not equivalent to durable history |
-| `aegis/api/websocket.py`; camera routes' WebSocket handlers | Runtime snapshots/previews -> JSON/JPEG messages | WebSocket, handshake authentication | Reconnection does not use a durable resume cursor; finite runtime history can omit outage events |
-| `frontend/src/hooks/use-aegis-api.ts`; `components/dashboard/operator-dashboard.tsx`; `components/events/activity-alerts-workspace.tsx` | REST data -> operator UI | Primarily polling; camera preview/events sockets separately | Client schema drift and event/alert mixing affect presentation; successful rendering is not delivery acknowledgment |
+| `hirzexa/alerts/alert_manager.py:AlertManager.process_risk` | Track risk + cooldown key -> Alert or None | Console/file/API queue; in-memory history, persisted cooldown lookup | Queue capacity 100 by default; suppression precedes incident update; no escalation bypass; no durable delivery retry worker found |
+| `FrameIngestionService._persist_event`; `hirzexa/database/repositories.py:EventRepository` | Event dictionary + image -> `Event` row / snapshot | Filesystem JPEG plus SQLAlchemy transaction | Snapshot and database can fail independently; no atomic file/database transaction or durable recovery protocol |
+| `hirzexa/intelligence/incident_correlation.py:IncidentCorrelationService.correlate_event` | Existing Event -> new/updated Incident | SQLAlchemy, same-camera candidate lookup | Best-effort attachment; matching can be coarse; no scheduled expiration worker found |
+| `hirzexa/api/routes/events.py`, `alerts.py`; `hirzexa/api/state.py:APIState` | Stored/runtime objects -> API JSON | REST; runtime event deque max 100 | Some endpoints fall back to runtime data after database errors; not equivalent to durable history |
+| `hirzexa/api/websocket.py`; camera routes' WebSocket handlers | Runtime snapshots/previews -> JSON/JPEG messages | WebSocket, handshake authentication | Reconnection does not use a durable resume cursor; finite runtime history can omit outage events |
+| `frontend/src/hooks/use-hirzexa-api.ts`; `components/dashboard/operator-dashboard.tsx`; `components/events/activity-alerts-workspace.tsx` | REST data -> operator UI | Primarily polling; camera preview/events sockets separately | Client schema drift and event/alert mixing affect presentation; successful rendering is not delivery acknowledgment |
 
 ## 4. Already implemented
 
-- Real detection contracts with model-source metadata and optional weapon-model capability reporting: `aegis/detection/yolo_detector.py:Detection`, `WeaponDetector`, `MultiModelDetector`.
+- Real detection contracts with model-source metadata and optional weapon-model capability reporting: `hirzexa/detection/yolo_detector.py:Detection`, `WeaponDetector`, `MultiModelDetector`.
 - Per-camera tracking, histories, velocity/direction-like features and geometric object association: `ByteTrackTracker`, `TrackHistoryManager`, `MotionAnalyzer`, `PersonWeaponAssociationEngine`.
-- Temporal/pair confirmation and explanations: `aegis/risk/weapon_aggression.py:WeaponAggressionEngine`, `FrameIngestionService._build_evidence`.
-- Persistent event/evidence records, incidents, operational alerts, lifecycle updates and audits: `aegis/database/models.py:Event`, `Incident`, `OperationalAlert`; `IncidentCorrelationService`; `aegis/audit/service.py:record_audit`.
-- Snapshot serving with a resolved-path containment check: `aegis/api/routes/events.py` snapshot endpoint.
-- Shared-key API enforcement, short-lived WebSocket credentials and readiness checks: `aegis/api/security.py:verify_api_key`, `aegis/api/routes/health.py`.
+- Temporal/pair confirmation and explanations: `hirzexa/risk/weapon_aggression.py:WeaponAggressionEngine`, `FrameIngestionService._build_evidence`.
+- Persistent event/evidence records, incidents, operational alerts, lifecycle updates and audits: `hirzexa/database/models.py:Event`, `Incident`, `OperationalAlert`; `IncidentCorrelationService`; `hirzexa/audit/service.py:record_audit`.
+- Snapshot serving with a resolved-path containment check: `hirzexa/api/routes/events.py` snapshot endpoint.
+- Shared-key API enforcement, short-lived WebSocket credentials and readiness checks: `hirzexa/api/security.py:verify_api_key`, `hirzexa/api/routes/health.py`.
 
 These are reusable foundations, not reasons to create a second competing incident subsystem.
 
@@ -128,10 +128,10 @@ These are reusable foundations, not reasons to create a second competing inciden
 
 - Correlation already groups events, but is downstream of risk/alerts and consumes selected events rather than observations: `IncidentCorrelationService.correlate_event`.
 - Evidence includes snapshot, bounding box, timestamps, metadata, factors and explanation on serious events. `FrameIngestionService._maybe_generate_alert` sets `clip_path=None`; model outputs are selected metadata, not an immutable, complete inference record.
-- `aegis/recording/risk_recorder.py:RiskRecorder` has a five-second nominal pre-buffer, risk-triggered recording, MP4 output and JSON metadata. `MultiCameraRecorder` exists. Integration from the active camera/incident path was **Not found / not verified**; class presence does not mean incident clips are being recorded.
-- `aegis/semantic/query_engine.py:SemanticQueryEngine` implements keyword/concept matching over live tracks/events, not general semantic search across stored video. `main.py:run_perception_pipeline` separately supports optional DINO. `aegis/fusion/risk_fusion.py:RiskFusionEngine` has CLIP/SAM/depth/action execution stubs returning no result, not operational multimodal validation.
+- `hirzexa/recording/risk_recorder.py:RiskRecorder` has a five-second nominal pre-buffer, risk-triggered recording, MP4 output and JSON metadata. `MultiCameraRecorder` exists. Integration from the active camera/incident path was **Not found / not verified**; class presence does not mean incident clips are being recorded.
+- `hirzexa/semantic/query_engine.py:SemanticQueryEngine` implements keyword/concept matching over live tracks/events, not general semantic search across stored video. `main.py:run_perception_pipeline` separately supports optional DINO. `hirzexa/fusion/risk_fusion.py:RiskFusionEngine` has CLIP/SAM/depth/action execution stubs returning no result, not operational multimodal validation.
 - Operator lifecycle persistence exists in `IncidentRepository.set_lifecycle_status`; a complete confirm/escalate/note workflow with authenticated operator identity and matching dashboard controls was **Not found / not verified**.
-- Observability modules and API health exist (`aegis/video/metrics.py`, `aegis/api/routes/metrics.py`, `aegis/intelligence/observability/telemetry.py`); complete timestamp-linked camera-to-operator latency accounting was **Not found / not verified**.
+- Observability modules and API health exist (`hirzexa/video/metrics.py`, `hirzexa/api/routes/metrics.py`, `hirzexa/intelligence/observability/telemetry.py`); complete timestamp-linked camera-to-operator latency accounting was **Not found / not verified**.
 
 ## 6. Missing foundations and concept separation
 
@@ -145,17 +145,17 @@ These are reusable foundations, not reasons to create a second competing inciden
 | RiskAssessment | Versioned reasoning about an incident | Scores/factors are embedded in events/incidents; independent append-only assessment entity **Not found / not verified** |
 | Alert | A delivery/review decision about an assessment transition | `OperationalAlert` is separate, but the camera path uses the alert's identifier for the event/evidence chain and dispatches first |
 
-Sources: `aegis/database/models.py:Event/Incident/OperationalAlert`, `IncidentCorrelationService`, `FrameIngestionService._maybe_generate_alert`. Explicit participants with role/confidence, versioned domain envelopes, immutable assessment history, durable delivery outbox and cross-camera identity mapping: **Not found / not verified** in these paths.
+Sources: `hirzexa/database/models.py:Event/Incident/OperationalAlert`, `IncidentCorrelationService`, `FrameIngestionService._maybe_generate_alert`. Explicit participants with role/confidence, versioned domain envelopes, immutable assessment history, durable delivery outbox and cross-camera identity mapping: **Not found / not verified** in these paths.
 
 ## 7. Critical architectural problems
 
 ### Different paths mean different safety policy
 
-`aegis/pipeline/risk_scoring.py:RiskScoringStage` marks a sufficiently confident unassociated weapon MEDIUM/concerning; `AlertingStage.process` can emit `risk_alert` events for concerning results even when an operational alert is not dispatched. Persistence accepts HIGH/CRITICAL or score >=0.7; `_trigger_alert` dispatches only CRITICAL or score >=0.85. Ordinary base-risk events without a threat event type do not share the specialized threat cooldown and can generate per-frame event IDs. Camera ingestion uses different gates. These differences undermine one consistent incident definition.
+`hirzexa/pipeline/risk_scoring.py:RiskScoringStage` marks a sufficiently confident unassociated weapon MEDIUM/concerning; `AlertingStage.process` can emit `risk_alert` events for concerning results even when an operational alert is not dispatched. Persistence accepts HIGH/CRITICAL or score >=0.7; `_trigger_alert` dispatches only CRITICAL or score >=0.85. Ordinary base-risk events without a threat event type do not share the specialized threat cooldown and can generate per-frame event IDs. Camera ingestion uses different gates. These differences undermine one consistent incident definition.
 
 ### Redis does not currently make the stages durable
 
-`DetectionStage.process` consumes/produces `_frame` as a NumPy array. `TrackingStage.process` passes raw track-analysis/history objects, and `RiskScoringStage` also carries process-local objects. `aegis/core/events.py:_serialize` uses MessagePack without serializers for those objects. The in-memory mode can conceal this boundary problem.
+`DetectionStage.process` consumes/produces `_frame` as a NumPy array. `TrackingStage.process` passes raw track-analysis/history objects, and `RiskScoringStage` also carries process-local objects. `hirzexa/core/events.py:_serialize` uses MessagePack without serializers for those objects. The in-memory mode can conceal this boundary problem.
 
 `EventBus` uses consumer-group reads for new messages, but pending-message reclaim, durable replay and a disk spool were **Not found / not verified**. The fallback deque is bounded at 10,000 and pops on read before successful processing. Publish/read failures do not implement a consistent reconnect-and-reconcile protocol. Subclass stage methods can catch a processing error and return no outputs, after which `PipelineStage._loop` acknowledges the input. Safety-critical delivery is therefore not guaranteed.
 
@@ -175,16 +175,16 @@ Sources: `aegis/database/models.py:Event/Incident/OperationalAlert`, `IncidentCo
 
 ## 9. Data model and migration problems
 
-`aegis/database/models.py` currently provides:
+`hirzexa/database/models.py` currently provides:
 
 - `Event`: unique nullable external event ID, camera/track keys, score/level, factors, bounding box, snapshot/clip fields and metadata. Incident ID is a string link, not a complete normalized provenance graph.
 - `Incident`: one `camera_id`, primary/related track IDs, zone, start/last-seen, risk/peak score, processing/lifecycle states and JSON arrays of event/alert/evidence IDs.
 - `OperationalAlert`: durable alert/event links, risk, cooldown, acknowledgment and delivery fields. The older `Alert` model also remains; it is not the primary camera operational-alert persistence path.
-- `TrackStats`: integer track ID primary key without camera/session namespace. `aegis/database/repository.py` contains aggregate save/get methods; active ingestion of full persistent track histories was **Not found / not verified**.
+- `TrackStats`: integer track ID primary key without camera/session namespace. `hirzexa/database/repository.py` contains aggregate save/get methods; active ingestion of full persistent track histories was **Not found / not verified**.
 
 Problems: identity collisions across resets; JSON relationship arrays without strong referential guarantees; evidence/event identity conflation; no independent assessment versions; one-camera incident assumption; current versus peak severity ambiguity; and unrestricted lifecycle transitions in `IncidentRepository.set_lifecycle_status`.
 
-Schema management is split between `aegis/database/connection.py:create_tables`, `init.sql`, and Alembic. The first migration creates knowledge tables, while `20260802_02_persistent_evidence.py:upgrade` assumes `events` already exists. The isolated blank-database failure confirms that Alembic alone cannot bootstrap that database. `create_all` is not an upgrade mechanism for existing tables. A safe adoption/baseline procedure for existing installations is needed before adding domain tables. The deprecated `aegis/db` package explicitly points to `aegis.database`; it should not become a new write path.
+Schema management is split between `hirzexa/database/connection.py:create_tables`, `init.sql`, and Alembic. The first migration creates knowledge tables, while `20260802_02_persistent_evidence.py:upgrade` assumes `events` already exists. The isolated blank-database failure confirms that Alembic alone cannot bootstrap that database. `create_all` is not an upgrade mechanism for existing tables. A safe adoption/baseline procedure for existing installations is needed before adding domain tables. The deprecated `hirzexa/db` package explicitly points to `hirzexa.database`; it should not become a new write path.
 
 ## 10. Current correlation coverage and gaps
 
@@ -198,13 +198,13 @@ Schema management is split between `aegis/database/connection.py:create_tables`,
 | Evidence/risk | Same service + `IncidentRepository` | Appends existing IDs/factors; severity/score preserve maximum, not a new contextual assessment |
 | Cross-camera | Incident has one camera scalar | Cross-camera event correlation or ReID **Not found / not verified** |
 
-Zone-only matching can merge unrelated situations. There is no general spatial-distance/event-compatibility model in incident matching. Default idle expiration is five minutes, invoked by correlation and an intelligence-context read path (`aegis/intelligence/context_service.py`), not by a verified scheduler. Under-review cases are exempt from the ordinary open/acknowledged expiration filter. Separate physical inactivity from operator case closure.
+Zone-only matching can merge unrelated situations. There is no general spatial-distance/event-compatibility model in incident matching. Default idle expiration is five minutes, invoked by correlation and an intelligence-context read path (`hirzexa/intelligence/context_service.py`), not by a verified scheduler. Under-review cases are exempt from the ordinary open/acknowledged expiration filter. Separate physical inactivity from operator case closure.
 
 ## 11. Tracking and association audit
 
 `ByteTrackTracker` wraps supervision ByteTrack with defaults activation 0.25, lost-track buffer 30, matching 0.3 and nominal frame rate 30. Those are tracker-update parameters, not a promise of one second of wall-clock survival under a five-FPS analyzed stream. It maintains detection metadata and matches returned tracks to class/bbox data. Its metadata map is not pruned with every lost track; `get_track_count` can count historical metadata. Reset clears identity without a persistent epoch.
 
-`aegis/tracking/deepsort_tracker.py:DeepSortTracker` is an alternative used by the stream tracking fallback for unavailable ByteTrack imports. Defaults include max age 30, three initial observations, cosine distance 0.3 and IoU distance 0.7. Its output construction does not preserve all the weapon/category/source fields of the enhanced ByteTrack contract. End-to-end metadata parity is required before treating the fallback as equivalent.
+`hirzexa/tracking/deepsort_tracker.py:DeepSortTracker` is an alternative used by the stream tracking fallback for unavailable ByteTrack imports. Defaults include max age 30, three initial observations, cosine distance 0.3 and IoU distance 0.7. Its output construction does not preserve all the weapon/category/source fields of the enhanced ByteTrack contract. End-to-end metadata parity is required before treating the fallback as equivalent.
 
 `TrackHistoryManager` defaults to 60 positions and removal after 90 stale processed frames. It has timestamps, centers, bounding boxes and cumulative image displacement. `MotionAnalyzer` derives velocity, acceleration and direction from sample displacement, not calibrated meters/second. There is no durable complete trajectory in the active ingestion path.
 
@@ -223,7 +223,7 @@ These are alternative/layered policies, not one coherent probability model. A va
 
 ### Base behavior risk
 
-Sources: `aegis/risk/risk_engine.py:RiskWeights/RiskEngine.compute_risk`, `risk_types.py:RiskThresholds`, `zone_context.py`, `temporal_model.py:TemporalConfig`.
+Sources: `hirzexa/risk/risk_engine.py:RiskWeights/RiskEngine.compute_risk`, `risk_types.py:RiskThresholds`, `zone_context.py`, `temporal_model.py:TemporalConfig`.
 
 | Factor | Default weight / calculation |
 | --- | --- |
@@ -256,7 +256,7 @@ Detection confidence is explicitly multiplied into risk here. Even stable high-c
 
 ### Weapon/aggression context
 
-Source: `aegis/risk/weapon_aggression.py:WeaponAggressionConfig/WeaponAggressionEngine`.
+Source: `hirzexa/risk/weapon_aggression.py:WeaponAggressionConfig/WeaponAggressionEngine`.
 
 - Close normalized box gap <=0.22; shrinking gap >=0.025; fast motion / body diagonal >=0.055; approach cosine >=0.45.
 - Association normally confirms after two frames. One-frame override requires weapon confidence >=0.90 and association >=0.80 with overlap/containment.
@@ -288,32 +288,32 @@ Unifying policies must cover camera, stream, analyze, edge and CLI entry points,
 | Snapshot/clip failure | Snapshot and DB persistence can diverge; active clip linkage not found | Artifact state machine, retry/quota, explicit missing evidence |
 | Queue overflow/restart | Alert queue bounded; volatile state can be lost | Durable alert intent, per-channel attempt state and restart recovery |
 
-Current latency identification: manager submission interval 0.2 seconds caps ordinary per-camera analysis at roughly five submissions/second before model cost; this is not measured throughput. Browser frames bypass that control. Preview and analysis FPS are different. `APIState` retains 100 recent events; ingestion has 1,000-entry deques. Default alert API queue is 100. Dashboard polling adds seconds of potential visibility delay independently of inference (`use-aegis-api.ts`); general WebSocket snapshots loop around 0.5 seconds (`aegis/api/websocket.py`). Real end-to-end percentile latency: **Not found / not verified**.
+Current latency identification: manager submission interval 0.2 seconds caps ordinary per-camera analysis at roughly five submissions/second before model cost; this is not measured throughput. Browser frames bypass that control. Preview and analysis FPS are different. `APIState` retains 100 recent events; ingestion has 1,000-entry deques. Default alert API queue is 100. Dashboard polling adds seconds of potential visibility delay independently of inference (`use-hirzexa-api.ts`); general WebSocket snapshots loop around 0.5 seconds (`hirzexa/api/websocket.py`). Real end-to-end percentile latency: **Not found / not verified**.
 
 Proposed measurements: captured/accepted/analyzed/dropped frames by reason; inference and queue-wait p50/p95/p99; event and incident creation latency; DB commit latency/failures; outbox age/retries; camera disconnect duration; model availability; tracker resets/ID switches; buffer bytes; evidence completeness; alert transition/suppression counts; delivery-to-ack latency; reviewed false positives per camera-hour. Carry capture, receive, inference start/end, observation commit, assessment commit, dispatch and UI receive timestamps. Avoid track/incident IDs as unbounded metric labels.
 
 Deployment findings:
 
 - Root `docker-compose.yml` publishes database/cache/application ports and includes default database credentials; Redis has no configured authentication. Published ports are not loopback-restricted by that file.
-- `deploy/docker-compose.yml` plus `deploy/nginx.conf` provide reverse-proxy/TLS structure, but this is not proof of deployment security. The camera credential production guard relies on Aegis-specific environment flags, not just frontend `NODE_ENV`.
+- `deploy/docker-compose.yml` plus `deploy/nginx.conf` provide reverse-proxy/TLS structure, but this is not proof of deployment security. The camera credential production guard relies on Hirzexa-specific environment flags, not just frontend `NODE_ENV`.
 - `Dockerfile` runs the API as non-root and preloads a base model, but startup does not supply a verified schema-upgrade workflow; liveness is not successful inference/persistence readiness.
-- `aegis/api/routes/health.py` readiness checks include credentials/database/model files/evidence storage. File presence/import success does not prove a functioning inference-to-alert loop.
+- `hirzexa/api/routes/health.py` readiness checks include credentials/database/model files/evidence storage. File presence/import success does not prove a functioning inference-to-alert loop.
 - `.github/workflows/ci.yml` runs unit/integration Python tests, not the separate security directory or frontend suite; dependency safety checking is non-blocking (`|| true`). Build/smoke checks are not replay/load/fault tests.
 
 ## 14. Security and privacy
 
-Positive controls: `verify_api_key` fails closed when no server key is configured and uses constant-time comparison; evidence snapshot path containment is checked; camera URLs and credential storage are separated; WebSocket tokens are signed and short-lived. Sources: `aegis/api/security.py`, `aegis/api/routes/events.py`, `aegis/camera/credentials.py`.
+Positive controls: `verify_api_key` fails closed when no server key is configured and uses constant-time comparison; evidence snapshot path containment is checked; camera URLs and credential storage are separated; WebSocket tokens are signed and short-lived. Sources: `hirzexa/api/security.py`, `hirzexa/api/routes/events.py`, `hirzexa/camera/credentials.py`.
 
 Material gaps:
 
 1. `frontend/src/app/api/backend/[...path]/route.ts` forwards broad HTTP methods/paths while injecting the server API key and internal HMAC marker. Caller authentication, role checks and origin enforcement were **Not found / not verified**. `frontend/src/middleware.ts` performs locale handling and excludes API routes. Thus the shared backend key does not protect callers arriving through this proxy. Valid internal proxy signatures bypass backend IP rate limiting in `GlobalRateLimitMiddleware`, so caller-facing limits are also needed.
-2. `aegis/cloud/cloud_server.py:analyze_event` accepts `x_api_key` but does not validate it. This is a separate optional service, not the main secured API. Do not expose it as authenticated cloud analysis.
+2. `hirzexa/cloud/cloud_server.py:analyze_event` accepts `x_api_key` but does not validate it. This is a separate optional service, not the main secured API. Do not expose it as authenticated cloud analysis.
 3. Main API authorization is a shared key, not camera/evidence-specific roles or authenticated operator identities. Tenant isolation: **Not found / not verified**. Single-owner localhost deployment does not require a tenancy platform, but LAN/public exposure must be a deliberate later step.
 4. WebSocket credentials authorize at handshake and are not scoped to a particular user/camera; ongoing revocation, origin restrictions and per-resource authorization were **Not found / not verified** in the inspected handlers.
 5. `CameraCredentialStorage` uses plaintext local JSON in development. Its production guard applies to saving, not proof that previously saved plaintext cannot be loaded. POSIX permission-setting is not an audited Windows ACL policy. Use Windows credential protection for this target.
 6. `validate_stream_url` checks scheme/hostname, not allowed destinations. Camera connection and uploaded-path capabilities need intentional LAN/device/path scope. Do not blanket-block private addresses, because local cameras need them; enforce an operator-controlled allowlist instead.
 7. Camera upload copies data after extension checks without an explicit application-level size quota. Recording routes trust stored recording paths more broadly than the snapshot root check. Exploitability beyond authorized inputs was **Not verified**; constrain path roots, upload bytes, decoded pixels and processing time.
-8. `aegis/audit/service.py:record_audit` is best-effort, and `x_aegis_actor` is a caller-provided label, not trusted identity. Complete recording-access auditing, tamper-evident audit retention, encryption-at-rest policy and video deletion/retention enforcement were **Not found / not verified**.
+8. `hirzexa/audit/service.py:record_audit` is best-effort, and `x_hirzexa_actor` is a caller-provided label, not trusted identity. Complete recording-access auditing, tamper-evident audit retention, encryption-at-rest policy and video deletion/retention enforcement were **Not found / not verified**.
 9. Local snapshots/recordings contain sensitive people/video. Generic privacy helpers elsewhere do not establish video masking, consent, retention or safe external-AI egress in the camera path.
 
 Local-PC baseline proposal: bind services to loopback, keep database/cache ports unpublished, validate Host/Origin and mutation requests, protect proxy access, restrict camera destinations and evidence roots, enforce quotas, store secrets with OS protection, and keep external video/model calls off unless explicitly configured. This is a technical proposal, not a jurisdiction-specific legal compliance assessment.
@@ -341,7 +341,7 @@ Some tests enforce the very policies the requested redesign should reconsider: o
 
 Frontend static findings needing contract tests:
 
-- `frontend/src/lib/evidence-api.ts:incidentSchema` accepts only `active`/`resolved`, while backend incident presentation includes operator lifecycle statuses such as `open`, `acknowledged`, `under_review`, and `false_positive`. `AegisVoiceCore.tsx` consumes this client. The separate schema in `lib/schemas.ts` accepts arbitrary status strings, so the mismatch is specific, not universal.
+- `frontend/src/lib/evidence-api.ts:incidentSchema` accepts only `active`/`resolved`, while backend incident presentation includes operator lifecycle statuses such as `open`, `acknowledged`, `under_review`, and `false_positive`. `HirzexaVoiceCore.tsx` consumes this client. The separate schema in `lib/schemas.ts` accepts arbitrary status strings, so the mismatch is specific, not universal.
 - `frontend/src/lib/activity-alerts.ts:buildActivityAlertItems` builds its displayed items from events even when operational alerts are supplied; alert data only helps related context. It groups with camera-level keys and treats acknowledged as resolved. This can hide distinctions between independent incidents and between acknowledgment and resolution.
 - `activity-alerts-workspace.tsx` provides camera/evidence navigation; a complete lifecycle-mutation UI was **Not found / not verified**.
 - `frontend/src/lib/config.ts` derives camera WebSocket URLs from configured API URLs; the relative default proxy URL cannot be used directly as an absolute URL. Socket operation with no explicit public backend URL needs a contract/browser test, not assumption.
@@ -497,8 +497,8 @@ No item below has been implemented by this audit. File lists are intentionally p
 
 | Change | Reason | Existing files affected | New files / migration | Dependencies | API / frontend implication | Tests required |
 | --- | --- | --- | --- | --- | --- | --- |
-| P0.1 Establish one authoritative camera event path and policy contract | Current camera, pipeline, analyze, edge and CLI paths can emit different severities | `aegis/api/app.py`, `camera/manager.py`, `video/camera_sources.py`, `pipeline/startup.py`, `pipeline/*`, `api/routes/analyze.py`, `edge/*` | `aegis/intelligence/policy.py` or equivalent documented policy adapter | Inventory of callers; no new infrastructure | Mark alternate routes experimental or normalize their response contract; dashboard reads authority marker | End-to-end camera ingest; assert inactive stages receive no untyped frames; same fixture produces one policy result |
-| P0.2 Make migrations bootstrappable and protect existing data | Clean Alembic upgrade demonstrably fails; schema authority is split | `alembic/env.py`, `alembic/versions/*`, `aegis/database/connection.py`, `init.sql`, Docker startup docs | Correct baseline/reconciliation migration and upgrade runbook | Backup/restore dry run on a copy of local DB | Readiness exposes schema version/migration health | Blank DB, legacy DB copy, upgrade/downgrade policy, interrupted migration recovery |
+| P0.1 Establish one authoritative camera event path and policy contract | Current camera, pipeline, analyze, edge and CLI paths can emit different severities | `hirzexa/api/app.py`, `camera/manager.py`, `video/camera_sources.py`, `pipeline/startup.py`, `pipeline/*`, `api/routes/analyze.py`, `edge/*` | `hirzexa/intelligence/policy.py` or equivalent documented policy adapter | Inventory of callers; no new infrastructure | Mark alternate routes experimental or normalize their response contract; dashboard reads authority marker | End-to-end camera ingest; assert inactive stages receive no untyped frames; same fixture produces one policy result |
+| P0.2 Make migrations bootstrappable and protect existing data | Clean Alembic upgrade demonstrably fails; schema authority is split | `alembic/env.py`, `alembic/versions/*`, `hirzexa/database/connection.py`, `init.sql`, Docker startup docs | Correct baseline/reconciliation migration and upgrade runbook | Backup/restore dry run on a copy of local DB | Readiness exposes schema version/migration health | Blank DB, legacy DB copy, upgrade/downgrade policy, interrupted migration recovery |
 | P0.3 Introduce Observation, Evidence and RiskAssessment as distinct durable records | Current event/evidence/alert identity conflation prevents audit/replay | `database/models.py`, `repositories.py`, `video/camera_sources.py`, `events.py` | models/repositories/schema module; migration for six entity links | P0.2 | Versioned observation/event/incident DTOs; keep legacy adapter temporarily | Idempotent observation write; artifact link; rollback; legacy API contract tests |
 | P0.4 Correlate before assessment/alert and preserve suppressed evidence | Alert cooldown now blocks durable incident updates | `video/camera_sources.py`, `intelligence/incident_correlation.py`, `alerts/alert_manager.py` | `intelligence/correlation_engine.py`, `risk/assessment_service.py` | P0.3 | Events endpoint gains incident/revision; dashboard can show evolving case | HIGH then CRITICAL inside cooldown; 100-frame scene; restart/replay; unrelated same-zone scenes |
 | P0.5 Replace fixed cooldown with transition-aware durable outbox | Dispatch precedes durable truth; escalation can be lost | `alerts/alert_manager.py`, `database/models.py`, `repositories.py`, camera and pipeline alert callers | `alerts/outbox.py`; `alert_deliveries`/outbox migration | P0.3/P0.4 | Alert status separates pending/sent/failed/acknowledged; no "delivered" on enqueue | DB failure, dispatcher restart, duplicate delivery, queue full, escalation notification |

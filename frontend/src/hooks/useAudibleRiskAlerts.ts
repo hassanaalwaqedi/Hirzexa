@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { IntelligenceContext } from "@/lib/intelligence-context";
 
-const AUDIBLE_ALERTS_STORAGE_KEY = "aegis.intelligence.audible-risk-alerts.v1";
+const AUDIBLE_ALERTS_STORAGE_KEY = "hirzexa.intelligence.audible-risk-alerts.v1";
 const GLOBAL_SPEECH_COOLDOWN_MS = 45_000;
 const CRITICAL_REPEAT_COOLDOWN_MS = 60_000;
 

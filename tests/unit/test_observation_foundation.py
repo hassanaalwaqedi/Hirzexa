@@ -8,11 +8,11 @@ from datetime import datetime, timezone
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.database.connection import Base
-from aegis.database.models import Observation, RiskAssessment
-from aegis.database.repositories import ObservationRepository
-from aegis.video.camera_sources import FrameIngestionService
-import aegis.database.models  # noqa: F401 - register mappings on Base
+from hirzexa.database.connection import Base
+from hirzexa.database.models import Observation, RiskAssessment
+from hirzexa.database.repositories import ObservationRepository
+from hirzexa.video.camera_sources import FrameIngestionService
+import hirzexa.database.models  # noqa: F401 - register mappings on Base
 
 
 def test_observations_are_persisted_before_and_linked_to_a_later_event(monkeypatch, tmp_path):
@@ -25,7 +25,7 @@ def test_observations_are_persisted_before_and_linked_to_a_later_event(monkeypat
         with Session.begin() as session:
             yield session
 
-    import aegis.database.connection as connection
+    import hirzexa.database.connection as connection
 
     monkeypatch.setattr(connection, "get_db_session", session_provider)
     service = FrameIngestionService()

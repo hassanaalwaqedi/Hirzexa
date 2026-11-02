@@ -3,10 +3,10 @@ from types import SimpleNamespace
 import numpy as np
 
 from config import DetectionConfig
-from aegis.detection.multi_model_detector import MultiModelDetector
-from aegis.detection.weapon_detector import WeaponDetector
-from aegis.detection.yolo_detector import Detection
-from aegis.detection.yolo_detector import YOLODetector
+from hirzexa.detection.multi_model_detector import MultiModelDetector
+from hirzexa.detection.weapon_detector import WeaponDetector
+from hirzexa.detection.yolo_detector import Detection
+from hirzexa.detection.yolo_detector import YOLODetector
 
 
 class _FakeTensor:
@@ -185,8 +185,8 @@ def test_custom_weapon_capability_turns_off_after_runtime_failure(tmp_path):
 
 
 def test_custom_weapon_class_mapping_is_configurable_from_environment(monkeypatch):
-    monkeypatch.setenv("AEGIS_WEAPON_CLASS_NAMES_JSON", '{"0":"knife","1":"gun","2":"sharp object"}')
-    monkeypatch.setenv("AEGIS_WEAPON_INTERNAL_CLASS_IDS_JSON", '{"0":1000,"1":1001,"2":1002}')
+    monkeypatch.setenv("HIRZEXA_WEAPON_CLASS_NAMES_JSON", '{"0":"knife","1":"gun","2":"sharp object"}')
+    monkeypatch.setenv("HIRZEXA_WEAPON_INTERNAL_CLASS_IDS_JSON", '{"0":1000,"1":1001,"2":1002}')
 
     config = DetectionConfig()
 

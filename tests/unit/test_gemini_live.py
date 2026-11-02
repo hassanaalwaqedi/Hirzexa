@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
 
-from aegis.intelligence.context_schemas import (
+from hirzexa.intelligence.context_schemas import (
     AIContext,
     AlertsContext,
     Availability,
@@ -29,8 +29,8 @@ from aegis.intelligence.context_schemas import (
     SemanticContext,
     VoiceCapability,
 )
-from aegis.intelligence.live_schemas import BrowserVoiceEnvelope, LiveCitation, ServerVoiceEnvelope, UICommandKind
-from aegis.intelligence.live_service import (
+from hirzexa.intelligence.live_schemas import BrowserVoiceEnvelope, LiveCitation, ServerVoiceEnvelope, UICommandKind
+from hirzexa.intelligence.live_service import (
     GeminiLiveVoiceSession,
     LiveCapabilityError,
     LiveSessionManager,
@@ -38,9 +38,9 @@ from aegis.intelligence.live_service import (
     _voice_envelope_payload,
     get_live_capabilities,
 )
-from aegis.settings import GeminiLiveSettings
-from aegis.intelligence.live_tools import LiveToolRegistry, ToolNotAllowedError
-from aegis.api.routes.intelligence_live import ws_router
+from hirzexa.settings import GeminiLiveSettings
+from hirzexa.intelligence.live_tools import LiveToolRegistry, ToolNotAllowedError
+from hirzexa.api.routes.intelligence_live import ws_router
 
 
 def now() -> datetime:
@@ -384,8 +384,8 @@ def test_tool_allowlist_and_citation_validation_reject_unsafe_actions():
 
 
 def test_live_agent_exposes_only_bounded_internal_controls(monkeypatch):
-    from aegis.intelligence.agent_control import CameraControlResult
-    from aegis.intelligence import live_tools
+    from hirzexa.intelligence.agent_control import CameraControlResult
+    from hirzexa.intelligence import live_tools
 
     registry = LiveToolRegistry(
         session_id="session-control",

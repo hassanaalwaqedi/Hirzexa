@@ -12,7 +12,7 @@ import {
   useDeleteCameraMutation,
   useStartCameraMutation,
   useStopCameraMutation
-} from "@/hooks/use-aegis-api";
+} from "@/hooks/use-hirzexa-api";
 import type { Camera } from "@/types";
 
 const sourceLabels: Record<Camera["source_type"], string> = {

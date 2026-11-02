@@ -10,10 +10,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.database.connection import Base
-import aegis.database.models  # noqa: F401
-from aegis.knowledge.official_records import OFFICIAL_KNOWLEDGE
-from aegis.knowledge.service import SystemKnowledgeService
+from hirzexa.database.connection import Base
+import hirzexa.database.models  # noqa: F401
+from hirzexa.knowledge.official_records import OFFICIAL_KNOWLEDGE
+from hirzexa.knowledge.service import SystemKnowledgeService
 
 
 @pytest.fixture()
@@ -39,9 +39,9 @@ def local_knowledge_service(tmp_path):
 
 @pytest.fixture()
 def knowledge_client(monkeypatch, local_knowledge_service):
-    monkeypatch.setenv("AEGIS_API_KEY", "operator-key")
-    monkeypatch.setenv("AEGIS_ADMIN_API_KEY", "admin-key")
-    from aegis.api.routes import system_knowledge as knowledge_routes
+    monkeypatch.setenv("HIRZEXA_API_KEY", "operator-key")
+    monkeypatch.setenv("HIRZEXA_ADMIN_API_KEY", "admin-key")
+    from hirzexa.api.routes import system_knowledge as knowledge_routes
 
     monkeypatch.setattr(knowledge_routes, "get_system_knowledge_service", lambda: local_knowledge_service)
     app = FastAPI()
@@ -51,10 +51,10 @@ def knowledge_client(monkeypatch, local_knowledge_service):
 
 
 def test_public_search_is_authenticated_and_hides_sensitive_fields(knowledge_client):
-    response = knowledge_client.get("/api/system-knowledge/search?q=Who%20created%20Aegis%3F", headers={"X-API-Key": "operator-key"})
+    response = knowledge_client.get("/api/system-knowledge/search?q=Who%20created%20Hirzexa%3F", headers={"X-API-Key": "operator-key"})
     assert response.status_code == 200
     record = response.json()["records"][0]
-    assert record["key"] == "aegis.creator.profile"
+    assert record["key"] == "hirzexa.creator.profile"
     assert "id" not in record
     assert "source" not in record
     assert "created_by" not in record
@@ -70,7 +70,7 @@ def test_normal_user_cannot_modify_knowledge(knowledge_client):
 
 
 def test_admin_can_create_version_restore_and_view_audit(knowledge_client):
-    headers = {"X-API-Key": "operator-key", "X-Aegis-Admin-Key": "admin-key"}
+    headers = {"X-API-Key": "operator-key", "X-Hirzexa-Admin-Key": "admin-key"}
     created = knowledge_client.post(
         "/api/admin/system-knowledge", headers=headers,
         json={"key": "test.admin-record", "category": "project_profile", "title": "Test", "content": "Original", "source": "test"},
@@ -89,26 +89,26 @@ def test_admin_can_create_version_restore_and_view_audit(knowledge_client):
 
 
 def test_chat_and_voice_use_shared_database_retrieval(monkeypatch, local_knowledge_service):
-    monkeypatch.setenv("AEGIS_API_KEY", "operator-key")
-    import aegis.ai.orchestrator as orchestrator
-    import aegis.ai.routes as ai_routes
+    monkeypatch.setenv("HIRZEXA_API_KEY", "operator-key")
+    import hirzexa.ai.orchestrator as orchestrator
+    import hirzexa.ai.routes as ai_routes
 
     monkeypatch.setattr(orchestrator, "get_system_knowledge_service", lambda: local_knowledge_service)
     app = FastAPI()
     app.include_router(ai_routes.router)
     client = TestClient(app)
     headers = {"X-API-Key": "operator-key"}
-    chat = client.post("/api/ai/chat", headers=headers, json={"message": "Who created Aegis?"})
-    voice = client.post("/api/ai/voice", headers=headers, json={"text": "What did Hassan do in Aegis?"})
+    chat = client.post("/api/ai/chat", headers=headers, json={"message": "Who created Hirzexa?"})
+    voice = client.post("/api/ai/voice", headers=headers, json={"text": "What did Hassan do in Hirzexa?"})
     assert chat.status_code == 200 and "Hassan" in chat.json()["answer"]
     assert voice.status_code == 200 and "semantic evidence search" in voice.json()["answer"]
 
 
 def test_ai_context_exposes_only_safe_knowledge_capability_metadata(monkeypatch, local_knowledge_service):
-    monkeypatch.setenv("AEGIS_API_KEY", "operator-key")
-    import aegis.ai.routes as ai_routes
-    import aegis.intelligence.context_service as context_service
-    import aegis.knowledge.service as knowledge_service
+    monkeypatch.setenv("HIRZEXA_API_KEY", "operator-key")
+    import hirzexa.ai.routes as ai_routes
+    import hirzexa.intelligence.context_service as context_service
+    import hirzexa.knowledge.service as knowledge_service
 
     class Snapshot:
         def model_dump(self, **_kwargs):

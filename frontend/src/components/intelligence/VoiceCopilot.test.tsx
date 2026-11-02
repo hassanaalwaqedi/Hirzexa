@@ -45,7 +45,7 @@ const liveCapability = {
   inputTranscription: true,
   outputTranscription: true,
   pushToTalk: "live" as const,
-  websocketProtocol: "aegis-live-v1" as const,
+  websocketProtocol: "hirzexa-live-v1" as const,
 };
 
 beforeEach(() => {
@@ -77,15 +77,15 @@ describe("VoiceCopilot hands-free presence", () => {
     testState.fetchCapabilities.mockResolvedValue({ ...liveCapability, availability: "unavailable", reason: "GEMINI_API_KEY is not configured." });
     render(<VoiceCopilot contextAvailability="unavailable" contextReason="Live voice is unavailable." />);
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "Talk to Aegis" })).toBeDisabled());
-    expect(screen.getByText(/Voice is unavailable for this Aegis session/i)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Talk to Hirzexa" })).toBeDisabled());
+    expect(screen.getByText(/Voice is unavailable for this Hirzexa session/i)).toBeInTheDocument();
   });
 
   it("starts listening from one direct operator click", async () => {
     render(<VoiceCopilot contextAvailability="live" />);
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "Talk to Aegis" })).toBeEnabled());
-    fireEvent.click(screen.getByRole("button", { name: "Talk to Aegis" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Talk to Hirzexa" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Talk to Hirzexa" }));
     expect(testState.voice.startListening).toHaveBeenCalledOnce();
     expect(testState.voice.activate).not.toHaveBeenCalled();
   });
@@ -109,7 +109,7 @@ describe("VoiceCopilot hands-free presence", () => {
     await waitFor(() => expect(testState.callbacks).toBeTruthy());
     await act(async () => {
       testState.callbacks.onCitations([{ evidenceId: "camera:gate-2", kind: "camera", label: "Gate 2", availability: "live", observedAt: "2026-07-30T12:00:00.000Z" }]);
-      testState.callbacks.onTranscript({ speaker: "aegis", text: "Camera two is open.", isFinal: true });
+      testState.callbacks.onTranscript({ speaker: "hirzexa", text: "Camera two is open.", isFinal: true });
     });
     expect(screen.getByText("Camera two is open.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Gate 2" })).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe("VoiceCopilot hands-free presence", () => {
   it("keeps the single control unavailable while an active voice session owns the microphone", async () => {
     Object.assign(testState.voice, { sessionActive: true, voiceSessionState: "LISTENING" });
     render(<VoiceCopilot contextAvailability="live" />);
-    await waitFor(() => expect(screen.getByRole("button", { name: "Talk to Aegis" })).toBeDisabled());
-    expect(screen.getByText("Aegis is listening")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Talk to Hirzexa" })).toBeDisabled());
+    expect(screen.getByText("Hirzexa is listening")).toBeInTheDocument();
   });
 });

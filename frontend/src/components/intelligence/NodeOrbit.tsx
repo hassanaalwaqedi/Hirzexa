@@ -51,15 +51,15 @@ export default function NodeOrbit({ nodes, activeNodeId = null }: NodeOrbitProps
   const reducedMotion = useReducedMotion();
 
   return (
-    <div className="aegis-topology absolute inset-0" role="group" aria-label="Aegis capability network">
+    <div className="hirzexa-topology absolute inset-0" role="group" aria-label="Hirzexa capability network">
       <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         <defs>
-          <filter id="aegis-line-glow" x="-30%" y="-30%" width="160%" height="160%">
+          <filter id="hirzexa-line-glow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="0.22" result="blur" />
             <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
-        <g className="aegis-network-flow" filter="url(#aegis-line-glow)">
+        <g className="hirzexa-network-flow" filter="url(#hirzexa-line-glow)">
           {DECORATIVE_FLOWS.map((d) => <path key={d} d={d} />)}
         </g>
         {nodes.map((node) => {
@@ -73,7 +73,7 @@ export default function NodeOrbit({ nodes, activeNodeId = null }: NodeOrbitProps
                 stroke={highlighted ? tone : "rgba(56,214,255,0.48)"}
                 strokeWidth={highlighted ? 1.15 : 0.72}
                 vectorEffect="non-scaling-stroke"
-                filter={highlighted ? "url(#aegis-line-glow)" : undefined}
+                filter={highlighted ? "url(#hirzexa-line-glow)" : undefined}
                 strokeDasharray={highlighted ? "1.2 0.85" : undefined}
                 animate={reducedMotion || !highlighted ? undefined : { strokeDashoffset: [0, -5] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
@@ -92,18 +92,18 @@ export default function NodeOrbit({ nodes, activeNodeId = null }: NodeOrbitProps
           : availabilityLabel(node.availability);
         const nodeContent = (
           <>
-            <span className="aegis-node-icon" style={{ color: tone }}>{getIcon(node.icon)}</span>
-            <span className={`aegis-node-copy ${node.labelSide === "left" ? "aegis-node-copy-left" : "aegis-node-copy-right"}`}>
-              <span className="aegis-node-label">{node.label}</span>
-              <span className="aegis-node-sublabel">{node.sublabel}</span>
-              <span className="aegis-node-state">{availability}</span>
+            <span className="hirzexa-node-icon" style={{ color: tone }}>{getIcon(node.icon)}</span>
+            <span className={`hirzexa-node-copy ${node.labelSide === "left" ? "hirzexa-node-copy-left" : "hirzexa-node-copy-right"}`}>
+              <span className="hirzexa-node-label">{node.label}</span>
+              <span className="hirzexa-node-sublabel">{node.sublabel}</span>
+              <span className="hirzexa-node-state">{availability}</span>
             </span>
           </>
         );
         const common = {
           left: `${node.x}%`, top: `${node.y}%`, "--node-tone": tone,
         } as React.CSSProperties;
-        const classes = `aegis-capability-node ${highlighted ? "is-active" : ""}`;
+        const classes = `hirzexa-capability-node ${highlighted ? "is-active" : ""}`;
 
         return node.href ? (
           <motion.a

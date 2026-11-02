@@ -1,7 +1,7 @@
 "use client";
 
 import { createAuthenticatedWebSocket, resolveWebSocketUrl } from "@/lib/config";
-import { AegisClientError } from "@/lib/errors";
+import { HirzexaClientError } from "@/lib/errors";
 import { websocketMessageSchema } from "@/lib/schemas";
 import type { WebSocketConnectionState, WebSocketMessage } from "@/types";
 
@@ -11,7 +11,7 @@ type Listener = {
   onError: (error: Error) => void;
 };
 
-export class AegisWebSocketClient {
+export class HirzexaWebSocketClient {
   private socket?: WebSocket;
   private closedByConsumer = false;
   private reconnectAttempts = 0;
@@ -32,7 +32,7 @@ export class AegisWebSocketClient {
     if (!this.url) {
       this.listener.onStateChange("error");
       this.listener.onError(
-        new AegisClientError("WebSocket URL is not configured.", "WEBSOCKET_DISCONNECTED")
+        new HirzexaClientError("WebSocket URL is not configured.", "WEBSOCKET_DISCONNECTED")
       );
       return;
     }
@@ -65,7 +65,7 @@ export class AegisWebSocketClient {
 
         if (!parsed.success) {
           this.listener.onError(
-            new AegisClientError(
+            new HirzexaClientError(
               "Invalid WebSocket message schema.",
               "INVALID_RESPONSE_SCHEMA",
               undefined,
@@ -84,7 +84,7 @@ export class AegisWebSocketClient {
     this.socket.onerror = () => {
       this.listener.onStateChange("error");
       this.listener.onError(
-        new AegisClientError("WebSocket connection error.", "WEBSOCKET_DISCONNECTED")
+        new HirzexaClientError("WebSocket connection error.", "WEBSOCKET_DISCONNECTED")
       );
     };
 

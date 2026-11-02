@@ -16,8 +16,8 @@ export const voiceStateSchema = z.enum([
 
 export type VoiceState = z.infer<typeof voiceStateSchema>;
 
-/** Browser-side, event-derived state for the hands-free Aegis session. */
-export const aegisVoiceSessionStateSchema = z.enum([
+/** Browser-side, event-derived state for the hands-free Hirzexa session. */
+export const hirzexaVoiceSessionStateSchema = z.enum([
   "DISABLED",
   "ACTIVATING",
   "STANDBY",
@@ -32,13 +32,13 @@ export const aegisVoiceSessionStateSchema = z.enum([
   "ERROR",
 ]);
 
-export type AegisVoiceSessionState = z.infer<typeof aegisVoiceSessionStateSchema>;
+export type HirzexaVoiceSessionState = z.infer<typeof hirzexaVoiceSessionStateSchema>;
 export type WakeWordMode = "browser-recognition" | "session-listening" | "unavailable";
 
 /** Frontend-only presentation state; the backend never needs to emit it. */
-export const aegisVoiceCoreStateSchema = z.union([voiceStateSchema, z.literal("degraded")]);
+export const hirzexaVoiceCoreStateSchema = z.union([voiceStateSchema, z.literal("degraded")]);
 
-export type AegisVoiceCoreState = z.infer<typeof aegisVoiceCoreStateSchema>;
+export type HirzexaVoiceCoreState = z.infer<typeof hirzexaVoiceCoreStateSchema>;
 
 const citationSchema = z.object({
   evidenceId: z.string().min(1),
@@ -77,7 +77,7 @@ export const liveCapabilitiesSchema = z.object({
   inputSampleRate: z.number().int().min(8000).max(48000).optional().nullable(),
   outputSampleRate: z.number().int().min(8000).max(48000).optional().nullable(),
   pushToTalk: availabilitySchema,
-  websocketProtocol: z.literal("aegis-live-v1")
+  websocketProtocol: z.literal("hirzexa-live-v1")
 });
 
 export type LiveCapabilities = z.infer<typeof liveCapabilitiesSchema>;
@@ -100,7 +100,7 @@ export const serverVoiceEnvelopeSchema = z.object({
   sessionId: z.string().min(1).optional(),
   inputSampleRate: z.number().int().min(8000).max(48000).optional(),
   outputSampleRate: z.number().int().min(8000).max(48000).optional(),
-  speaker: z.enum(["operator", "aegis"]).optional(),
+  speaker: z.enum(["operator", "hirzexa"]).optional(),
   text: z.string().min(1).optional(),
   isFinal: z.boolean().optional(),
   turnId: z.string().min(1).optional().nullable(),
@@ -188,7 +188,7 @@ export async function closeLiveSession(sessionId: string) {
 }
 
 function liveWebSocketBase() {
-  const configured = process.env.NEXT_PUBLIC_AEGIS_LIVE_WS_URL || process.env.NEXT_PUBLIC_WS_URL;
+  const configured = process.env.NEXT_PUBLIC_HIRZEXA_LIVE_WS_URL || process.env.NEXT_PUBLIC_WS_URL;
   if (configured) return configured;
   if (typeof window === "undefined") return "";
 
@@ -198,7 +198,7 @@ function liveWebSocketBase() {
   // when 3000 is occupied), while FastAPI serves the Live gateway on 8080.
   // Use the IPv4 loopback address explicitly: on Windows `localhost` may
   // resolve to a stale IPv6 listener rather than this local API process.
-  // Deployed environments must configure NEXT_PUBLIC_AEGIS_LIVE_WS_URL.
+  // Deployed environments must configure NEXT_PUBLIC_HIRZEXA_LIVE_WS_URL.
   if (["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) && url.port !== "8080") {
     url.hostname = "127.0.0.1";
     url.port = "8080";

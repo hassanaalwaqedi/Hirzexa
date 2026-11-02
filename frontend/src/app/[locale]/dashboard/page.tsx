@@ -2,7 +2,7 @@
 
 import { AppShell } from "@/components/layout/app-shell";
 import { OperatorDashboard } from "@/components/dashboard/operator-dashboard";
-import { useAlertsQuery, useCamerasQuery, useEventsQuery, useIncidentsQuery, usePersistedEvidenceQuery, useStatusQuery } from "@/hooks/use-aegis-api";
+import { useAlertsQuery, useCamerasQuery, useEventsQuery, useIncidentsQuery, usePersistedEvidenceQuery, useStatusQuery } from "@/hooks/use-hirzexa-api";
 
 export default function DashboardPage() {
   const statusQuery = useStatusQuery();

@@ -4,18 +4,18 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: aegis_postgres
+    container_name: hirzexa_postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-aegis}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aegis_secret}
-      POSTGRES_DB: ${POSTGRES_DB:-aegisai}
+      POSTGRES_USER: ${POSTGRES_USER:-hirzexa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hirzexa_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-hirzexa}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "5432:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U aegis -d aegisai" ]
+      test: [ "CMD-SHELL", "pg_isready -U hirzexa -d hirzexa" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,7 +24,7 @@ services:
   # Redis for caching and sessions
   redis:
     image: redis:7-alpine
-    container_name: aegis_redis
+    container_name: hirzexa_redis
     ports:
       - "6379:6379"
     volumes:
@@ -36,47 +36,47 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # AegisAI Backend API
+  # Hirzexa Backend API
   api:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        AEGIS_DETECTION_MODEL_PATH: ${AEGIS_DETECTION_MODEL_PATH:-/app/models/yolo11n.pt}
-        AEGIS_THREAT_MODEL_PATH: ${AEGIS_THREAT_MODEL_PATH:-/app/models/yoloe-26n-seg.pt}
-        AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH: ${AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH:-/app/models/yoloe-26n-seg.threat-prompts.npz}
-    container_name: aegis_api
+        HIRZEXA_DETECTION_MODEL_PATH: ${HIRZEXA_DETECTION_MODEL_PATH:-/app/models/yolo11n.pt}
+        HIRZEXA_THREAT_MODEL_PATH: ${HIRZEXA_THREAT_MODEL_PATH:-/app/models/yoloe-26n-seg.pt}
+        HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH: ${HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH:-/app/models/yoloe-26n-seg.threat-prompts.npz}
+    container_name: hirzexa_api
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-aegis}:${POSTGRES_PASSWORD:-aegis_secret}@postgres:5432/${POSTGRES_DB:-aegisai}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-hirzexa}:${POSTGRES_PASSWORD:-hirzexa_secret}@postgres:5432/${POSTGRES_DB:-hirzexa}
       - REDIS_URL=redis://redis:6379/0
-      - AEGIS_API_KEY=${AEGIS_API_KEY:?AEGIS_API_KEY must be set}
-      - AEGIS_DEBUG=${AEGIS_DEBUG:-false}
-      - AEGIS_DEVICE=${AEGIS_DEVICE:-auto}
-      - AEGIS_DETECTION_MODEL_PATH=${AEGIS_DETECTION_MODEL_PATH:-/app/models/yolo11n.pt}
-      - AEGIS_DETECTION_HALF_PRECISION=${AEGIS_DETECTION_HALF_PRECISION:-false}
-      - AEGIS_WEAPON_MODEL_PATH=${AEGIS_WEAPON_MODEL_PATH:-/app/models/weapon_detector.pt}
-      - AEGIS_WEAPON_DETECTOR_ENABLED=${AEGIS_WEAPON_DETECTOR_ENABLED:-false}
-      - AEGIS_THREAT_DETECTOR_ENABLED=${AEGIS_THREAT_DETECTOR_ENABLED:-true}
-      - AEGIS_THREAT_DETECTOR_BACKEND=${AEGIS_THREAT_DETECTOR_BACKEND:-yoloe}
-      - AEGIS_THREAT_MODEL_PATH=${AEGIS_THREAT_MODEL_PATH:-/app/models/yoloe-26n-seg.pt}
-      - AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH=${AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH:-/app/models/yoloe-26n-seg.threat-prompts.npz}
-      - AEGIS_THREAT_CLASSES_JSON=${AEGIS_THREAT_CLASSES_JSON:-["handgun","pistol","revolver","rifle","shotgun","knife","machete","baseball bat","crowbar"]}
-      - AEGIS_THREAT_CONFIDENCE_THRESHOLD=${AEGIS_THREAT_CONFIDENCE_THRESHOLD:-0.35}
-      - AEGIS_THREAT_FRAME_SKIP=${AEGIS_THREAT_FRAME_SKIP:-3}
-      - AEGIS_THREAT_FUSION_ENABLED=${AEGIS_THREAT_FUSION_ENABLED:-true}
-      - AEGIS_THREAT_DEDUP_IOU_THRESHOLD=${AEGIS_THREAT_DEDUP_IOU_THRESHOLD:-0.55}
-      - AEGIS_THREAT_PERSON_EXPANSION_RATIO=${AEGIS_THREAT_PERSON_EXPANSION_RATIO:-0.25}
-      - AEGIS_THREAT_ASSOCIATION_MIN_SCORE=${AEGIS_THREAT_ASSOCIATION_MIN_SCORE:-0.45}
-      - AEGIS_THREAT_ASSOCIATION_WINNER_MARGIN=${AEGIS_THREAT_ASSOCIATION_WINNER_MARGIN:-0.08}
-      - AEGIS_THREAT_EVIDENCE_TTL_FRAMES=${AEGIS_THREAT_EVIDENCE_TTL_FRAMES:-9}
-      - AEGIS_THREAT_CONTINUITY_BONUS=${AEGIS_THREAT_CONTINUITY_BONUS:-0.08}
-      - AEGIS_ALLOWED_ORIGINS=${AEGIS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001}
-      - AEGIS_PIPELINE_AUTOSTART=${AEGIS_PIPELINE_AUTOSTART:-false}
-      - AEGIS_PIPELINE_WARM_MODEL=${AEGIS_PIPELINE_WARM_MODEL:-true}
-      - AEGIS_CAMERA_STREAM_FPS=${AEGIS_CAMERA_STREAM_FPS:-15}
-      - AEGIS_CAMERA_INFERENCE_FPS=${AEGIS_CAMERA_INFERENCE_FPS:-5}
-      - AEGIS_CAMERA_PREVIEW_MAX_WIDTH=${AEGIS_CAMERA_PREVIEW_MAX_WIDTH:-960}
-      - AEGIS_CAMERA_PREVIEW_JPEG_QUALITY=${AEGIS_CAMERA_PREVIEW_JPEG_QUALITY:-75}
+      - HIRZEXA_API_KEY=${HIRZEXA_API_KEY:?HIRZEXA_API_KEY must be set}
+      - HIRZEXA_DEBUG=${HIRZEXA_DEBUG:-false}
+      - HIRZEXA_DEVICE=${HIRZEXA_DEVICE:-auto}
+      - HIRZEXA_DETECTION_MODEL_PATH=${HIRZEXA_DETECTION_MODEL_PATH:-/app/models/yolo11n.pt}
+      - HIRZEXA_DETECTION_HALF_PRECISION=${HIRZEXA_DETECTION_HALF_PRECISION:-false}
+      - HIRZEXA_WEAPON_MODEL_PATH=${HIRZEXA_WEAPON_MODEL_PATH:-/app/models/weapon_detector.pt}
+      - HIRZEXA_WEAPON_DETECTOR_ENABLED=${HIRZEXA_WEAPON_DETECTOR_ENABLED:-false}
+      - HIRZEXA_THREAT_DETECTOR_ENABLED=${HIRZEXA_THREAT_DETECTOR_ENABLED:-true}
+      - HIRZEXA_THREAT_DETECTOR_BACKEND=${HIRZEXA_THREAT_DETECTOR_BACKEND:-yoloe}
+      - HIRZEXA_THREAT_MODEL_PATH=${HIRZEXA_THREAT_MODEL_PATH:-/app/models/yoloe-26n-seg.pt}
+      - HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH=${HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH:-/app/models/yoloe-26n-seg.threat-prompts.npz}
+      - HIRZEXA_THREAT_CLASSES_JSON=${HIRZEXA_THREAT_CLASSES_JSON:-["handgun","pistol","revolver","rifle","shotgun","knife","machete","baseball bat","crowbar"]}
+      - HIRZEXA_THREAT_CONFIDENCE_THRESHOLD=${HIRZEXA_THREAT_CONFIDENCE_THRESHOLD:-0.35}
+      - HIRZEXA_THREAT_FRAME_SKIP=${HIRZEXA_THREAT_FRAME_SKIP:-3}
+      - HIRZEXA_THREAT_FUSION_ENABLED=${HIRZEXA_THREAT_FUSION_ENABLED:-true}
+      - HIRZEXA_THREAT_DEDUP_IOU_THRESHOLD=${HIRZEXA_THREAT_DEDUP_IOU_THRESHOLD:-0.55}
+      - HIRZEXA_THREAT_PERSON_EXPANSION_RATIO=${HIRZEXA_THREAT_PERSON_EXPANSION_RATIO:-0.25}
+      - HIRZEXA_THREAT_ASSOCIATION_MIN_SCORE=${HIRZEXA_THREAT_ASSOCIATION_MIN_SCORE:-0.45}
+      - HIRZEXA_THREAT_ASSOCIATION_WINNER_MARGIN=${HIRZEXA_THREAT_ASSOCIATION_WINNER_MARGIN:-0.08}
+      - HIRZEXA_THREAT_EVIDENCE_TTL_FRAMES=${HIRZEXA_THREAT_EVIDENCE_TTL_FRAMES:-9}
+      - HIRZEXA_THREAT_CONTINUITY_BONUS=${HIRZEXA_THREAT_CONTINUITY_BONUS:-0.08}
+      - HIRZEXA_ALLOWED_ORIGINS=${HIRZEXA_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001}
+      - HIRZEXA_PIPELINE_AUTOSTART=${HIRZEXA_PIPELINE_AUTOSTART:-false}
+      - HIRZEXA_PIPELINE_WARM_MODEL=${HIRZEXA_PIPELINE_WARM_MODEL:-true}
+      - HIRZEXA_CAMERA_STREAM_FPS=${HIRZEXA_CAMERA_STREAM_FPS:-15}
+      - HIRZEXA_CAMERA_INFERENCE_FPS=${HIRZEXA_CAMERA_INFERENCE_FPS:-5}
+      - HIRZEXA_CAMERA_PREVIEW_MAX_WIDTH=${HIRZEXA_CAMERA_PREVIEW_MAX_WIDTH:-960}
+      - HIRZEXA_CAMERA_PREVIEW_JPEG_QUALITY=${HIRZEXA_CAMERA_PREVIEW_JPEG_QUALITY:-75}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.6-flash}
       - VLM_ENABLED=${VLM_ENABLED:-false}
@@ -125,16 +125,16 @@ services:
     restart: unless-stopped
 
   # Next.js dashboard. It owns the authenticated /api/backend proxy, so the
-  # browser never receives AEGIS_API_KEY.
+  # browser never receives HIRZEXA_API_KEY.
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: aegis_frontend
+    container_name: hirzexa_frontend
     environment:
       - NODE_ENV=production
-      - AEGIS_API_URL=http://api:8080
-      - AEGIS_API_KEY=${AEGIS_API_KEY:?AEGIS_API_KEY must be set}
+      - HIRZEXA_API_URL=http://api:8080
+      - HIRZEXA_API_KEY=${HIRZEXA_API_KEY:?HIRZEXA_API_KEY must be set}
     ports:
       - "3000:3000"
     depends_on:

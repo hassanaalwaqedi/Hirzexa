@@ -1,5 +1,5 @@
 """
-AegisAI - Alembic Migration Environment
+Hirzexa - Alembic Migration Environment
 
 Configures the migration context with the correct database URL
 and SQLAlchemy metadata for autogeneration.
@@ -16,10 +16,10 @@ from sqlalchemy import engine_from_config, pool
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import the SQLAlchemy Base that contains all model metadata
-from aegis.database.connection import Base
+from hirzexa.database.connection import Base
 
 # Import all models so they register with Base.metadata
-import aegis.database.models  # noqa: F401
+import hirzexa.database.models  # noqa: F401
 
 # This is the Alembic Config object
 config = context.config

@@ -6,16 +6,16 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from aegis.settings import VehicleEnrichmentSettings
-from aegis.video.evidence_deduplication import EvidenceDeduplicator
-from aegis.video.frame_quality import FrameQualityGate
-from aegis.video.metrics import VehicleMetrics, metrics_payload
-from aegis.video.plate_recognition import PlateRecognitionService, resolve_ocr_device
-from aegis.video.plate_validation import validate_turkish_plate
-from aegis.video.vehicle_color import VehicleColorService
-from aegis.video.vehicle_enrichment import VehicleEnrichmentScheduler, VehicleEnrichmentService
-from aegis.video.vehicle_make_model import LocalVehicleMakeModelService
-from aegis.video.vehicle_types import FrameQuality, OCRCandidate, PlateRecognitionResult, VehicleEnrichmentResult
+from hirzexa.settings import VehicleEnrichmentSettings
+from hirzexa.video.evidence_deduplication import EvidenceDeduplicator
+from hirzexa.video.frame_quality import FrameQualityGate
+from hirzexa.video.metrics import VehicleMetrics, metrics_payload
+from hirzexa.video.plate_recognition import PlateRecognitionService, resolve_ocr_device
+from hirzexa.video.plate_validation import validate_turkish_plate
+from hirzexa.video.vehicle_color import VehicleColorService
+from hirzexa.video.vehicle_enrichment import VehicleEnrichmentScheduler, VehicleEnrichmentService
+from hirzexa.video.vehicle_make_model import LocalVehicleMakeModelService
+from hirzexa.video.vehicle_types import FrameQuality, OCRCandidate, PlateRecognitionResult, VehicleEnrichmentResult
 
 
 def _sharp_image(width: int = 320, height: int = 180) -> np.ndarray:
@@ -151,15 +151,15 @@ def test_metrics_are_created_without_sensitive_labels() -> None:
     metrics.duration(0.001)
     payload, _ = metrics_payload()
     rendered = payload.decode("utf-8")
-    assert "aegis_vehicle_enrichment_requests_total" in rendered
+    assert "hirzexa_vehicle_enrichment_requests_total" in rendered
     assert "plate_text" not in rendered
     assert "camera_id" not in rendered
 
 
 def test_camera_ingestion_keeps_vehicle_sidecar_out_of_detection_and_risk_logic(monkeypatch) -> None:
     """Vehicle enrichment is post-risk and only its sanitised view is emitted."""
-    from aegis.analysis.analysis_types import BehaviorFlags, MotionState
-    from aegis.video.camera_sources import FrameIngestionService
+    from hirzexa.analysis.analysis_types import BehaviorFlags, MotionState
+    from hirzexa.video.camera_sources import FrameIngestionService
 
     service = FrameIngestionService()
     track = SimpleNamespace(

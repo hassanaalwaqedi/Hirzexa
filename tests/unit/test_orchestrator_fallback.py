@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from aegis.ai.orchestrator import AIOrchestrator
-from aegis.ai.schemas import Intent
+from hirzexa.ai.orchestrator import AIOrchestrator
+from hirzexa.ai.schemas import Intent
 
 
 def test_risk_fallback_summarizes_verified_high_priority_alerts(monkeypatch) -> None:
     monkeypatch.setattr(
-        "aegis.ai.tools.get_active_alerts",
+        "hirzexa.ai.tools.get_active_alerts",
         lambda limit: [
             {
                 "event_id": "risk-1",

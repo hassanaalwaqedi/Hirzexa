@@ -130,7 +130,7 @@ describe("audible Intelligence risk alerts", () => {
 
   it("keeps an opted-in alert preference and arms Gemini after the first post-reload interaction", async () => {
     const storedValues = installLocalStorage({
-      "aegis.intelligence.audible-risk-alerts.v1": JSON.stringify({ version: 1, enabled: true }),
+      "hirzexa.intelligence.audible-risk-alerts.v1": JSON.stringify({ version: 1, enabled: true }),
     });
     const prepareGeminiAudio = vi.fn(async () => true);
     const speakWithGemini = vi.fn(async () => "spoken" as const);
@@ -151,6 +151,6 @@ describe("audible Intelligence risk alerts", () => {
     });
     await waitFor(() => expect(prepareGeminiAudio).toHaveBeenCalledOnce());
     await waitFor(() => expect(speakWithGemini).toHaveBeenCalledWith("alert-high-1"));
-    expect(storedValues.get("aegis.intelligence.audible-risk-alerts.v1")).toContain("\"enabled\":true");
+    expect(storedValues.get("hirzexa.intelligence.audible-risk-alerts.v1")).toContain("\"enabled\":true");
   });
 });

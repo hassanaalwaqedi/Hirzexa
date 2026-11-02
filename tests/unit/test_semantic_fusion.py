@@ -1,5 +1,5 @@
 """
-AegisAI - Semantic Fusion Unit Tests
+Hirzexa - Semantic Fusion Unit Tests
 
 Tests for combining YOLO + tracking + DINO outputs.
 """
@@ -7,11 +7,11 @@ Tests for combining YOLO + tracking + DINO outputs.
 import pytest
 from unittest.mock import MagicMock
 
-from aegis.semantic.semantic_fusion import (
+from hirzexa.semantic.semantic_fusion import (
     SemanticFusion,
     UnifiedObjectIntelligence
 )
-from aegis.semantic.dino_engine import SemanticDetection
+from hirzexa.semantic.dino_engine import SemanticDetection
 
 
 class TestSemanticFusion:

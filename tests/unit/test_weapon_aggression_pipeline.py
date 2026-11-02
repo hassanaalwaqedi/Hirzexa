@@ -4,8 +4,8 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from aegis.pipeline.alerting import AlertingStage
-from aegis.pipeline.risk_scoring import RiskScoringStage
+from hirzexa.pipeline.alerting import AlertingStage
+from hirzexa.pipeline.risk_scoring import RiskScoringStage
 
 
 def _track(track_id, class_name, bbox, *, is_person=False, is_weapon=False, confidence=0.9):

@@ -9,7 +9,7 @@ import { createAuthenticatedWebSocket, resolveCameraWebSocketUrl } from "@/lib/c
 import { cameraWebSocketMessageSchema } from "@/lib/schemas";
 import { formatOperatorLabel, formatOperatorList } from "@/lib/data-format";
 import { formatTime } from "@/lib/utils";
-import { useCameraEventsQuery } from "@/hooks/use-aegis-api";
+import { useCameraEventsQuery } from "@/hooks/use-hirzexa-api";
 import type { Camera, RiskEvent } from "@/types";
 
 function eventKey(event: RiskEvent) {

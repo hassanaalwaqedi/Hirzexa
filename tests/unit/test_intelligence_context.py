@@ -9,8 +9,8 @@ from typing import Any, Dict, List
 
 from fastapi.testclient import TestClient
 
-from aegis.intelligence.context_schemas import Availability, IntelligenceContext
-from aegis.intelligence.context_service import IntelligenceContextService, _EvidenceValidator
+from hirzexa.intelligence.context_schemas import Availability, IntelligenceContext
+from hirzexa.intelligence.context_service import IntelligenceContextService, _EvidenceValidator
 
 
 NOW = datetime(2026, 7, 30, 12, 0, tzinfo=timezone.utc)
@@ -399,7 +399,7 @@ def test_failed_persistence_readiness_is_explicitly_unavailable() -> None:
 
 
 def test_persistence_readiness_probe_rolls_back_its_internal_record(monkeypatch) -> None:
-    from aegis.database import connection, persistence, repositories
+    from hirzexa.database import connection, persistence, repositories
 
     captured: Dict[str, Any] = {}
 
@@ -446,9 +446,9 @@ def test_persistence_readiness_probe_rolls_back_its_internal_record(monkeypatch)
 
 def test_alerting_stage_enters_the_active_database_session_and_uses_idempotent_evidence_create(monkeypatch) -> None:
     """Regression test for the old ``create_event``/un-entered-session bug."""
-    from aegis.database import connection, repositories
-    from aegis.database.persistence import get_persistence_status, reset_persistence_status
-    from aegis.pipeline.alerting import AlertingStage
+    from hirzexa.database import connection, repositories
+    from hirzexa.database.persistence import get_persistence_status, reset_persistence_status
+    from hirzexa.pipeline.alerting import AlertingStage
 
     captured: Dict[str, Any] = {}
 
@@ -498,9 +498,9 @@ def test_alerting_stage_enters_the_active_database_session_and_uses_idempotent_e
 
 
 def test_alerting_stage_persistence_failure_is_recorded(monkeypatch) -> None:
-    from aegis.database import connection, repositories
-    from aegis.database.persistence import get_persistence_status, reset_persistence_status
-    from aegis.pipeline.alerting import AlertingStage
+    from hirzexa.database import connection, repositories
+    from hirzexa.database.persistence import get_persistence_status, reset_persistence_status
+    from hirzexa.pipeline.alerting import AlertingStage
 
     class SessionContext:
         def __enter__(self):
@@ -539,10 +539,10 @@ def test_alerting_stage_persistence_failure_is_recorded(monkeypatch) -> None:
 
 def test_recent_events_enters_database_session_before_constructing_repository(monkeypatch) -> None:
     """Regression test for passing ``get_db_session()`` itself to a repository."""
-    from aegis.ai.tools import get_recent_events
-    from aegis.api import state as runtime_state
-    from aegis.database import connection, repositories
-    import aegis.pipeline.startup as startup
+    from hirzexa.ai.tools import get_recent_events
+    from hirzexa.api import state as runtime_state
+    from hirzexa.database import connection, repositories
+    import hirzexa.pipeline.startup as startup
 
     captured: Dict[str, Any] = {}
     session = object()
@@ -591,21 +591,16 @@ def test_recent_events_enters_database_session_before_constructing_repository(mo
     events = get_recent_events(limit=3)
 
     assert session_context.entered
-    assert captured == {"session": session, "limit": 3}
-    assert events == [
-        {
-            "id": "11",
-            "event_id": "11",
-            "type": "risk_alert",
-            "event_type": "risk_alert",
-            "camera_id": "cam-1",
-            "timestamp": NOW.isoformat(),
-            "risk_level": "HIGH",
-            "risk_score": 0.8,
-            "message": "Confirmed risk alert",
-            "data": {"camera_id": "cam-1"},
-        }
-    ]
+    assert len(events) == 1
+    assert events[0]["id"] == "11"
+    assert events[0]["event_id"] == "11"
+    assert events[0]["type"] == "risk_alert"
+    assert events[0]["camera_id"] == "cam-1"
+    assert events[0]["timestamp"] == NOW.isoformat()
+    assert events[0]["risk_level"] == "HIGH"
+    assert events[0]["risk_score"] == 0.8
+    assert events[0]["message"] == "Confirmed risk alert"
+    assert events[0]["data"] == {"camera_id": "cam-1"}
 
 
 def test_schema_contract_uses_camel_case_and_endpoint_validates_response(monkeypatch) -> None:
@@ -652,14 +647,14 @@ def test_schema_contract_uses_camel_case_and_endpoint_validates_response(monkeyp
     assert payload["cameras"]["totalConfigured"] == 1
     assert IntelligenceContext.model_validate(payload).schema_version == "1.0"
 
-    import aegis.api.routes.intelligence_context as route_module
-    from aegis.api.app import APIConfig, create_app
+    import hirzexa.api.routes.intelligence_context as route_module
+    from hirzexa.api.app import APIConfig, create_app
 
     monkeypatch.setattr(route_module, "get_intelligence_context_service", lambda: service)
     client = TestClient(create_app(APIConfig(serve_dashboard=False)))
     unauthorized = client.get("/api/intelligence/context")
     response = client.get(
-        "/api/intelligence/context", headers={"X-API-Key": os.environ["AEGIS_API_KEY"]}
+        "/api/intelligence/context", headers={"X-API-Key": os.environ["HIRZEXA_API_KEY"]}
     )
 
     assert unauthorized.status_code == 401

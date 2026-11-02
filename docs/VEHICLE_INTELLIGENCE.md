@@ -37,7 +37,7 @@ data are never in the metrics endpoint or operator payloads.
 
 ## PaddleOCR isolation
 
-The primary Aegis runtime uses `opencv-python`. Current PaddleOCR dependency
+The primary Hirzexa runtime uses `opencv-python`. Current PaddleOCR dependency
 resolution pulls `opencv-contrib-python`, which must not be installed alongside
 it. For that reason PaddleOCR is declared in
 `requirements-vehicle-ocr-isolated.txt` for an isolated OCR worker/service,

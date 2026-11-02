@@ -10,7 +10,7 @@ const testState = vi.hoisted(() => ({
   updateCamera: vi.fn(),
 }));
 
-vi.mock("@/hooks/use-aegis-api", () => ({
+vi.mock("@/hooks/use-hirzexa-api", () => ({
   useCameraDetectionsQuery: () => ({ data: { detections: testState.detections }, isLoading: false, isError: false }),
   useCameraEventsQuery: () => ({ data: { events: testState.events }, isLoading: false, isError: testState.eventsError, error: new Error("diagnostic detail") }),
   useCameraOverlaysQuery: () => ({ data: { zones: [], heatmap: [] } }),

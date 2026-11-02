@@ -70,4 +70,4 @@ Get-Content worker_out.log -Tail 200
 
 cd C:\Users\Hassan\AegisAi-1
 
-python -m uvicorn aegis.api.app:app --host 0.0.0.0 --port 8080
+python -m uvicorn hirzexa.api.app:app --host 0.0.0.0 --port 8080

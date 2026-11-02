@@ -11,7 +11,7 @@ from typing import Iterable
 
 import cv2
 
-from aegis.detection import YOLODetector, YOLOEThreatDetector
+from hirzexa.detection import YOLODetector, YOLOEThreatDetector
 from config import DetectionConfig
 
 
@@ -157,7 +157,7 @@ def main() -> int:
             risk_level, risk_score, reasons = assess_risk(detections, motion_score, frame.shape)
             draw_risk_panel(frame, risk_level, risk_score, reasons, motion_score)
             cv2.putText(frame, f"Detections: {len(detections)}", (12, frame.shape[0] - 18), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 255, 255), 2, cv2.LINE_AA)
-            cv2.imshow("AegisAI Safety Camera Preview", frame)
+            cv2.imshow("Hirzexa Safety Camera Preview", frame)
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), 27):
                 return 0

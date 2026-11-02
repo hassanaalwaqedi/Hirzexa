@@ -1,5 +1,5 @@
 """
-AegisAI - Risk Engine Unit Tests
+Hirzexa - Risk Engine Unit Tests
 
 Tests for risk score calculation, level mapping, and explainability.
 
@@ -7,7 +7,7 @@ Sprint 1: Security & Testing Foundation
 """
 
 import pytest
-from aegis.risk import (
+from hirzexa.risk import (
     RiskEngine,
     RiskEngineConfig,
     RiskWeights,
@@ -15,7 +15,7 @@ from aegis.risk import (
     TemporalConfig,
     RiskLevel
 )
-from aegis.analysis import (
+from hirzexa.analysis import (
     TrackAnalysis,
     MotionState,
     BehaviorFlags,

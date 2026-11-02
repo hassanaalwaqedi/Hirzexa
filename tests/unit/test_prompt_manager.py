@@ -1,5 +1,5 @@
 """
-AegisAI - Prompt Manager Unit Tests
+Hirzexa - Prompt Manager Unit Tests
 
 Tests for prompt caching and management.
 """
@@ -9,12 +9,12 @@ import time
 import numpy as np
 from unittest.mock import MagicMock
 
-from aegis.semantic.prompt_manager import (
+from hirzexa.semantic.prompt_manager import (
     PromptManager,
     Prompt,
     CacheEntry
 )
-from aegis.semantic.dino_engine import SemanticDetection
+from hirzexa.semantic.dino_engine import SemanticDetection
 
 
 class TestPromptManager:

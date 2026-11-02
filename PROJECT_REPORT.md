@@ -1,6 +1,6 @@
-# AegisAI – Smart City Risk Intelligence System
+# Hirzexa – Smart City Risk Intelligence System
 
-> **Historical project report:** This document describes an earlier phase of AegisAI. For current components, deployment limits, and evidence available today, see [Current Engineering Status](STATUS_REPORT.md). Do not treat phase completion or production-readiness statements below as current validation.
+> **Historical project report:** This document describes an earlier phase of Hirzexa. For current components, deployment limits, and evidence available today, see [Current Engineering Status](STATUS_REPORT.md). Do not treat phase completion or production-readiness statements below as current validation.
 
 ## Professional Project Report
 
@@ -14,7 +14,7 @@
 
 Urban environments face unprecedented challenges in maintaining public safety while respecting individual privacy. Traditional surveillance systems rely heavily on human operators to monitor camera feeds—an approach that scales poorly, introduces fatigue-related errors, and lacks systematic risk assessment capabilities.
 
-**AegisAI** addresses these limitations through a four-phase intelligent surveillance system that transforms raw video streams into actionable, explainable risk intelligence. The system demonstrates that modern AI can enhance public safety without compromising transparency or privacy.
+**Hirzexa** addresses these limitations through a four-phase intelligent surveillance system that transforms raw video streams into actionable, explainable risk intelligence. The system demonstrates that modern AI can enhance public safety without compromising transparency or privacy.
 
 ### Key Achievements
 
@@ -66,7 +66,7 @@ The convergence of several technological advances creates an opportunity for a n
 - **Explainable AI Movement**: Regulatory and ethical pressures demand transparent decision-making
 - **Edge Computing**: Processing can occur on-site, addressing bandwidth and privacy concerns
 
-AegisAI was conceived to demonstrate that these capabilities can be integrated into a cohesive, production-grade system that prioritizes **explainability**, **modularity**, and **privacy-by-design**.
+Hirzexa was conceived to demonstrate that these capabilities can be integrated into a cohesive, production-grade system that prioritizes **explainability**, **modularity**, and **privacy-by-design**.
 
 ---
 
@@ -74,7 +74,7 @@ AegisAI was conceived to demonstrate that these capabilities can be integrated i
 
 ## 3.1 Long-Term Vision
 
-AegisAI envisions a future where urban safety systems:
+Hirzexa envisions a future where urban safety systems:
 
 - Augment human operators rather than replace them
 - Provide proactive risk signals rather than reactive recordings
@@ -119,7 +119,7 @@ The architecture supports:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                         AegisAI Pipeline                            │
+│                         Hirzexa Pipeline                            │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │   VIDEO INPUT                                                       │
@@ -452,7 +452,7 @@ All alerts logged to file with:
 
 ## 7.1 Privacy Considerations
 
-AegisAI is designed with privacy-by-design principles:
+Hirzexa is designed with privacy-by-design principles:
 
 - **No Biometric Storage**: The system does not store facial features or identification data
 - **Behavioral Focus**: Analysis targets movement patterns, not identity
@@ -501,12 +501,12 @@ The system employs multiple mechanisms to minimize false alerts:
 
 All modules verified to compile without errors:
 ```
-✓ aegis/detection/*
-✓ aegis/tracking/*
-✓ aegis/analysis/*
-✓ aegis/risk/*
-✓ aegis/alerts/*
-✓ aegis/api/*
+✓ hirzexa/detection/*
+✓ hirzexa/tracking/*
+✓ hirzexa/analysis/*
+✓ hirzexa/risk/*
+✓ hirzexa/alerts/*
+✓ hirzexa/api/*
 ✓ config.py
 ✓ main.py
 ```
@@ -600,7 +600,7 @@ All modules verified to compile without errors:
 
 # 12. Conclusion
 
-AegisAI demonstrates that modern AI techniques can be assembled into a coherent, production-oriented system for urban safety. Over four phases, the project progressed from basic perception to a complete platform with:
+Hirzexa demonstrates that modern AI techniques can be assembled into a coherent, production-oriented system for urban safety. Over four phases, the project progressed from basic perception to a complete platform with:
 
 - **Real-time detection and tracking** achieving stable object identification
 - **Behavioral analysis** extracting meaningful patterns from movement data
@@ -609,15 +609,15 @@ AegisAI demonstrates that modern AI techniques can be assembled into a coherent,
 
 This project represents serious engineering work suitable for academic evaluation, competition submission, or professional portfolio demonstration. Every architectural decision prioritized **modularity**, **explainability**, and **privacy**—principles that should guide all AI systems intended for public deployment.
 
-The codebase is organized, documented, and ready for extension. AegisAI provides a foundation upon which advanced capabilities—machine learning models, cloud scaling, multi-camera federation—can be built.
+The codebase is organized, documented, and ready for extension. Hirzexa provides a foundation upon which advanced capabilities—machine learning models, cloud scaling, multi-camera federation—can be built.
 
 ---
 
 ## Appendix: Repository Structure
 
 ```
-AegisAI/
-├── aegis/
+Hirzexa/
+├── hirzexa/
 │   ├── detection/       # YOLOv8 wrapper
 │   ├── tracking/        # DeepSORT integration
 │   ├── video/           # Video I/O

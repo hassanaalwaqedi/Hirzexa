@@ -6,14 +6,14 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from aegis.detection.yolo_detector import YOLODetector
-from aegis.settings import get_settings
+from hirzexa.detection.yolo_detector import YOLODetector
+from hirzexa.settings import get_settings
 from config import DetectionConfig
 
 
 def test_environment_model_path_reaches_legacy_camera_adapter(monkeypatch, tmp_path):
     configured = tmp_path / "configured.pt"
-    monkeypatch.setenv("AEGIS_DETECTION_MODEL_PATH", str(configured))
+    monkeypatch.setenv("HIRZEXA_DETECTION_MODEL_PATH", str(configured))
     get_settings.cache_clear()
     try:
         assert DetectionConfig().model_path == str(configured)
@@ -54,7 +54,7 @@ def test_runtime_metadata_is_derived_from_the_loaded_model(monkeypatch, tmp_path
                 model=SimpleNamespace(device="cuda:0", fp16=True),
             )
 
-    monkeypatch.setattr("aegis.detection.yolo_detector.YOLO", FakeYOLO)
+    monkeypatch.setattr("hirzexa.detection.yolo_detector.YOLO", FakeYOLO)
     detector = YOLODetector(detection_config=DetectionConfig(model_path=str(checkpoint)), device="cuda:0")
     metadata = detector.model and detector.get_runtime_metadata()
 
@@ -99,7 +99,7 @@ def test_active_inference_metrics_come_from_the_ultralytics_prediction(monkeypat
                 speed={"preprocess": 1.0, "inference": 3.0, "postprocess": 2.0},
             )]
 
-    monkeypatch.setattr("aegis.detection.yolo_detector.YOLO", FakeYOLO)
+    monkeypatch.setattr("hirzexa.detection.yolo_detector.YOLO", FakeYOLO)
     detector = YOLODetector(
         detection_config=DetectionConfig(model_path=str(checkpoint)),
         device="cuda:0",
@@ -119,7 +119,7 @@ def test_active_inference_metrics_come_from_the_ultralytics_prediction(monkeypat
 
 
 def test_multimodel_detector_passes_the_selected_device_to_yolo_wrappers():
-    from aegis.detection.multi_model_detector import MultiModelDetector
+    from hirzexa.detection.multi_model_detector import MultiModelDetector
 
     detector = MultiModelDetector(detection_config=DetectionConfig(), device="cuda:0")
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AegisAI - Deploy to Hugging Face Spaces
+Hirzexa - Deploy to Hugging Face Spaces
 
 This script automates deployment to HF Spaces:
 1. Creates a new HF Space (Docker SDK)
@@ -17,7 +17,7 @@ from pathlib import Path
 
 # Configuration
 HF_USERNAME = "Hassanali2025"
-SPACE_NAME = "AegisAI"
+SPACE_NAME = "Hirzexa"
 SPACE_ID = f"{HF_USERNAME}/{SPACE_NAME}"
 PROJECT_DIR = Path(__file__).parent
 
@@ -50,7 +50,7 @@ def check_hf_cli():
 def create_space_readme():
     """Generate HF Space README.md content."""
     return """---
-title: AegisAI - Smart City Risk Intelligence
+title: Hirzexa - Smart City Risk Intelligence
 emoji: 🛡️
 colorFrom: blue
 colorTo: purple
@@ -60,7 +60,7 @@ pinned: false
 license: mit
 ---
 
-# AegisAI - Smart City Risk Intelligence System
+# Hirzexa - Smart City Risk Intelligence System
 
 **Production-ready AI-powered surveillance and risk assessment platform.**
 
@@ -88,7 +88,7 @@ license: mit
 
 ## Authentication
 All API endpoints require an `X-API-Key` header.
-Set the `AEGIS_API_KEY` secret in the Space settings.
+Set the `HIRZEXA_API_KEY` secret in the Space settings.
 
 ## Built With
 - [Ultralytics YOLO11](https://ultralytics.com/)
@@ -100,7 +100,7 @@ Set the `AEGIS_API_KEY` secret in the Space settings.
 def deploy():
     """Main deployment function."""
     print("=" * 60)
-    print("  AegisAI → Hugging Face Spaces Deployment")
+    print("  Hirzexa → Hugging Face Spaces Deployment")
     print("=" * 60)
     print()
 
@@ -171,11 +171,11 @@ def deploy():
         (tmp_path / "README.md").write_text(readme_content, encoding="utf-8")
 
         # Create a .env file with defaults for the space
-        env_content = """# AegisAI HF Space Environment
-AEGIS_DEBUG=true
-AEGIS_API_HOST=0.0.0.0
-AEGIS_API_PORT=7860
-DATABASE_URL=sqlite:///data/aegis.db
+        env_content = """# Hirzexa HF Space Environment
+HIRZEXA_DEBUG=true
+HIRZEXA_API_HOST=0.0.0.0
+HIRZEXA_API_PORT=7860
+DATABASE_URL=sqlite:///data/hirzexa.db
 """
         (tmp_path / ".env").write_text(env_content, encoding="utf-8")
 
@@ -196,7 +196,7 @@ DATABASE_URL=sqlite:///data/aegis.db
                 folder_path=str(tmp_path),
                 repo_id=SPACE_ID,
                 repo_type="space",
-                commit_message="Deploy AegisAI v4.2.0 to HF Spaces",
+                commit_message="Deploy Hirzexa v4.2.0 to HF Spaces",
             )
             print(f"✓ Upload complete!")
         except Exception as e:
@@ -213,7 +213,7 @@ DATABASE_URL=sqlite:///data/aegis.db
     print("  ⚠️  IMPORTANT: Set your API key as a Space secret:")
     print(f"     1. Go to https://huggingface.co/spaces/{SPACE_ID}/settings")
     print(f"     2. Scroll to 'Repository secrets'")
-    print(f"     3. Add: AEGIS_API_KEY = <your-secret-key>")
+    print(f"     3. Add: HIRZEXA_API_KEY = <your-secret-key>")
     print("=" * 60)
 
 

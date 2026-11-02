@@ -7,11 +7,11 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from aegis.analysis.analysis_types import BehaviorFlags, CrowdMetrics, MotionState
-from aegis.alerts.alert_manager import AlertManager, AlertManagerConfig
-from aegis.risk.person_weapon_association import PersonWeaponAssociationEngine
-from aegis.risk.weapon_aggression import WeaponAggressionRiskLayer
-from aegis.video.camera_sources import EventSnapshot, FrameIngestionService
+from hirzexa.analysis.analysis_types import BehaviorFlags, CrowdMetrics, MotionState
+from hirzexa.alerts.alert_manager import AlertManager, AlertManagerConfig
+from hirzexa.risk.person_weapon_association import PersonWeaponAssociationEngine
+from hirzexa.risk.weapon_aggression import WeaponAggressionRiskLayer
+from hirzexa.video.camera_sources import EventSnapshot, FrameIngestionService
 from config import DetectionConfig
 
 

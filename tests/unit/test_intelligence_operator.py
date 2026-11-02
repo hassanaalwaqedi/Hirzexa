@@ -2,8 +2,8 @@
 
 from datetime import datetime, timezone
 
-from aegis.ai.schemas import OperatorCommandRequest
-from aegis.intelligence import operator
+from hirzexa.ai.schemas import OperatorCommandRequest
+from hirzexa.intelligence import operator
 
 
 def test_high_risk_command_filters_real_event_records_and_preserves_navigation(monkeypatch):
@@ -50,7 +50,7 @@ def test_camera_command_resolves_only_a_configured_camera(monkeypatch):
 
 
 def test_camera_runtime_command_executes_bounded_autonomous_control(monkeypatch):
-    from aegis.intelligence.agent_control import CameraControlResult
+    from hirzexa.intelligence.agent_control import CameraControlResult
 
     monkeypatch.setattr(operator, "get_camera_status", lambda: {
         "availability": "available",
@@ -152,7 +152,7 @@ def test_similar_evidence_falls_back_to_stored_relationships_when_index_is_offli
 
 
 def test_voice_scene_ordinal_resolves_display_order_before_query(monkeypatch):
-    from aegis.intelligence import operator_scene
+    from hirzexa.intelligence import operator_scene
     captured = []
     monkeypatch.setattr(operator_scene, "execute_operator_command", lambda request: captured.append(request))
     context = operator_scene.OperatorSceneContext(panel="events", ordered_ids=["newer", "older"], selected_id="newer")
@@ -164,6 +164,6 @@ def test_voice_scene_ordinal_resolves_display_order_before_query(monkeypatch):
 def test_voice_scene_context_is_bounded():
     import pytest
     from pydantic import ValidationError
-    from aegis.intelligence.operator_scene import OperatorSceneContext
+    from hirzexa.intelligence.operator_scene import OperatorSceneContext
     with pytest.raises(ValidationError):
         OperatorSceneContext(ordered_ids=[str(i) for i in range(51)])

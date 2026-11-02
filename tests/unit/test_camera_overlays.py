@@ -1,4 +1,4 @@
-from aegis.api.routes.cameras import _build_camera_heatmap, _normalise_camera_zones
+from hirzexa.api.routes.cameras import _build_camera_heatmap, _normalise_camera_zones
 
 
 def test_camera_heatmap_uses_actual_detection_centres():

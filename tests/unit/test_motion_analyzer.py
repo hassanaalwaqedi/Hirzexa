@@ -1,5 +1,5 @@
 """
-AegisAI - Motion Analyzer Unit Tests
+Hirzexa - Motion Analyzer Unit Tests
 
 Tests for motion metrics computation.
 
@@ -8,7 +8,7 @@ Sprint 1: Security & Testing Foundation
 
 import pytest
 import math
-from aegis.analysis import (
+from hirzexa.analysis import (
     MotionAnalyzer,
     MotionAnalyzerConfig,
     TrackHistoryManager,

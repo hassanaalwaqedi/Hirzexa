@@ -1,17 +1,17 @@
-import type { AegisVoiceCoreState, LiveCitation, SafeUICommand } from "@/lib/live-voice";
+import type { HirzexaVoiceCoreState, LiveCitation, SafeUICommand } from "@/lib/live-voice";
 
-export type { AegisVoiceCoreState } from "@/lib/live-voice";
+export type { HirzexaVoiceCoreState } from "@/lib/live-voice";
 
 export type VoiceCapabilityNodeId = "cameras" | "tracking" | "risk" | "semantic" | "analytics";
 
-export function voiceCoreStateLabel(state: AegisVoiceCoreState) {
-  const labels: Record<AegisVoiceCoreState, string> = {
+export function voiceCoreStateLabel(state: HirzexaVoiceCoreState) {
+  const labels: Record<HirzexaVoiceCoreState, string> = {
     off: "Ready",
     connecting: "Connecting",
     ready: "Ready",
     listening: "Listening",
     thinking: "Analysing",
-    speaking: "Aegis speaking",
+    speaking: "Hirzexa speaking",
     degraded: "Voice degraded",
     error: "Voice error",
   };

@@ -1,5 +1,5 @@
 """
-AegisAI - Edge Risk Filter Unit Tests
+Hirzexa - Edge Risk Filter Unit Tests
 
 Tests the edge-side risk assessment logic including
 weapon detection scoring, bbox overlap, cooldowns, and event creation.
@@ -11,8 +11,8 @@ import pytest
 from unittest.mock import MagicMock
 from collections import namedtuple
 
-from aegis.edge.edge_risk_filter import EdgeRiskFilter, bbox_iou, bbox_contains
-from aegis.edge.event_types import EdgeAssessment, TrackSummary, SuspiciousEvent
+from hirzexa.edge.edge_risk_filter import EdgeRiskFilter, bbox_iou, bbox_contains
+from hirzexa.edge.event_types import EdgeAssessment, TrackSummary, SuspiciousEvent
 from config import EdgeConfig
 
 

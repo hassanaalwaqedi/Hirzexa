@@ -33,7 +33,7 @@ describe("persistent operator scene", () => {
     expect(navigate).toHaveBeenCalledWith("/events?risk=high&event=one");
   });
 
-  it("executes allow-listed workspace navigation returned by Aegis", async () => {
+  it("executes allow-listed workspace navigation returned by Hirzexa", async () => {
     execute.mockResolvedValue({ ...events, action: "NAVIGATE_WORKSPACE", panel: "navigation", target: "/analytics", result: { workspace: "analytics" } });
     const navigate = vi.fn();
     const { result } = renderHook(() => useOperatorScene(navigate));

@@ -13,7 +13,7 @@ import {
   useCreateCameraMutation,
   useProcessVideoMutation,
   useUploadVideoMutation
-} from "@/hooks/use-aegis-api";
+} from "@/hooks/use-hirzexa-api";
 import type { CameraSourceType } from "@/types";
 
 const sourceTypeLabels: Record<CameraSourceType, string> = {

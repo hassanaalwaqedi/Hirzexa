@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AudioLines, Mic, Radio, ShieldCheck, Volume2 } from "lucide-react";
 
 import { useGeminiLiveVoice } from "@/hooks/useGeminiLiveVoice";
-import { fetchLiveCapabilities, type AegisVoiceSessionState, type LiveCapabilities, type LiveCitation, type SafeUICommand, type VoiceState } from "@/lib/live-voice";
+import { fetchLiveCapabilities, type HirzexaVoiceSessionState, type LiveCapabilities, type LiveCitation, type SafeUICommand, type VoiceState } from "@/lib/live-voice";
 import { type Availability } from "@/lib/intelligence-context";
 
-type Subtitle = { speaker: "operator" | "aegis"; text: string; citations: LiveCitation[] } | null;
+type Subtitle = { speaker: "operator" | "hirzexa"; text: string; citations: LiveCitation[] } | null;
 
 /** A tool response can cite the same durable event through multiple paths. */
 export function uniqueCitations(citations: LiveCitation[]) {
@@ -21,7 +21,7 @@ export function uniqueCitations(citations: LiveCitation[]) {
 
 export function applySafeUiCommand(command: SafeUICommand) {
   if (command.kind === "close_operator_view") {
-    window.dispatchEvent(new CustomEvent("aegis:close-operator-view"));
+    window.dispatchEvent(new CustomEvent("hirzexa:close-operator-view"));
     return;
   }
   if (command.kind === "open_workspace") {
@@ -57,18 +57,18 @@ export function applySafeUiCommand(command: SafeUICommand) {
   window.location.assign("/semantic");
 }
 
-function sessionLabel(state: AegisVoiceSessionState, voiceAvailable: boolean) {
+function sessionLabel(state: HirzexaVoiceSessionState, voiceAvailable: boolean) {
   if (state === "DISABLED" && voiceAvailable) return "Ready to listen";
   return {
     DISABLED: "Voice disabled",
-    ACTIVATING: "Activating Aegis",
+    ACTIVATING: "Activating Hirzexa",
     STANDBY: "Voice standby",
-    WAKE_DETECTED: "Aegis attentive",
+    WAKE_DETECTED: "Hirzexa attentive",
     LISTENING: "Listening",
     END_OF_SPEECH: "Processing speech",
     THINKING: "Thinking",
     EXECUTING: "Executing",
-    SPEAKING: "Aegis speaking",
+    SPEAKING: "Hirzexa speaking",
     FOLLOW_UP_WINDOW: "Follow-up ready",
     MUTED: "Microphone muted",
     ERROR: "Voice needs attention",
@@ -80,9 +80,9 @@ function privacyLabel({
 }: {
   enabled: boolean; sessionActive: boolean;
 }) {
-  if (!enabled) return "Voice is unavailable for this Aegis session.";
-  if (sessionActive) return "Local VAD sends audio to Aegis only while you are speaking.";
-  return "Aegis is monitoring the system. Select Talk to Aegis whenever you want to speak.";
+  if (!enabled) return "Voice is unavailable for this Hirzexa session.";
+  if (sessionActive) return "Local VAD sends audio to Hirzexa only while you are speaking.";
+  return "Hirzexa is monitoring the system. Select Talk to Hirzexa whenever you want to speak.";
 }
 
 export default function VoiceCopilot({
@@ -98,7 +98,7 @@ export default function VoiceCopilot({
 }: {
   contextAvailability: Availability;
   contextReason?: string | null;
-  onActivity?: (activity: { state: VoiceState; sessionState: AegisVoiceSessionState; inputLevel: number; outputLevel: number; sessionActive: boolean; isCapturing: boolean }) => void;
+  onActivity?: (activity: { state: VoiceState; sessionState: HirzexaVoiceSessionState; inputLevel: number; outputLevel: number; sessionActive: boolean; isCapturing: boolean }) => void;
   onUiCommand?: (command: SafeUICommand) => void;
   onUserTurn?: (message: string) => void;
   onToolActivity?: (activity: { tool: string; status: "calling" | "completed" | "failed" }) => void;
@@ -119,14 +119,14 @@ export default function VoiceCopilot({
     userTurnRef.current = "";
   }, [onUserTurn]);
 
-  const onTranscript = useCallback((entry: { speaker: "operator" | "aegis"; text: string; isFinal: boolean }) => {
+  const onTranscript = useCallback((entry: { speaker: "operator" | "hirzexa"; text: string; isFinal: boolean }) => {
     if (!entry.isFinal) return;
     if (entry.speaker === "operator") userTurnRef.current += entry.text;
     if (subtitleTimer.current !== null) window.clearTimeout(subtitleTimer.current);
-    const citations = entry.speaker === "aegis" ? pendingCitationsRef.current : [];
+    const citations = entry.speaker === "hirzexa" ? pendingCitationsRef.current : [];
     setSubtitle({ speaker: entry.speaker, text: entry.text, citations });
     subtitleTimer.current = window.setTimeout(() => setSubtitle(null), 9_000);
-    if (entry.speaker === "aegis") pendingCitationsRef.current = [];
+    if (entry.speaker === "hirzexa") pendingCitationsRef.current = [];
   }, []);
 
   const voice = useGeminiLiveVoice({
@@ -180,10 +180,10 @@ export default function VoiceCopilot({
   const state = voice.voiceSessionState;
   const voiceReady = enabled && !voice.sessionActive;
 
-  return <aside className="operator-voice-presence" data-voice-state={state} data-active={voice.sessionActive} aria-label="Aegis voice presence">
-    <button type="button" className="operator-voice-presence-action" onClick={startConversation} disabled={!voiceReady} aria-label="Talk to Aegis" title={enabled ? "Start listening now with one click." : unavailableReason}>
+  return <aside className="operator-voice-presence" data-voice-state={state} data-active={voice.sessionActive} aria-label="Hirzexa voice presence">
+    <button type="button" className="operator-voice-presence-action" onClick={startConversation} disabled={!voiceReady} aria-label="Talk to Hirzexa" title={enabled ? "Start listening now with one click." : unavailableReason}>
       {voice.sessionActive ? <AudioLines aria-hidden /> : <Mic aria-hidden />}
-      <span>{voice.sessionActive ? "Aegis is listening" : "Talk to Aegis"}</span>
+      <span>{voice.sessionActive ? "Hirzexa is listening" : "Talk to Hirzexa"}</span>
     </button>
     <div className="operator-voice-presence-status" role="status" aria-live="polite">
       <Radio aria-hidden />
@@ -192,7 +192,7 @@ export default function VoiceCopilot({
     </div>
     <p className="operator-voice-privacy"><ShieldCheck aria-hidden />{privacyLabel({ enabled, sessionActive: voice.sessionActive })}</p>
     {voice.error ? <p className="operator-voice-error" role="alert">{voice.error}</p> : null}
-    {subtitle ? <div className="operator-voice-subtitle" data-speaker={subtitle.speaker} aria-live="polite"><span>{subtitle.speaker === "operator" ? "Operator" : "Aegis"}</span><p>{subtitle.text}</p>{uniqueCitations(subtitle.citations).map((citation) => <button key={citation.evidenceId} type="button" onClick={() => onCitation?.(citation)}>{citation.label}</button>)}</div> : null}
+    {subtitle ? <div className="operator-voice-subtitle" data-speaker={subtitle.speaker} aria-live="polite"><span>{subtitle.speaker === "operator" ? "Operator" : "Hirzexa"}</span><p>{subtitle.text}</p>{uniqueCitations(subtitle.citations).map((citation) => <button key={citation.evidenceId} type="button" onClick={() => onCitation?.(citation)}>{citation.label}</button>)}</div> : null}
     {voice.state === "speaking" ? <Volume2 className="operator-voice-speaking-icon" aria-hidden /> : null}
   </aside>;
 }

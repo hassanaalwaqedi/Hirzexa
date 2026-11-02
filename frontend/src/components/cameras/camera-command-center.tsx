@@ -33,7 +33,7 @@ import {
   useStartCameraMutation,
   useStopCameraMutation,
   useUpdateCameraMutation
-} from "@/hooks/use-aegis-api";
+} from "@/hooks/use-hirzexa-api";
 import type { Camera, CameraHeatmapCell, CameraZoneOverlay, RiskEvent, RiskLevel, Track } from "@/types";
 
 type SocketState = "idle" | "connecting" | "connected" | "reconnecting" | "error" | "unavailable";

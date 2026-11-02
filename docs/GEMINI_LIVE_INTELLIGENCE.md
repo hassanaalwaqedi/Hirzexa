@@ -1,9 +1,9 @@
 # Gemini Live Voice Intelligence Copilot
 
-The Intelligence Center can use Gemini Live as AegisAI's conversational layer
+The Intelligence Center can use Gemini Live as Hirzexa's conversational layer
 for authorised human operators. It is a read-only, evidence-grounded feature:
 Gemini never receives database access, a camera object, a backend route, or an
-API key. It can only invoke the typed Aegis tool allowlist described below.
+API key. It can only invoke the typed Hirzexa tool allowlist described below.
 
 ## Configuration
 
@@ -21,7 +21,7 @@ variable, a browser bundle, or a WebSocket URL.
 | `GEMINI_LIVE_MAX_SESSION_SECONDS` | no | Maximum active voice session; default `900`. |
 | `GEMINI_LIVE_TRANSCRIPT_RETENTION_SECONDS` | no | Completed transcript retention in gateway memory. Default `0` clears it on close. |
 | `GEMINI_LIVE_TOOL_AUDIT_RETENTION_SECONDS` | no | Process-memory tool-audit retention. Default `3600`. |
-| `NEXT_PUBLIC_AEGIS_LIVE_WS_URL` | deployment-dependent | Public FastAPI WebSocket origin, such as `wss://api.example.com`. It is not a credential. |
+| `NEXT_PUBLIC_HIRZEXA_LIVE_WS_URL` | deployment-dependent | Public FastAPI WebSocket origin, such as `wss://api.example.com`. It is not a credential. |
 
 Install the official server SDK after pulling the change:
 
@@ -39,20 +39,20 @@ support them.
 
 ```text
 Browser microphone (16 kHz PCM)
-  -> short-lived authenticated Aegis WebSocket
+  -> short-lived authenticated Hirzexa WebSocket
   -> FastAPI Live gateway
   -> Gemini Live native-audio session
-  -> read-only typed Aegis tools
+  -> read-only typed Hirzexa tools
   -> cited tool result + safe UI command
   -> Gemini native audio (24 kHz PCM), transcripts, citations
   -> browser playback and Intelligence Center
 ```
 
 The browser first calls `POST /api/intelligence/live/sessions` through the
-existing dashboard server proxy. The proxy attaches the server-side Aegis API
+existing dashboard server proxy. The proxy attaches the server-side Hirzexa API
 key; the browser never sees it. The response contains a random, single-use,
 short-lived `connectionToken`. The browser offers that token in the
-`Sec-WebSocket-Protocol` handshake alongside `aegis-live-v1` when connecting to
+`Sec-WebSocket-Protocol` handshake alongside `hirzexa-live-v1` when connecting to
 `WS /ws/intelligence/live/{session_id}`. The gateway validates the token before
 accepting the socket. Permanent credentials are never placed in a WebSocket
 query string.
@@ -65,7 +65,7 @@ native audio output is played as 16-bit PCM at 24 kHz.
 
 ## API surface
 
-All HTTP endpoints require the existing Aegis API-key authentication. The
+All HTTP endpoints require the existing Hirzexa API-key authentication. The
 dashboard uses its same-origin server proxy for these requests.
 
 | Method | Route | Purpose |
@@ -105,7 +105,7 @@ latency, and evidence IDs. The current platform has no per-user/RBAC identity;
 the session boundary is explicitly recorded as API-key-authenticated until
 RBAC is added.
 
-The only UI commands are enum values mapped by the browser to existing Aegis
+The only UI commands are enum values mapped by the browser to existing Hirzexa
 views: Cameras, Tracks, Semantic Evidence, Events/Risk, and the current Health
 panel. Gemini cannot emit a URL, JavaScript, route string, or mutation.
 
@@ -113,8 +113,8 @@ panel. Gemini cannot emit a URL, JavaScript, route string, or mutation.
 
 Hands-free Voice is off by default. An operator must press **Enable
 hands-free** and grant microphone permission. The page shows `Voice off`,
-`Listening`, `Thinking`, `Aegis speaking`, or `Connection error`, plus a live
-waveform. Speaking while Aegis is responding stops local native-audio playback
+`Listening`, `Thinking`, `Hirzexa speaking`, or `Connection error`, plus a live
+waveform. Speaking while Hirzexa is responding stops local native-audio playback
 immediately and sends new PCM input to Gemini Live for barge-in. **Stop** and
 `Escape` immediately stop microphone capture and native playback.
 
@@ -122,14 +122,14 @@ immediately and sends new PCM input to Gemini Live for barge-in. **Stop** and
 capture. Browsers without AudioWorklet fall back to a push-to-talk
 ScriptProcessor PCM path; browsers without microphone/AudioContext support
 receive an explicit typed-command fallback message. Browser `speechSynthesis`
-and browser speech recognition are not used for primary Aegis voice responses.
+and browser speech recognition are not used for primary Hirzexa voice responses.
 
 ## Local verification
 
 1. Configure a valid Gemini key and an account-supported Live model/voice in
    the backend `.env`, then set `GEMINI_LIVE_ENABLED=true`.
 2. Start FastAPI and the frontend. For local Next development, use
-   `NEXT_PUBLIC_AEGIS_LIVE_WS_URL=ws://127.0.0.1:8080` in
+   `NEXT_PUBLIC_HIRZEXA_LIVE_WS_URL=ws://127.0.0.1:8080` in
    `frontend/.env.local` if the endpoint differs from the default local URL.
 3. Open `/intelligence`, wait for the Intelligence context, and enable
    Hands-free Voice.
@@ -139,7 +139,7 @@ and browser speech recognition are not used for primary Aegis voice responses.
 5. Ask about active risk alerts, a current track, semantic evidence, and
    pipeline health. An unavailable source must produce a clear unavailable or
    degraded explanation rather than a guessed answer.
-6. Press Escape during microphone capture and during Aegis audio. Confirm that
+6. Press Escape during microphone capture and during Hirzexa audio. Confirm that
    capture and playback stop immediately.
 
 ## Current limitations

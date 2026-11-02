@@ -1,5 +1,5 @@
 """
-AegisAI - API Integration Tests
+Hirzexa - API Integration Tests
 
 Tests for REST API endpoints with authentication.
 
@@ -8,7 +8,7 @@ Sprint 1: Security & Testing Foundation
 
 import pytest
 from fastapi.testclient import TestClient
-from aegis.api.app import create_app
+from hirzexa.api.app import create_app
 
 
 class TestAPIAuthentication:
@@ -149,4 +149,4 @@ class TestRootEndpoint:
         data = response.json()
         
         assert "name" in data
-        assert data["name"] == "AegisAI API"
+        assert data["name"] in ("HIRZEXA API", "Hirzexa API")

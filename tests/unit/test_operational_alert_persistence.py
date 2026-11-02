@@ -9,7 +9,7 @@ import pytest
 
 @pytest.fixture
 def isolated_database(monkeypatch: pytest.MonkeyPatch, tmp_path):
-    from aegis.database import connection
+    from hirzexa.database import connection
 
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'alerts.db'}")
     monkeypatch.setattr(connection, "_engine", None)
@@ -21,8 +21,8 @@ def isolated_database(monkeypatch: pytest.MonkeyPatch, tmp_path):
 
 
 def test_alert_creation_acknowledgement_and_cooldown_survive_new_manager(isolated_database) -> None:
-    from aegis.alerts import AlertChannel, AlertManager, AlertManagerConfig
-    from aegis.database.repositories import EventRepository
+    from hirzexa.alerts import AlertChannel, AlertManager, AlertManagerConfig
+    from hirzexa.database.repositories import EventRepository
 
     with isolated_database.get_db_session() as session:
         EventRepository(session).create_or_get_evidence(

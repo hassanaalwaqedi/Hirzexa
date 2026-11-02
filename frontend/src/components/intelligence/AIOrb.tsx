@@ -7,12 +7,12 @@ import { useTranslations } from "next-intl";
 
 import { availabilityLabel, type Availability } from "@/lib/intelligence-context";
 import type { AudibleRiskVisualState } from "@/hooks/useAudibleRiskAlerts";
-import type { AegisVoiceCoreState, VoiceCapabilityNodeId } from "./voice-core";
+import type { HirzexaVoiceCoreState, VoiceCapabilityNodeId } from "./voice-core";
 import { voiceCoreStateLabel } from "./voice-core";
 
 interface AIOrbProps {
   contextStatus: Availability;
-  voiceState: AegisVoiceCoreState;
+  voiceState: HirzexaVoiceCoreState;
   microphoneLevel: number;
   playbackLevel: number;
   activeCapability?: VoiceCapabilityNodeId | null;
@@ -37,7 +37,7 @@ function useReducedMotion() {
   return reducedMotion;
 }
 
-function voiceColors(voiceState: AegisVoiceCoreState, contextStatus: Availability) {
+function voiceColors(voiceState: HirzexaVoiceCoreState, contextStatus: Availability) {
   if (voiceState === "error") return { glow: "rgba(56,214,255,0.34)", ring: "#38d6ff", dot: "#f6c453" };
   if (voiceState === "degraded" || contextStatus === "degraded" || contextStatus === "stale") {
     return { glow: "rgba(56,214,255,0.34)", ring: "#38d6ff", dot: "#f6c453" };
@@ -105,73 +105,73 @@ export default function AIOrb({
   }, [reducedMotion]);
 
   const statusDescription = voiceState === "off"
-    ? "Ready. The microphone is off until Ask Aegis is clicked."
+    ? "Ready. The microphone is off until Ask Hirzexa is clicked."
     : `${stateLabel}. Intelligence context is ${availabilityLabel(contextStatus).toLowerCase()}.`;
 
   return (
     <div
-      className="aegis-core"
-      data-testid="aegis-voice-orb"
+      className="hirzexa-core"
+      data-testid="hirzexa-voice-orb"
       data-voice-state={voiceState}
       data-active-capability={activeCapability ?? ""}
       data-audible-risk={audibleRiskState}
       data-reduced-motion={reducedMotion ? "true" : "false"}
       style={{ "--core-tone": colors.ring, "--core-glow": colors.glow } as React.CSSProperties}
     >
-      <canvas ref={canvasRef} className="aegis-core-particles" width={320} height={320} aria-hidden="true" />
+      <canvas ref={canvasRef} className="hirzexa-core-particles" width={320} height={320} aria-hidden="true" />
       <motion.div
-        className="aegis-core-aura"
+        className="hirzexa-core-aura"
         animate={reducedMotion ? undefined : { scale: hasMeasuredLevel ? measuredScale : [1, 1.035, 1], opacity: [0.58, 0.92, 0.58] }}
         transition={{ duration: hasMeasuredLevel ? 0.12 : 3.8, repeat: Infinity, ease: "easeInOut" }}
         aria-hidden="true"
       />
-      <div className="aegis-core-orbit aegis-core-orbit-outer" aria-hidden="true" />
-      <div className="aegis-core-orbit aegis-core-orbit-inner" aria-hidden="true" />
+      <div className="hirzexa-core-orbit hirzexa-core-orbit-outer" aria-hidden="true" />
+      <div className="hirzexa-core-orbit hirzexa-core-orbit-inner" aria-hidden="true" />
       <motion.div
-        className="aegis-core-sphere"
+        className="hirzexa-core-sphere"
         animate={reducedMotion ? undefined : { scale: hasMeasuredLevel ? measuredScale : voiceState === "thinking" ? [1, 1.025, 1] : 1 }}
         transition={{ duration: hasMeasuredLevel ? 0.12 : 1.5, repeat: voiceState === "thinking" ? Infinity : 0, ease: "easeInOut" }}
         aria-hidden="true"
       >
-        <svg className="aegis-core-mesh" viewBox="0 0 100 100" aria-hidden="true">
+        <svg className="hirzexa-core-mesh" viewBox="0 0 100 100" aria-hidden="true">
           <path d="M8 49 L26 30 L49 48 L68 20 L91 44 M12 67 L35 57 L51 74 L76 61 L92 79 M25 11 L42 35 L61 14 L76 38 M18 84 L40 66 L63 88 L87 57" />
           <path d="M49 8 L49 92 M8 50 L92 50 M24 22 L77 78 M78 22 L22 78" />
           <circle cx="26" cy="30" r="1.3" /><circle cx="49" cy="48" r="1.6" /><circle cx="68" cy="20" r="1.3" /><circle cx="35" cy="57" r="1.2" /><circle cx="76" cy="61" r="1.3" /><circle cx="63" cy="88" r="1" />
         </svg>
-        <span className="aegis-core-grid aegis-core-grid-latitude" />
-        <span className="aegis-core-grid aegis-core-grid-longitude" />
-        <span className="aegis-core-grid aegis-core-grid-diagonal" />
-        <span className="aegis-core-star" />
+        <span className="hirzexa-core-grid hirzexa-core-grid-latitude" />
+        <span className="hirzexa-core-grid hirzexa-core-grid-longitude" />
+        <span className="hirzexa-core-grid hirzexa-core-grid-diagonal" />
+        <span className="hirzexa-core-star" />
       </motion.div>
 
       <button
         type="button"
         onClick={onActivate}
-        className="aegis-core-button"
-        aria-label={`Aegis Voice Core. ${statusDescription}`}
-        aria-describedby="aegis-voice-core-status"
+        className="hirzexa-core-button"
+        aria-label={`Hirzexa Voice Core. ${statusDescription}`}
+        aria-describedby="hirzexa-voice-core-status"
       >
-        <span className="aegis-core-wordmark">AEGIS</span>
-        <span className="aegis-core-caption">{t("core")}</span>
-        <span className="aegis-core-state" style={{ color: colors.dot }}>
+        <span className="hirzexa-core-wordmark">HIRZEXA</span>
+        <span className="hirzexa-core-caption">{t("core")}</span>
+        <span className="hirzexa-core-state" style={{ color: colors.dot }}>
           <span style={{ backgroundColor: colors.dot }} />{stateLabel}
         </span>
-        {activeCapability && <span className="aegis-core-active">{activeCapability}</span>}
+        {activeCapability && <span className="hirzexa-core-active">{activeCapability}</span>}
       </button>
 
       <button
         type="button"
         onClick={onListenToggle}
         disabled={!listeningEnabled}
-        className="aegis-core-action"
-        aria-label={voiceSessionActive ? t("stopListening") : t("askAegis")}
+        className="hirzexa-core-action"
+        aria-label={voiceSessionActive ? t("stopListening") : t("askHirzexa")}
         title={voiceSessionActive ? "Stop listening and release the microphone" : "Microphone access begins only after this click."}
       >
         {voiceSessionActive ? <Square size={12} /> : <Mic size={13} />}
         {voiceSessionActive ? t("stopListening") : t("voice")}
       </button>
 
-      <span id="aegis-voice-core-status" className="sr-only" aria-live="polite">{statusDescription}</span>
+      <span id="hirzexa-voice-core-status" className="sr-only" aria-live="polite">{statusDescription}</span>
     </div>
   );
 }

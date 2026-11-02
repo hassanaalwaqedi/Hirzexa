@@ -11,12 +11,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.api.security import verify_api_key
-from aegis.database.connection import Base
-from aegis.database.repositories import EventRepository, IncidentRepository
-from aegis.intelligence.incident_correlation import IncidentCorrelationService
-from aegis.video.camera_sources import FrameIngestionService
-import aegis.database.models  # noqa: F401 - register mapped tables
+from hirzexa.api.security import verify_api_key
+from hirzexa.database.connection import Base
+from hirzexa.database.repositories import EventRepository, IncidentRepository
+from hirzexa.intelligence.incident_correlation import IncidentCorrelationService
+from hirzexa.video.camera_sources import FrameIngestionService
+import hirzexa.database.models  # noqa: F401 - register mapped tables
 
 
 BASE_TIME = datetime(2026, 8, 2, 12, 0, tzinfo=timezone.utc)
@@ -180,8 +180,8 @@ def test_correlation_failure_keeps_durable_alert_evidence_and_pipeline_running(m
         with Session.begin() as session:
             yield session
 
-    import aegis.database.connection as connection
-    from aegis.intelligence import incident_correlation
+    import hirzexa.database.connection as connection
+    from hirzexa.intelligence import incident_correlation
 
     monkeypatch.setattr(connection, "get_db_session", session_provider)
     monkeypatch.setattr(
@@ -227,11 +227,11 @@ def test_incident_api_returns_active_timeline_and_evidence(monkeypatch, incident
         with Session.begin() as session:
             yield session
 
-    import aegis.database.connection as connection
-    from aegis.api.routes import events as event_routes
+    import hirzexa.database.connection as connection
+    from hirzexa.api.routes import events as event_routes
 
     monkeypatch.setattr(connection, "get_db_session", session_provider)
-    monkeypatch.setenv("AEGIS_API_KEY", "incident-key")
+    monkeypatch.setenv("HIRZEXA_API_KEY", "incident-key")
     app = FastAPI()
     app.include_router(event_routes.router, dependencies=[Depends(verify_api_key)])
     client = TestClient(app)

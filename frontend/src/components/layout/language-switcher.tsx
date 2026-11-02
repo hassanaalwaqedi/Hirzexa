@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
       locale={targetLocale}
       aria-label={label}
       className={cn(
-        "aegis-language-switcher"
+        "hirzexa-language-switcher"
       )}
       title={label}
     >

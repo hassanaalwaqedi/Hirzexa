@@ -11,11 +11,11 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.ai.gemini_client import GeminiClient, GeminiConfig
-from aegis.database.connection import Base
-from aegis.database.repositories import EventRepository, IncidentVerificationRepository, IncidentRepository
-from aegis.intelligence.live_tools import LiveToolRegistry
-from aegis.intelligence.vlm_verifier import (
+from hirzexa.ai.gemini_client import GeminiClient, GeminiConfig
+from hirzexa.database.connection import Base
+from hirzexa.database.repositories import EventRepository, IncidentVerificationRepository, IncidentRepository
+from hirzexa.intelligence.live_tools import LiveToolRegistry
+from hirzexa.intelligence.vlm_verifier import (
     EvidenceFrameBuffer,
     IncidentEvidencePackage,
     IncidentVerification,
@@ -26,8 +26,8 @@ from aegis.intelligence.vlm_verifier import (
     VerificationStatus,
     combined_state,
 )
-from aegis.video.camera_sources import FrameIngestionService
-import aegis.database.models  # noqa: F401
+from hirzexa.video.camera_sources import FrameIngestionService
+import hirzexa.database.models  # noqa: F401
 
 
 NOW = datetime(2026, 9, 30, tzinfo=timezone.utc)
@@ -227,7 +227,7 @@ def test_camera_identity_change_cannot_bypass_deferred_authorization():
 
 def test_unauthorized_camera_is_rejected_before_local_jpeg_encoding(monkeypatch):
     from types import SimpleNamespace
-    import aegis.settings as settings_module
+    import hirzexa.settings as settings_module
 
     monkeypatch.setattr(
         settings_module,
@@ -235,7 +235,7 @@ def test_unauthorized_camera_is_rejected_before_local_jpeg_encoding(monkeypatch)
         lambda: SimpleNamespace(vlm=VLMSettings(enabled=True, camera_allowlist="approved-camera")),
     )
     monkeypatch.setattr(
-        "aegis.intelligence.vlm_verifier.cv2.imencode",
+        "hirzexa.intelligence.vlm_verifier.cv2.imencode",
         lambda *_args, **_kwargs: pytest.fail("unauthorized frames must be rejected before JPEG encoding"),
     )
     ingestion = FrameIngestionService()
@@ -253,7 +253,7 @@ def test_unauthorized_camera_is_rejected_before_local_jpeg_encoding(monkeypatch)
 
 
 def test_on_demand_incident_verification_checks_camera_before_reading_snapshots(monkeypatch, tmp_path):
-    import aegis.intelligence.vlm_verifier as verifier_module
+    import hirzexa.intelligence.vlm_verifier as verifier_module
 
     snapshot = tmp_path / "must-not-be-read.jpg"
     snapshot.write_bytes(b"private-image-placeholder")
@@ -289,9 +289,9 @@ def test_on_demand_incident_verification_checks_camera_before_reading_snapshots(
         def __enter__(self): return self
         def __exit__(self, *_args): return False
 
-    monkeypatch.setattr("aegis.database.connection.get_db_session", lambda: FakeSession())
-    monkeypatch.setattr("aegis.database.repositories.IncidentRepository", IncidentRepo)
-    monkeypatch.setattr("aegis.database.repositories.EventRepository", EventRepo)
+    monkeypatch.setattr("hirzexa.database.connection.get_db_session", lambda: FakeSession())
+    monkeypatch.setattr("hirzexa.database.repositories.IncidentRepository", IncidentRepo)
+    monkeypatch.setattr("hirzexa.database.repositories.EventRepository", EventRepo)
     monkeypatch.setattr(verifier_module, "get_vlm_verifier", lambda: service)
     monkeypatch.setattr(
         "pathlib.Path.read_bytes",
@@ -348,7 +348,7 @@ def test_live_agent_tool_retrieves_stored_verification(tmp_path, monkeypatch):
             verification_id="vlm-agent", incident_id="inc-agent", event_id="evt-agent", camera_id="cam-agent",
             status="COMPLETED", provider="gemini", model="mock", evidence_metadata={"keyframe_count": 4},
         )
-    import aegis.database.connection as connection
+    import hirzexa.database.connection as connection
     monkeypatch.setattr(connection, "_SessionLocal", Session)
     registry = LiveToolRegistry(session_id="s", operator_id="o", correlation_id="c")
     result = registry.execute("get_incident_verification", {"incident_id": "inc-agent"})
@@ -403,7 +403,7 @@ def _install_test_database(tmp_path, monkeypatch, name):
     engine = create_engine(f"sqlite:///{tmp_path / name}")
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine, expire_on_commit=False)
-    import aegis.database.connection as connection
+    import hirzexa.database.connection as connection
     monkeypatch.setattr(connection, "_SessionLocal", Session)
     return engine, Session
 
@@ -483,7 +483,7 @@ def test_medium_candidates_use_separate_gating_and_remain_unincidentated(tmp_pat
 def test_real_detection_event_is_persisted_as_candidate_without_incident(tmp_path, monkeypatch):
     engine, Session = _install_test_database(tmp_path, monkeypatch, "candidate-event-flow.db")
     from types import SimpleNamespace
-    import aegis.settings as settings_module
+    import hirzexa.settings as settings_module
 
     monkeypatch.setattr(
         settings_module,

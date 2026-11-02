@@ -1,4 +1,4 @@
-"""Regression coverage for the active Aegis camera registration V2 path."""
+"""Regression coverage for the active Hirzexa camera registration V2 path."""
 
 from __future__ import annotations
 
@@ -7,16 +7,16 @@ import json
 
 import pytest
 
-from aegis.camera.base import BaseCameraSource, OpenCVLoopCameraSource
-from aegis.camera.connection_tests import (
+from hirzexa.camera.base import BaseCameraSource, OpenCVLoopCameraSource
+from hirzexa.camera.connection_tests import (
     CameraConnectionTestResult,
     CameraConnectionTestStore,
 )
-from aegis.camera.credentials import DevelopmentFileCredentialStorage
-from aegis.camera.manager import MultiCameraPipelineManager
-from aegis.camera.registry import CameraRegistry
-from aegis.camera.types import CameraConfig, CameraConnectionStatus, CameraSourceType
-from aegis.camera.utils import build_rtsp_url, mask_url, normalise_stream_identity
+from hirzexa.camera.credentials import DevelopmentFileCredentialStorage
+from hirzexa.camera.manager import MultiCameraPipelineManager
+from hirzexa.camera.registry import CameraRegistry
+from hirzexa.camera.types import CameraConfig, CameraConnectionStatus, CameraSourceType
+from hirzexa.camera.utils import build_rtsp_url, mask_url, normalise_stream_identity
 
 
 class _FakeSource(BaseCameraSource):
@@ -205,7 +205,7 @@ def test_test_proof_is_configuration_bound_and_failed_results_are_never_online()
 
 def test_active_rtsp_api_save_requires_a_matching_verified_test(monkeypatch: pytest.MonkeyPatch):
     from fastapi import HTTPException
-    from aegis.api.routes import cameras as camera_routes
+    from hirzexa.api.routes import cameras as camera_routes
 
     class _RecordingManager:
         def __init__(self):
@@ -233,7 +233,7 @@ def test_active_rtsp_api_save_requires_a_matching_verified_test(monkeypatch: pyt
         auto_start=True,
     )
     with pytest.raises(HTTPException) as rejected:
-        asyncio.run(camera_routes.create_camera(request, x_aegis_actor=None, _=True))
+        asyncio.run(camera_routes.create_camera(request, x_hirzexa_actor=None, _=True))
     assert rejected.value.status_code == 409
 
     result = CameraConnectionTestResult(ok=True, status="online", masked_url="rtsp://****@192.168.1.20:554/stream1")
@@ -242,7 +242,7 @@ def test_active_rtsp_api_save_requires_a_matching_verified_test(monkeypatch: pyt
     manager = _RecordingManager()
     monkeypatch.setattr(camera_routes, "get_camera_manager", lambda: manager)
 
-    payload = asyncio.run(camera_routes.create_camera(verified_request, x_aegis_actor=None, _=True))
+    payload = asyncio.run(camera_routes.create_camera(verified_request, x_hirzexa_actor=None, _=True))
     assert manager.received is not None
     assert manager.received[1]["connection_verified"] is True
     assert payload["registration"]["config_saved"] is True

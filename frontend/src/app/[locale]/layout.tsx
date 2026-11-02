@@ -7,8 +7,8 @@ import { Providers } from "./providers";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "AegisAI | AI Security Operating System",
-  description: "AI-powered security intelligence platform — real-time threat detection, risk assessment, and autonomous incident management."
+  title: "HIRZEXA | AI-Powered Threat Detection & Public Safety Intelligence",
+  description: "HIRZEXA - AI-Powered Threat Detection & Public Safety Intelligence. Detect Early. Protect Better."
 };
 
 export default async function RootLayout({

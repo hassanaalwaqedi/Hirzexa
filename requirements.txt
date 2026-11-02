@@ -1,4 +1,4 @@
-# AegisAI - AI Security Operating System
+# Hirzexa - AI Security Operating System
 # Python 3.10+ required
 
 # ─── Core AI / Perception ─────────────────────────────────

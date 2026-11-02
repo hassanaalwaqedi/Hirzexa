@@ -1,9 +1,9 @@
 """Regression coverage for user-facing YouTube camera diagnostics."""
 
-from aegis.camera import sources
-from aegis.camera.connection_tests import CameraConnectionTestResult
-from aegis.camera.sources import HTTPCameraSource
-from aegis.camera.types import CameraConfig, CameraSourceType
+from hirzexa.camera import sources
+from hirzexa.camera.connection_tests import CameraConnectionTestResult
+from hirzexa.camera.sources import HTTPCameraSource
+from hirzexa.camera.types import CameraConfig, CameraSourceType
 
 
 def test_youtube_resolution_failure_is_not_reported_as_unreachable_camera(monkeypatch):

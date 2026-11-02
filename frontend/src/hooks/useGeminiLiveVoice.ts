@@ -10,7 +10,7 @@ import {
   serverVoiceEnvelopeSchema,
   type LiveCitation,
   type LiveSession,
-  type AegisVoiceSessionState,
+  type HirzexaVoiceSessionState,
   type SafeUICommand,
   type VoiceState,
   type WakeWordMode,
@@ -28,10 +28,10 @@ function configuredMilliseconds(value: string | undefined, fallback: number, min
 }
 
 /** One source of truth for all hands-free timing and VAD thresholds. */
-export const AEGIS_VOICE_SESSION_CONFIG = {
-  followUpWindowMs: configuredMilliseconds(process.env.NEXT_PUBLIC_AEGIS_VOICE_FOLLOW_UP_MS, 20_000, 15_000, 30_000),
-  gatewayReadyTimeoutMs: configuredMilliseconds(process.env.NEXT_PUBLIC_AEGIS_VOICE_GATEWAY_READY_TIMEOUT_MS, 8_000, 4_000, 20_000),
-  responseTimeoutMs: configuredMilliseconds(process.env.NEXT_PUBLIC_AEGIS_VOICE_RESPONSE_TIMEOUT_MS, 25_000, 8_000, 60_000),
+export const HIRZEXA_VOICE_SESSION_CONFIG = {
+  followUpWindowMs: configuredMilliseconds(process.env.NEXT_PUBLIC_HIRZEXA_VOICE_FOLLOW_UP_MS, 20_000, 15_000, 30_000),
+  gatewayReadyTimeoutMs: configuredMilliseconds(process.env.NEXT_PUBLIC_HIRZEXA_VOICE_GATEWAY_READY_TIMEOUT_MS, 8_000, 4_000, 20_000),
+  responseTimeoutMs: configuredMilliseconds(process.env.NEXT_PUBLIC_HIRZEXA_VOICE_RESPONSE_TIMEOUT_MS, 25_000, 8_000, 60_000),
   gatewayReconnectDelayMs: 300,
   maxGatewayReconnectAttempts: 1,
   vadSpeechStartLevel: 0.018,
@@ -42,12 +42,12 @@ export const AEGIS_VOICE_SESSION_CONFIG = {
 } as const;
 
 /** Compatibility export for callers that previously named this an idle timeout. */
-export const VOICE_CONVERSATION_IDLE_TIMEOUT_MS = AEGIS_VOICE_SESSION_CONFIG.followUpWindowMs;
-export const VOICE_FOLLOW_UP_WINDOW_MS = AEGIS_VOICE_SESSION_CONFIG.followUpWindowMs;
+export const VOICE_CONVERSATION_IDLE_TIMEOUT_MS = HIRZEXA_VOICE_SESSION_CONFIG.followUpWindowMs;
+export const VOICE_FOLLOW_UP_WINDOW_MS = HIRZEXA_VOICE_SESSION_CONFIG.followUpWindowMs;
 
 /** Returns the command portion only when a standalone wake phrase was heard. */
 export function wakePhraseCommand(text: string): string | null {
-  const match = text.match(/^\s*(?:hey\s+)?aegis\b[\s,.:;!\-]*/i);
+  const match = text.match(/^\s*(?:hey\s+)?hirzexa\b[\s,.:;!\-]*/i);
   return match ? text.slice(match[0].length).trim() : null;
 }
 
@@ -86,7 +86,7 @@ function browserSpeechRecognitionConstructor(): BrowserSpeechRecognitionConstruc
   return browserWindow.SpeechRecognition ?? browserWindow.webkitSpeechRecognition ?? null;
 }
 
-/** A final result must contain more than whitespace before Aegis receives it. */
+/** A final result must contain more than whitespace before Hirzexa receives it. */
 export function isMeaningfulVoiceTranscript(text: string) {
   return text.trim().length > 1;
 }
@@ -112,14 +112,14 @@ type VoiceCallbacks = {
   sceneContext?: string;
   onProjection?: (execution: import("@/lib/operator-api").OperatorExecution) => void;
   onTurnComplete?: () => void;
-  onTranscript?: (entry: { speaker: "operator" | "aegis"; text: string; isFinal: boolean }) => void;
+  onTranscript?: (entry: { speaker: "operator" | "hirzexa"; text: string; isFinal: boolean }) => void;
   onCitations?: (citations: LiveCitation[]) => void;
   onUiCommand?: (command: SafeUICommand) => void;
   onToolActivity?: (activity: { tool: string; status: "calling" | "completed" | "failed"; turnId?: string | null }) => void;
 };
 
 // Hands-free capture keeps sending PCM while the operator is silent so Gemini
-// can detect a completed utterance. That silence must never cancel Aegis's
+// can detect a completed utterance. That silence must never cancel Hirzexa's
 // own output. A few consecutive elevated capture blocks are required before
 // we treat input as a real barge-in rather than microphone floor noise.
 const BARGE_IN_LEVEL = 0.035;
@@ -438,7 +438,7 @@ export function voiceStateLabel(state: VoiceState) {
     ready: "Ready",
     listening: "Listening",
     thinking: "Thinking",
-    speaking: "Aegis speaking",
+    speaking: "Hirzexa speaking",
     error: "Connection error"
   }[state];
 }
@@ -458,7 +458,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
   const [captureMode, setCaptureMode] = useState<CaptureMode>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [sessionPhase, setSessionPhase] = useState<VoiceSessionPhase>("idle");
-  const [voiceSessionState, setVoiceSessionState] = useState<AegisVoiceSessionState>("DISABLED");
+  const [voiceSessionState, setVoiceSessionState] = useState<HirzexaVoiceSessionState>("DISABLED");
   const [isActivated, setIsActivated] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
@@ -556,7 +556,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
       onIdle: onPlayerIdle,
     }));
   // Risk-alert audio has an independent lifecycle. Sharing this player with
-  // conversational output allowed alert cleanup to stop an Aegis response.
+  // conversational output allowed alert cleanup to stop an Hirzexa response.
   const [audibleAlertPlayer] = useState(() => new NativePcmPlayer({
     onLevel: () => undefined,
     onStarted: () => undefined,
@@ -574,7 +574,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
     conversationAudioBatcher.setOnBatch((chunk, sampleRate) => {
       if (!sessionActiveRef.current) return;
       void player.playPcm(chunk, sampleRate).catch(() => {
-        finishSessionRef.current(null, "Aegis native audio playback is unavailable in this browser.");
+        finishSessionRef.current(null, "Hirzexa native audio playback is unavailable in this browser.");
       });
     });
     return () => conversationAudioBatcher.clear();
@@ -678,8 +678,8 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
     clearResponseTimer();
     responseTimerRef.current = window.setTimeout(() => {
       if (!sessionActiveRef.current || responseCompleteRef.current) return;
-      finishSessionRef.current(null, "Aegis did not receive a voice response in time. Tap Talk to Aegis to reconnect.");
-    }, AEGIS_VOICE_SESSION_CONFIG.responseTimeoutMs);
+      finishSessionRef.current(null, "Hirzexa did not receive a voice response in time. Tap Talk to Hirzexa to reconnect.");
+    }, HIRZEXA_VOICE_SESSION_CONFIG.responseTimeoutMs);
   }, [clearResponseTimer]);
 
   const clearSessionTimers = useCallback(() => {
@@ -799,15 +799,15 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
         setWaveformLevel(published);
       }
 
-      if (level >= AEGIS_VOICE_SESSION_CONFIG.vadSpeechStartLevel) {
+      if (level >= HIRZEXA_VOICE_SESSION_CONFIG.vadSpeechStartLevel) {
         nativeSpeechFramesRef.current += 1;
         nativeSilenceFramesRef.current = 0;
-      } else if (level <= AEGIS_VOICE_SESSION_CONFIG.vadSpeechEndLevel) {
+      } else if (level <= HIRZEXA_VOICE_SESSION_CONFIG.vadSpeechEndLevel) {
         nativeSpeechFramesRef.current = 0;
         if (nativeTransmissionActiveRef.current) nativeSilenceFramesRef.current += 1;
       }
 
-      if (!nativeTransmissionActiveRef.current && nativeSpeechFramesRef.current >= AEGIS_VOICE_SESSION_CONFIG.vadStartFrames) {
+      if (!nativeTransmissionActiveRef.current && nativeSpeechFramesRef.current >= HIRZEXA_VOICE_SESSION_CONFIG.vadStartFrames) {
         nativeTransmissionActiveRef.current = true;
         setIsUserSpeaking(true);
         setPhase("listening");
@@ -821,7 +821,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
 
       if (!nativeTransmissionActiveRef.current) return;
       queueOrSendInputAudio(resampleMonoToPcm16(samples, context.sampleRate));
-      if (nativeSilenceFramesRef.current >= AEGIS_VOICE_SESSION_CONFIG.vadEndFrames) {
+      if (nativeSilenceFramesRef.current >= HIRZEXA_VOICE_SESSION_CONFIG.vadEndFrames) {
         nativeTransmissionActiveRef.current = false;
         nativeSilenceFramesRef.current = 0;
         setIsUserSpeaking(false);
@@ -869,7 +869,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
     clearSessionTimers();
     stopNativeAudioCapture();
     stopRecognition();
-    // Keep the user-authorized output context alive while Aegis is in standby.
+    // Keep the user-authorized output context alive while Hirzexa is in standby.
     // A wake event is not itself a fresh click, so recreating it then may make
     // the next native response ineligible for browser playback.
     player.stop();
@@ -982,7 +982,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
       if (!sessionActiveRef.current || epoch !== sessionEpochRef.current || intentionalRecognitionStopRef.current) return;
       if (event.error === "no-speech" || event.error === "aborted") return;
       const message = event.error === "not-allowed" || event.error === "service-not-allowed"
-        ? "Microphone permission was denied. Allow microphone access to ask Aegis."
+        ? "Microphone permission was denied. Allow microphone access to ask Hirzexa."
         : `Browser speech recognition failed (${event.error}). Use the typed fallback or try again.`;
       finishSessionRef.current(null, message);
     };
@@ -1044,12 +1044,12 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
       }
       if (session) void closeLiveSession(session.sessionId);
 
-      if (attempt < AEGIS_VOICE_SESSION_CONFIG.maxGatewayReconnectAttempts) {
+      if (attempt < HIRZEXA_VOICE_SESSION_CONFIG.maxGatewayReconnectAttempts) {
         setState("connecting");
         setVoiceSessionState("LISTENING");
         window.setTimeout(() => {
           void openLiveConnectionRef.current(epoch, attempt + 1);
-        }, AEGIS_VOICE_SESSION_CONFIG.gatewayReconnectDelayMs);
+        }, HIRZEXA_VOICE_SESSION_CONFIG.gatewayReconnectDelayMs);
         return;
       }
       finishSessionRef.current(null, message);
@@ -1083,9 +1083,9 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
     socket.binaryType = "arraybuffer";
     gatewayReadyTimerRef.current = window.setTimeout(() => {
       if (socketRef.current === socket && !gatewayReadyRef.current) {
-        retryOrFinish("Aegis could not establish the secure voice connection. Check the service and try again.");
+        retryOrFinish("Hirzexa could not establish the secure voice connection. Check the service and try again.");
       }
-    }, AEGIS_VOICE_SESSION_CONFIG.gatewayReadyTimeoutMs);
+    }, HIRZEXA_VOICE_SESSION_CONFIG.gatewayReadyTimeoutMs);
     socket.onmessage = (message) => {
       const queueNativeAudio = (chunk: ArrayBuffer) => {
         if (!sessionActiveRef.current || socketRef.current !== socket) return;
@@ -1135,7 +1135,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
         }
       }
       if (event.type === "transcript" && event.speaker && event.text) {
-        if (event.speaker === "aegis") clearResponseTimer();
+        if (event.speaker === "hirzexa") clearResponseTimer();
         if (event.speaker === "operator" && event.isFinal && event.text.trim() === lastSubmittedTranscriptRef.current) return;
         callbacksRef.current.onTranscript?.({ speaker: event.speaker, text: event.text, isFinal: event.isFinal ?? true });
       }
@@ -1425,7 +1425,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
         setIsActivated(false);
         setVoiceSessionState("ERROR");
         setState("error");
-        setError("Microphone permission was denied. Allow microphone access to activate Aegis.");
+        setError("Microphone permission was denied. Allow microphone access to activate Hirzexa.");
       }
     };
     recognition.onend = () => {
@@ -1436,7 +1436,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
       wakeRecognitionRestartTimerRef.current = window.setTimeout(() => {
         wakeRecognitionRestartTimerRef.current = null;
         beginWakeDetectionRef.current();
-      }, AEGIS_VOICE_SESSION_CONFIG.recognitionRestartDelayMs);
+      }, HIRZEXA_VOICE_SESSION_CONFIG.recognitionRestartDelayMs);
     };
     wakeRecognitionRef.current = recognition;
     try {
@@ -1489,7 +1489,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
     resetConversationInactivityTimer(epoch);
     // Preparing playback inside this click keeps native Gemini response audio
     // eligible for browser playback without opening the microphone early.
-    void player.prepare().catch(() => finishSessionRef.current(null, "The browser could not authorize Aegis audio playback."));
+    void player.prepare().catch(() => finishSessionRef.current(null, "The browser could not authorize Hirzexa audio playback."));
     void startNativeAudioCapture(epoch).then((started) => {
       if (!started) beginSpeechRecognition(epoch);
     });
@@ -1517,7 +1517,7 @@ export function useGeminiLiveVoice(callbacks: VoiceCallbacks = {}) {
     setSessionOutcome(null);
     setPhase("activating");
     setVoiceSessionState("ACTIVATING");
-    // This happens inside the user gesture so Aegis can play a later response.
+    // This happens inside the user gesture so Hirzexa can play a later response.
     await player.prepare().catch(() => undefined);
     beginWakeDetectionRef.current();
   }, [player]);

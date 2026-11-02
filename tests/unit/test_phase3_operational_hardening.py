@@ -10,18 +10,18 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.ai.language import ResponseLanguage, detect_response_language
-from aegis.ai.routes import _audit_agent_request
-from aegis.ai.schemas import ChatResponse, Intent
-from aegis.alerts import AlertManager
-from aegis.api.routes import alerts as alert_routes
-from aegis.api.routes import events as event_routes
-from aegis.api.security import verify_api_key
-from aegis.database.connection import Base
-from aegis.database.models import AuditLog
-from aegis.database.repositories import AuditLogRepository, EventRepository, IncidentRepository, OperationalAlertRepository
-from aegis.intelligence.incident_correlation import IncidentCorrelationService
-import aegis.database.models  # noqa: F401 - register all mapped tables
+from hirzexa.ai.language import ResponseLanguage, detect_response_language
+from hirzexa.ai.routes import _audit_agent_request
+from hirzexa.ai.schemas import ChatResponse, Intent
+from hirzexa.alerts import AlertManager
+from hirzexa.api.routes import alerts as alert_routes
+from hirzexa.api.routes import events as event_routes
+from hirzexa.api.security import verify_api_key
+from hirzexa.database.connection import Base
+from hirzexa.database.models import AuditLog
+from hirzexa.database.repositories import AuditLogRepository, EventRepository, IncidentRepository, OperationalAlertRepository
+from hirzexa.intelligence.incident_correlation import IncidentCorrelationService
+import hirzexa.database.models  # noqa: F401 - register all mapped tables
 
 
 def _session_factory(tmp_path):
@@ -104,14 +104,14 @@ def test_operator_actions_and_agent_queries_create_non_sensitive_audit_records(m
             with Session.begin() as session:
                 yield session
 
-        import aegis.database.connection as connection
+        import hirzexa.database.connection as connection
 
         monkeypatch.setattr(connection, "get_db_session", session_provider)
-        monkeypatch.setenv("AEGIS_API_KEY", "phase3-key")
+        monkeypatch.setenv("HIRZEXA_API_KEY", "phase3-key")
         app = FastAPI()
         app.include_router(event_routes.router, dependencies=[Depends(verify_api_key)])
         client = TestClient(app)
-        headers = {"X-API-Key": "phase3-key", "X-Aegis-Actor": "operator-17"}
+        headers = {"X-API-Key": "phase3-key", "X-Hirzexa-Actor": "operator-17"}
 
         response = client.patch(
             f"/events/incidents/{incident_id}/status",
@@ -168,17 +168,17 @@ def test_alert_acknowledgement_is_audited_and_language_selection_stays_local(mon
             with Session.begin() as session:
                 yield session
 
-        import aegis.database.connection as connection
+        import hirzexa.database.connection as connection
 
         monkeypatch.setattr(connection, "get_db_session", session_provider)
-        monkeypatch.setenv("AEGIS_API_KEY", "phase3-key")
+        monkeypatch.setenv("HIRZEXA_API_KEY", "phase3-key")
         alert_routes.set_alert_manager(AlertManager())
         app = FastAPI()
         app.include_router(alert_routes.router)
         client = TestClient(app)
         response = client.post(
             "/alerts/alert-phase3/acknowledge",
-            headers={"X-API-Key": "phase3-key", "X-Aegis-Actor": "operator-17"},
+            headers={"X-API-Key": "phase3-key", "X-Hirzexa-Actor": "operator-17"},
         )
         assert response.status_code == 200
         with Session() as session:

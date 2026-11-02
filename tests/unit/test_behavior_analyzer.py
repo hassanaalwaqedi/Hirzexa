@@ -1,5 +1,5 @@
 """
-AegisAI - Behavior Analyzer Unit Tests
+Hirzexa - Behavior Analyzer Unit Tests
 
 Tests for behavior detection logic.
 
@@ -7,7 +7,7 @@ Sprint 1: Security & Testing Foundation
 """
 
 import pytest
-from aegis.analysis import (
+from hirzexa.analysis import (
     BehaviorAnalyzer,
     BehaviorAnalyzerConfig,
     BehaviorFlags,

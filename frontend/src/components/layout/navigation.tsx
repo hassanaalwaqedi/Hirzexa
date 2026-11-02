@@ -27,8 +27,8 @@ export function Navigation() {
       const detail = (event as CustomEvent<{ domain?: string | null }>).detail;
       setEngagedDomain(detail?.domain ?? null);
     };
-    window.addEventListener("aegis:domain-focus", handleDomainFocus);
-    return () => window.removeEventListener("aegis:domain-focus", handleDomainFocus);
+    window.addEventListener("hirzexa:domain-focus", handleDomainFocus);
+    return () => window.removeEventListener("hirzexa:domain-focus", handleDomainFocus);
   }, []);
 
   const engagedHref = engagedDomain === "cameras" ? "/cameras"
@@ -39,7 +39,7 @@ export function Navigation() {
             : null;
 
   return (
-    <nav className="aegis-nav-rail" aria-label="Primary navigation">
+    <nav className="hirzexa-nav-rail" aria-label="Primary navigation">
       {navItems.map((item) => {
         const Icon = item.icon;
         const active = pathname === item.href;
@@ -55,7 +55,7 @@ export function Navigation() {
             data-active={active}
             data-engaged={engaged}
             className={cn(
-              "aegis-nav-link",
+              "hirzexa-nav-link",
               active && "is-active"
             )}
           >
@@ -64,7 +64,7 @@ export function Navigation() {
           </Link>
         );
       })}
-      <div className="aegis-nav-language">
+      <div className="hirzexa-nav-language">
         <LanguageSwitcher />
       </div>
     </nav>

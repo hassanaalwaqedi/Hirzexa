@@ -7,10 +7,10 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.database.connection import Base
-from aegis.database.repositories import EventRepository
-from aegis.semantic.evidence_search import EvidenceSearchRequest, EvidenceSearchService
-import aegis.database.models  # noqa: F401 - register mappings
+from hirzexa.database.connection import Base
+from hirzexa.database.repositories import EventRepository
+from hirzexa.semantic.evidence_search import EvidenceSearchRequest, EvidenceSearchService
+import hirzexa.database.models  # noqa: F401 - register mappings
 
 
 class FakeEncoder:

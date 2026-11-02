@@ -1,14 +1,14 @@
-# AegisAI presentation: critical questions and defensible answers
+# Hirzexa presentation: critical questions and defensible answers
 
 Use these as speaking notes. Replace any performance or accuracy statement with a measurement from the exact demo build and hardware.
 
 ## Opening answer (45–60 seconds)
 
-**What is AegisAI?** AegisAI helps an operator review camera activity. It detects and tracks objects, combines observations over time into contextual risk signals, records supporting evidence, and presents alerts in a live dashboard. The operator verifies the scene and decides what to do. The prototype demonstrates the data flow; field accuracy and scale still require formal evaluation.
+**What is Hirzexa?** Hirzexa helps an operator review camera activity. It detects and tracks objects, combines observations over time into contextual risk signals, records supporting evidence, and presents alerts in a live dashboard. The operator verifies the scene and decides what to do. The prototype demonstrates the data flow; field accuracy and scale still require formal evaluation.
 
 ## Questions from evaluators and engineers
 
-1. **How does this differ from running YOLO on a video?** YOLO supplies object observations. AegisAI adds tracking, contextual risk rules, event persistence, alert delivery, evidence search, and an operator workflow. Show one event moving through those stages.
+1. **How does this differ from running YOLO on a video?** YOLO supplies object observations. Hirzexa adds tracking, contextual risk rules, event persistence, alert delivery, evidence search, and an operator workflow. Show one event moving through those stages.
 2. **Why choose lightweight YOLO and ByteTrack?** They offer a practical latency and resource tradeoff for the local processing path. Compare alternatives on the same footage and hardware before claiming one is best.
 3. **What does a risk score mean?** It prioritizes review based on observed factors such as detections, proximity, persistence, and context. It is not a probability that a person will commit a crime. Show the factors and supporting frame.
 4. **How were risk weights and thresholds selected?** They are configurable engineering parameters. Before deployment, tune them against annotated footage from the intended environment and publish the tradeoff between misses and false alerts.

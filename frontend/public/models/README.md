@@ -1,6 +1,6 @@
-# Aegis rigged operator asset contract
+# Hirzexa rigged operator asset contract
 
-Place the production avatar at `aegis-operator.glb` in this directory. Until
+Place the production avatar at `hirzexa-operator.glb` in this directory. Until
 that rig is supplied, the Intelligence route uses the approved operator artwork
 with restrained state-driven motion. The artwork is an interim visual skin, not
 the final skeletal animation system.

@@ -1,5 +1,5 @@
 """
-AegisAI - Security Tests: Input Validation
+Hirzexa - Security Tests: Input Validation
 
 Tests for input sanitization and validation.
 """
@@ -15,7 +15,7 @@ class TestInputValidation:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
-        from aegis.api.app import create_app
+        from hirzexa.api.app import create_app
         
         app = create_app()
         return TestClient(app)
@@ -25,7 +25,7 @@ class TestInputValidation:
         """Valid headers with API key."""
         return {"X-API-Key": "test-key"}
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_sql_injection_in_query_params_blocked(self, client, valid_headers):
         """SQL injection attempts in query params should be safe."""
         # Attempt SQL injection in query parameter
@@ -44,7 +44,7 @@ class TestInputValidation:
             # Should either reject (422) or safely ignore
             assert response.status_code in [200, 401, 422, 500]
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_xss_in_query_params_sanitized(self, client, valid_headers):
         """XSS attempts should not be reflected."""
         xss_payloads = [
@@ -65,7 +65,7 @@ class TestInputValidation:
                 content = response.text
                 assert "<script>" not in content.lower()
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_path_traversal_blocked(self, client, valid_headers):
         """Path traversal attempts should be blocked."""
         traversal_payloads = [
@@ -83,7 +83,7 @@ class TestInputValidation:
             # Should return 404, not actual file contents
             assert response.status_code in [400, 404, 401]
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_oversized_payload_rejected(self, client, valid_headers):
         """Extremely large payloads should be rejected."""
         # Create oversized JSON payload
@@ -98,7 +98,7 @@ class TestInputValidation:
         # Should reject (422 validation error or 413 payload too large)
         assert response.status_code in [401, 413, 422, 400, 500]
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_invalid_json_handled(self, client, valid_headers):
         """Invalid JSON should return proper error."""
         response = client.post(
@@ -110,7 +110,7 @@ class TestInputValidation:
         # Should return 422 or 400 for invalid JSON
         assert response.status_code in [400, 401, 422]
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_unicode_handling(self, client, valid_headers):
         """Unicode input should be handled safely."""
         unicode_payloads = [
@@ -129,7 +129,7 @@ class TestInputValidation:
             # Should handle without crashing
             assert response.status_code in [200, 401, 422, 503]
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_null_bytes_handled(self, client, valid_headers):
         """Null bytes should not cause issues."""
         response = client.post(
@@ -141,7 +141,7 @@ class TestInputValidation:
         # Should handle safely
         assert response.status_code in [200, 401, 422, 503]
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_negative_numbers_handled(self, client, valid_headers):
         """Negative numbers in params should be validated."""
         response = client.get(
@@ -152,7 +152,7 @@ class TestInputValidation:
         # Should either reject or treat as default
         assert response.status_code in [200, 401, 422]
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_extremely_large_numbers_handled(self, client, valid_headers):
         """Extremely large numbers should not overflow."""
         response = client.get(
@@ -171,12 +171,12 @@ class TestSemanticQueryValidation:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
-        from aegis.api.app import create_app
+        from hirzexa.api.app import create_app
         
         app = create_app()
         return TestClient(app)
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_prompt_min_length_enforced(self, client):
         """Prompt should have minimum length."""
         response = client.post(
@@ -187,7 +187,7 @@ class TestSemanticQueryValidation:
         
         assert response.status_code in [401, 422]  # Validation error
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_prompt_max_length_enforced(self, client):
         """Prompt should have maximum length."""
         response = client.post(
@@ -198,7 +198,7 @@ class TestSemanticQueryValidation:
         
         assert response.status_code in [401, 422]  # Validation error
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"})
     def test_priority_range_validated(self, client):
         """Priority should be within valid range."""
         response = client.post(

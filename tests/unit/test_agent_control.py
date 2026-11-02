@@ -1,4 +1,4 @@
-from aegis.intelligence.agent_control import control_camera_runtime, permission_manifest, workspace_target
+from hirzexa.intelligence.agent_control import control_camera_runtime, permission_manifest, workspace_target
 
 
 class FakeCameraManager:
@@ -31,8 +31,8 @@ def test_permission_manifest_keeps_destructive_and_host_actions_outside_autonomy
 def test_camera_control_executes_only_configured_runtime_actions(monkeypatch):
     manager = FakeCameraManager()
     audits = []
-    monkeypatch.setattr("aegis.api.routes.cameras.get_camera_manager", lambda: manager)
-    monkeypatch.setattr("aegis.audit.record_audit", lambda *args, **kwargs: audits.append((args, kwargs)))
+    monkeypatch.setattr("hirzexa.api.routes.cameras.get_camera_manager", lambda: manager)
+    monkeypatch.setattr("hirzexa.audit.record_audit", lambda *args, **kwargs: audits.append((args, kwargs)))
 
     one = control_camera_runtime(action="stop", scope="one", camera_id="north", actor_id="operator")
     all_enabled = control_camera_runtime(action="start", scope="all", actor_id="operator")
@@ -44,7 +44,7 @@ def test_camera_control_executes_only_configured_runtime_actions(monkeypatch):
 
 
 def test_camera_control_rejects_unknown_camera(monkeypatch):
-    monkeypatch.setattr("aegis.api.routes.cameras.get_camera_manager", FakeCameraManager)
+    monkeypatch.setattr("hirzexa.api.routes.cameras.get_camera_manager", FakeCameraManager)
 
     try:
         control_camera_runtime(action="stop", scope="one", camera_id="unknown")

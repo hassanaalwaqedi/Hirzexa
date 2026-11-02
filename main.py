@@ -5,7 +5,7 @@ import os
 warnings.filterwarnings('ignore', message='.*Numpy built with MINGW.*')
 
 """
-AegisAI - Smart City Risk Intelligence System
+Hirzexa - Smart City Risk Intelligence System
 Main Entry Point
 
 Phase 1: Perception Layer - Object detection and tracking
@@ -34,7 +34,7 @@ Usage:
     # Disable display window
     python main.py --input video.mp4 --output result.mp4 --no-display
 
-Copyright 2024 AegisAI Project
+Copyright 2024 Hirzexa Project
 """
 
 import argparse
@@ -48,7 +48,7 @@ from collections import defaultdict
 import cv2
 
 from config import (
-    AegisConfig,
+    HirzexaConfig,
     DetectionConfig,
     TrackingConfig,
     VideoConfig,
@@ -60,14 +60,14 @@ from config import (
     SemanticConfig,
     DeviceType
 )
-from aegis.detection import YOLODetector
-from aegis.tracking import DeepSORTTracker
-from aegis.video import VideoSource, VideoWriter
-from aegis.visualization import Renderer
+from hirzexa.detection import YOLODetector
+from hirzexa.tracking import DeepSORTTracker
+from hirzexa.video import VideoSource, VideoWriter
+from hirzexa.visualization import Renderer
 
 # Phase 2 imports (conditional for backward compatibility)
 try:
-    from aegis.analysis import (
+    from hirzexa.analysis import (
         TrackHistoryManager,
         MotionAnalyzer,
         MotionAnalyzerConfig,
@@ -86,7 +86,7 @@ except ImportError:
 
 # Phase 3 imports (conditional for backward compatibility)
 try:
-    from aegis.risk import (
+    from hirzexa.risk import (
         RiskEngine,
         RiskEngineConfig,
         RiskWeights,
@@ -102,15 +102,15 @@ except ImportError:
 
 # Phase 4 imports (conditional for backward compatibility)
 try:
-    from aegis.alerts import AlertManager, AlertManagerConfig, AlertLevel
-    from aegis.api import APIServer, APIConfig as APIServerConfig, get_state
+    from hirzexa.alerts import AlertManager, AlertManagerConfig, AlertLevel
+    from hirzexa.api import APIServer, APIConfig as APIServerConfig, get_state
     RESPONSE_AVAILABLE = True
 except ImportError:
     RESPONSE_AVAILABLE = False
 
 # Phase 5 imports (conditional for backward compatibility)
 try:
-    from aegis.semantic import (
+    from hirzexa.semantic import (
         DinoEngine,
         PromptManager,
         SemanticTrigger,
@@ -123,8 +123,8 @@ except ImportError:
     SEMANTIC_AVAILABLE = False
 
 
-# Logging is configured by aegis.core.logging (called in aegis/__init__.py)
-logger = logging.getLogger("AegisAI")
+# Logging is configured by hirzexa.core.logging (called in hirzexa/__init__.py)
+logger = logging.getLogger("Hirzexa")
 
 
 def parse_args() -> argparse.Namespace:
@@ -135,7 +135,7 @@ def parse_args() -> argparse.Namespace:
         Parsed arguments namespace
     """
     parser = argparse.ArgumentParser(
-        description="AegisAI - Smart City Risk Intelligence System",
+        description="Hirzexa - Smart City Risk Intelligence System",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -279,7 +279,7 @@ Examples:
     return parser.parse_args()
 
 
-def build_config(args: argparse.Namespace) -> AegisConfig:
+def build_config(args: argparse.Namespace) -> HirzexaConfig:
     """
     Build configuration from command-line arguments.
     
@@ -287,7 +287,7 @@ def build_config(args: argparse.Namespace) -> AegisConfig:
         args: Parsed command-line arguments
         
     Returns:
-        AegisConfig instance
+        HirzexaConfig instance
     """
     # Detection configuration with optimizations
     detection_config = DetectionConfig(
@@ -345,7 +345,7 @@ def build_config(args: argparse.Namespace) -> AegisConfig:
     }
     device = device_map.get(args.device, DeviceType.AUTO)
     
-    return AegisConfig(
+    return HirzexaConfig(
         detection=detection_config,
         tracking=tracking_config,
         video=video_config,
@@ -376,7 +376,7 @@ def get_video_source(input_arg: str) -> tuple:
         return input_arg, False
 
 
-def create_analysis_components(config: AegisConfig):
+def create_analysis_components(config: HirzexaConfig):
     """
     Create Phase 2 analysis components.
     
@@ -389,7 +389,7 @@ def create_analysis_components(config: AegisConfig):
     if not ANALYSIS_AVAILABLE:
         raise RuntimeError("Analysis module not available")
     
-    # Create configurations from AegisConfig
+    # Create configurations from HirzexaConfig
     motion_config = MotionAnalyzerConfig(
         stationary_threshold=config.analysis.stationary_speed_threshold,
         min_history_for_analysis=config.analysis.min_history_for_analysis,
@@ -428,7 +428,7 @@ def create_analysis_components(config: AegisConfig):
 
 
 def run_perception_pipeline(
-    config: AegisConfig,
+    config: HirzexaConfig,
     input_source: str,
     output_path: str,
     show_fps: bool = True,
@@ -945,8 +945,8 @@ def run_perception_pipeline(
     return stats
 
 
-# Overlay rendering is now in aegis.pipeline.overlays
-from aegis.pipeline.overlays import draw_analysis_overlay, draw_risk_overlay  # noqa: F401
+# Overlay rendering is now in hirzexa.pipeline.overlays
+from hirzexa.pipeline.overlays import draw_analysis_overlay, draw_risk_overlay  # noqa: F401
 
 
 def print_summary(stats: dict, output_path: str) -> None:
@@ -958,7 +958,7 @@ def print_summary(stats: dict, output_path: str) -> None:
         output_path: Path to output video
     """
     print("\n" + "=" * 60)
-    print("AegisAI - Processing Complete")
+    print("Hirzexa - Processing Complete")
     print("=" * 60)
     print(f"  Frames Processed:    {stats['frames_processed']}")
     print(f"  Total Detections:    {stats['total_detections']}")

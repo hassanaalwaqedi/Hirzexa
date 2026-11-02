@@ -1,8 +1,8 @@
-# AegisAI Semantic Layer
+# Hirzexa Semantic Layer
 
 **Phase 5: Language-Guided Scene Understanding**
 
-Transform AegisAI from a system that *sees objects* into a system that *understands situations*.
+Transform Hirzexa from a system that *sees objects* into a system that *understands situations*.
 
 ---
 
@@ -249,5 +249,5 @@ If Grounding DINO is not installed, the system runs in **fallback mode**:
 
 Enable debug mode for simulated detections:
 ```bash
-export AEGIS_DEBUG=true
+export HIRZEXA_DEBUG=true
 ```

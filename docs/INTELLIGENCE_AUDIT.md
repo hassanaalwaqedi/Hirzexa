@@ -18,25 +18,25 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 | --- | --- | --- | --- | --- | --- |
 | Page shell and “AI Security OS” label | `frontend/src/app/intelligence/page.tsx`, `IntelligencePage` | None | Mock/decorative | Static strings and animation-only layout. | Label as prototype until status/capability data is attached. |
 | Header clock | `IntelligencePage`, `currentTime` effect | Browser clock | Real, local only | Updates every 60 seconds with `new Date()`; not a service freshness timestamp. | Keep as local time, but add separately sourced `context.generated_at` and per-source freshness. |
-| Cameras Online | `StatBar`; `useCoreStatus` | `GET /api/ai/metrics` -> `ai_system_metrics` -> `get_camera_status` | **Broken for online count; partial total** | `aegis/ai/tools.py:get_camera_status` instantiates `CameraRegistry` and checks `getattr(config, "status", "")`; `aegis/camera/types.py:CameraConfig` has no `status` field. Configured cameras are therefore counted as non-online. | Source runtime status from `CameraManager` / `CameraRuntimeStatus`, return `online`, `offline`, `stale`, and freshness in a typed contract. |
+| Cameras Online | `StatBar`; `useCoreStatus` | `GET /api/ai/metrics` -> `ai_system_metrics` -> `get_camera_status` | **Broken for online count; partial total** | `hirzexa/ai/tools.py:get_camera_status` instantiates `CameraRegistry` and checks `getattr(config, "status", "")`; `hirzexa/camera/types.py:CameraConfig` has no `status` field. Configured cameras are therefore counted as non-online. | Source runtime status from `CameraManager` / `CameraRuntimeStatus`, return `online`, `offline`, `stale`, and freshness in a typed contract. |
 | Active Incidents | `StatBar`; `useCoreStatus` maps `alerts_today` to `activeIncidents` | `GET /api/ai/metrics` -> `get_active_alerts` | Partial / mislabeled | `get_active_alerts` reads the in-memory `AlertingStage` event deque and filters `type == "risk_alert"`; `/metrics` calls this “alerts_today”. There is no Incident model/workflow and no date filter. | Rename to “active risk alerts” until an incident model/state machine exists; do not call it incidents or daily count. |
 | System Health | `useCoreStatus` | `GET /api/ai/metrics` -> `get_system_health` | Partial, misleading presentation | `useCoreStatus` converts only DB/pipeline string values into arbitrary 98/85/60 percentages. `StatBar` always says “All Systems Normal.” `get_system_health` does perform DB, Redis, pipeline, and model checks. | Return component checks and a computed documented health policy from backend; render degraded reasons rather than a fixed reassuring subtitle. |
 | Officers Online | `useCoreStatus` | None | Mock/unavailable | Set to `0` with comment “No officer tracking yet.” No identity, shift, or staffing source is wired. | Remove the card or render “Not available” until a separately authorised operations/staff system exists. |
 | AI Confidence badge | `StatBar`; `useCoreStatus` | Derived from pipeline string, not AI evidence | Mock | Hard-coded initial `92`; subsequently `92` when pipeline is “running”, else `70`; badge always says “High.” `AIOrb` receives `confidence` but does not use it. | Remove global AI confidence. For each answer show retrieval coverage, evidence count/freshness, and calibrated model confidence only when validated. |
 | AI assistant greeting and external-link icon | `SuggestionsPanel` | None | Mock/broken | “Hello Hassan” is hard-coded. `ExternalLink` is an icon, not a link or button action. | Use authenticated display name or neutral greeting; remove/implement the link. |
-| AI suggestions | `useAISuggestions`; `SuggestionsPanel` | `GET /api/ai/suggestions` | Partial, with mock fallback | Server derives offline-camera, risk-alert, and health suggestions through `aegis/ai/tools.py`; but it always pads with “Export daily report” and “Search security events”. Client also replaces empty server data with hard-coded prompts. Clicking sidebar suggestions directly calls chat and TTS, bypassing chat history and `onAction`. | Return only evidence-backed suggestions with evidence refs and capability/availability; remove client and server default suggestions, or visibly label non-executable examples. |
-| Suggestion “Export daily report” | `aegis/ai/routes.py:ai_suggestions`; click handler in `SuggestionsPanel` | Chat only | Broken claim | `generate_incident_report` only constructs a dictionary; no report file/export action is exposed by this flow. | Remove until a reviewed report endpoint and operator confirmation exist. |
+| AI suggestions | `useAISuggestions`; `SuggestionsPanel` | `GET /api/ai/suggestions` | Partial, with mock fallback | Server derives offline-camera, risk-alert, and health suggestions through `hirzexa/ai/tools.py`; but it always pads with “Export daily report” and “Search security events”. Client also replaces empty server data with hard-coded prompts. Clicking sidebar suggestions directly calls chat and TTS, bypassing chat history and `onAction`. | Return only evidence-backed suggestions with evidence refs and capability/availability; remove client and server default suggestions, or visibly label non-executable examples. |
+| Suggestion “Export daily report” | `hirzexa/ai/routes.py:ai_suggestions`; click handler in `SuggestionsPanel` | Chat only | Broken claim | `generate_incident_report` only constructs a dictionary; no report file/export action is exposed by this flow. | Remove until a reviewed report endpoint and operator confirmation exist. |
 | AI activity feed | `useIntelligenceFeed`; `ActivityFeed` | Polls `GET /api/ai/context` every 15 seconds | Partial with synthetic fallback | Context reads alerts/recent events. When empty, client injects “System Status ... timestamp: Now”; errors are silently swallowed. Feed IDs use `Date.now()`, and “View all” has no handler. | Subscribe to typed event stream, show source ID/timestamp/camera and empty/offline states; remove synthetic feed row and implement or remove “View all.” |
 | Chat input and answer display | `CommandBar`; `sendChatMessage` | `POST /api/ai/chat` -> `ai_chat` -> `AIOrchestrator.process` | Partial | Real request/response path exists and the server collects read-only system context. Messages live only in React state; `ChatRequest.conversation_id` is unused and no history is sent despite `AIOrchestrator.process` reading a non-schema `history` attribute. `sources` returned by the API are not shown. | Persist auditable conversation turns; display clickable, permission-checked evidence citations; enforce context and conversation schemas. |
-| LLM grounding and citations | `aegis/ai/prompts.py`, `AIOrchestrator._parse_response` | Gemini or `FallbackProvider` | Partial, not enforceably grounded | Prompt instructs the LLM to use verified context, but `_parse_response` accepts LLM-provided answer, source list, actions, and confidence without server-side citation validation. There is no retrieval coverage check. | Generate citations from retrieved records server-side; reject/label unsupported claims; return “insufficient evidence” when evidence is absent. |
+| LLM grounding and citations | `hirzexa/ai/prompts.py`, `AIOrchestrator._parse_response` | Gemini or `FallbackProvider` | Partial, not enforceably grounded | Prompt instructs the LLM to use verified context, but `_parse_response` accepts LLM-provided answer, source list, actions, and confidence without server-side citation validation. There is no retrieval coverage check. | Generate citations from retrieved records server-side; reject/label unsupported claims; return “insufficient evidence” when evidence is absent. |
 | Chat confidence in message bubbles | `CommandBar.processResponse` | `ChatResponse.confidence` | Mock / uncalibrated | `AIOrchestrator._parse_response` defaults missing LLM confidence to `0.85`; no calibration or test validates it. Fallback returns `0.3` or provider returns `0`. | Replace with evidence-quality fields; only expose model confidence after calibration and evaluation. |
 | Chat actions | `handleAction` in `IntelligencePage` | LLM `actions` from `/api/ai/chat` | Unsafe/partial | Frontend executes `navigate` with `window.location.href = action.target`; no action allowlist validates target. `open_panel` only sets a visual selected node. The server accepts arbitrary LLM action objects in `_parse_response`. | Server-side action registry with typed parameters, RBAC, audit event, and confirmation policy. Initially allow only read-only navigation. |
 | Conversation history | `CommandBar` local `messages` | None | Mock/local-only | Last six messages are rendered only in browser memory; no reload persistence, no `NLQRepository` use, no conversation ID. | Store operator-owned, retention-controlled conversations and tool invocations; support erase/export policy. |
 | Voice microphone | `CommandBar.toggleVoice`; `sendVoiceCommand` | Browser `SpeechRecognition` / `webkitSpeechRecognition`; `POST /api/ai/voice` | Partial prototype | It runs continuous browser recognition, sends final transcript, and browser TTS reads response. No wake word, no explicit hands-free toggle, no silence timeout, no explicit permission/privacy policy, no shortcut/emergency stop state model. Browser speech recognition may be cloud-backed. | Do not market as hands-free. Implement the design in section 4 before enabling persistent listening. |
-| Voice backend path | `aegis/ai/routes.py:ai_voice` | `VoiceRequest.text` -> `AIOrchestrator.process` | Partial/broken voice specialization | `VoiceRequest.audio_base64` is unused; only transcript is read. `ai_voice` does not pass `voice_mode=True`, so `VOICE_SYSTEM_PROMPT` is unused by this endpoint. | Use a command-session API and pass a typed transcript; keep audio local by default; validate intents/actions. |
+| Voice backend path | `hirzexa/ai/routes.py:ai_voice` | `VoiceRequest.text` -> `AIOrchestrator.process` | Partial/broken voice specialization | `VoiceRequest.audio_base64` is unused; only transcript is read. `ai_voice` does not pass `voice_mode=True`, so `VOICE_SYSTEM_PROMPT` is unused by this endpoint. | Use a command-session API and pass a typed transcript; keep audio local by default; validate intents/actions. |
 | TTS toggle | `CommandBar.speak` and volume button | Browser `speechSynthesis` | Real browser feature, not operational evidence | Speech can read arbitrary model text; selected voice availability varies by browser. `SuggestionsPanel` separately speaks text and does not respect `CommandBar` voice-enabled state. | Make speaking a user preference at page scope and speak only the reviewed answer summary/citations state. |
 | Static command chips | `CommandBar.SUGGESTIONS` | Chat endpoint | Mock examples with unsafe implication | Includes “Generate incident report”; all four bypass `handleSubmit` and invoke chat directly. | Replace with evidence-driven suggested read queries, or label as examples and route through one guarded submit path. |
-| AEGIS Intelligence Core orb | `AIOrb` | Derived UI status only | Decorative | Canvas particles use `Math.random()` locally; labels and rings have no backend interaction. | Retain as visual identity only if explicitly labelled “visual system map,” not a core status/control. |
+| HIRZEXA Intelligence Core orb | `AIOrb` | Derived UI status only | Decorative | Canvas particles use `Math.random()` locally; labels and rings have no backend interaction. | Retain as visual identity only if explicitly labelled “visual system map,” not a core status/control. |
 | Investigation node | `AGENT_NODES` -> `NodeOrbit` | None | Mock | Constant `{ id: "investigation", status: "active" }`; click only changes CSS state. No investigation route/model. | Disable/link to a future workspace only after Phase 2. |
 | Search & Semantic node | `AGENT_NODES`; `NodeOrbit` | None from this page | Partial capability, mock connection | `/semantic/query` and `SemanticQueryEngine.search` exist elsewhere, but this node never calls or navigates to them. | Link to `/semantic` and surface `GET /semantic/stats` availability/freshness. |
 | Tracking & Behaviour node | `AGENT_NODES`; `NodeOrbit` | None from this page | Partial capability, mock connection | Tracking/risk code exists (`TrackingStage`, `RiskScoringStage`, `RiskEngine`), but node status is constant and opens no track evidence. | Link to typed tracks/investigation view; display pipeline stage health, not `active`. |
@@ -53,14 +53,14 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 ### 1.2 Backend and data-path observations
 
-1. **The active API state is real but process-local.** `aegis/api/state.py:APIState` keeps tracks, a maximum-100 event deque, status, and statistics under a lock. `aegis/video/camera_sources.py` calls `update_track`, `update_status`, `update_statistics`, and `add_event`. This supports live service output but does not by itself survive restart.
-2. **The current pipeline composition is present.** `aegis/pipeline/startup.py:create_pipeline` wires detection, tracking, risk scoring, and alerting stages. `RiskScoringStage.process` calls `RiskEngine.compute_frame_risks`; `RiskEngine` uses explicit weights, thresholds, zone context, and temporal adjustment. Unit tests in `tests/unit/test_risk_engine.py` cover deterministic scoring and explanations.
-3. **Alert persistence as wired is broken.** `aegis/pipeline/alerting.py:_persist_event` imports `aegis.database.repositories.EventRepository` then calls `repo.create_event(...)`. That repository defines `create(...)`, not `create_event(...)`; the exception is caught and only debug-logged. Thus this pipeline path does not persist high-risk events through that repository.
-4. **The AI fallback event query also has a session defect.** `aegis/ai/tools.py:get_recent_events` passes `get_db_session()` directly to `EventRepository`; `aegis/database/connection.py:get_db_session` is a context manager and must be entered with `with`. The repository receives a context-manager object rather than a `Session`, errors, and returns `[]`. Pipeline-buffer data may mask this while running.
-5. **There are parallel persistence stacks.** `aegis/database/models.py` and `aegis/db/models.py` define overlapping Event/Alert/track models against different bases/connection modules. `aegis/db/repository.py` contains `create_event`, while the pipeline imports `aegis.database.repositories`. This ambiguity is a material production risk until one schema/repository is selected and migration-tested.
-6. **The semantic evidence engine is a real, conservative rule/query matcher.** `aegis/semantic/query_engine.py:SemanticQueryEngine.search` evaluates current tracks, events, and statistics and returns evidence strings, camera IDs, timestamps, and track/event identifiers when supplied. Tests in `tests/unit/test_semantic_query_engine.py` verify it does not fabricate a red-backpack result and requires a person-weapon association. Its `semantic_confidence` is a deterministic match heuristic, not calibrated visual/model confidence.
-7. **The `/semantic` route is usable but terminology is inconsistent.** `aegis/api/routes/semantic.py` exposes live evidence results; route comments still claim Grounding DINO. `aegis/api/app.py:_initialize_semantic_state` initialises `SemanticQueryEngine`, whereas the query engine explicitly says it is separate from Grounding DINO. Product copy must distinguish evidence search from open-vocabulary visual detection.
-8. **WebSockets exist but are not an event model for Intelligence yet.** `aegis/api/websocket.py:websocket_endpoint` sends the entire `APIState` snapshot every 500 ms; `broadcast_event` and `broadcast_alert` are defined but source search found no caller. Camera frame/events WebSockets in `aegis/api/routes/cameras.py` poll manager buffers. The Intelligence page uses REST polling only. The generic and camera WebSocket handlers call `accept()` without authentication.
+1. **The active API state is real but process-local.** `hirzexa/api/state.py:APIState` keeps tracks, a maximum-100 event deque, status, and statistics under a lock. `hirzexa/video/camera_sources.py` calls `update_track`, `update_status`, `update_statistics`, and `add_event`. This supports live service output but does not by itself survive restart.
+2. **The current pipeline composition is present.** `hirzexa/pipeline/startup.py:create_pipeline` wires detection, tracking, risk scoring, and alerting stages. `RiskScoringStage.process` calls `RiskEngine.compute_frame_risks`; `RiskEngine` uses explicit weights, thresholds, zone context, and temporal adjustment. Unit tests in `tests/unit/test_risk_engine.py` cover deterministic scoring and explanations.
+3. **Alert persistence as wired is broken.** `hirzexa/pipeline/alerting.py:_persist_event` imports `hirzexa.database.repositories.EventRepository` then calls `repo.create_event(...)`. That repository defines `create(...)`, not `create_event(...)`; the exception is caught and only debug-logged. Thus this pipeline path does not persist high-risk events through that repository.
+4. **The AI fallback event query also has a session defect.** `hirzexa/ai/tools.py:get_recent_events` passes `get_db_session()` directly to `EventRepository`; `hirzexa/database/connection.py:get_db_session` is a context manager and must be entered with `with`. The repository receives a context-manager object rather than a `Session`, errors, and returns `[]`. Pipeline-buffer data may mask this while running.
+5. **There are parallel persistence stacks.** `hirzexa/database/models.py` and `hirzexa/db/models.py` define overlapping Event/Alert/track models against different bases/connection modules. `hirzexa/db/repository.py` contains `create_event`, while the pipeline imports `hirzexa.database.repositories`. This ambiguity is a material production risk until one schema/repository is selected and migration-tested.
+6. **The semantic evidence engine is a real, conservative rule/query matcher.** `hirzexa/semantic/query_engine.py:SemanticQueryEngine.search` evaluates current tracks, events, and statistics and returns evidence strings, camera IDs, timestamps, and track/event identifiers when supplied. Tests in `tests/unit/test_semantic_query_engine.py` verify it does not fabricate a red-backpack result and requires a person-weapon association. Its `semantic_confidence` is a deterministic match heuristic, not calibrated visual/model confidence.
+7. **The `/semantic` route is usable but terminology is inconsistent.** `hirzexa/api/routes/semantic.py` exposes live evidence results; route comments still claim Grounding DINO. `hirzexa/api/app.py:_initialize_semantic_state` initialises `SemanticQueryEngine`, whereas the query engine explicitly says it is separate from Grounding DINO. Product copy must distinguish evidence search from open-vocabulary visual detection.
+8. **WebSockets exist but are not an event model for Intelligence yet.** `hirzexa/api/websocket.py:websocket_endpoint` sends the entire `APIState` snapshot every 500 ms; `broadcast_event` and `broadcast_alert` are defined but source search found no caller. Camera frame/events WebSockets in `hirzexa/api/routes/cameras.py` poll manager buffers. The Intelligence page uses REST polling only. The generic and camera WebSocket handlers call `accept()` without authentication.
 9. **AI endpoint tests are absent.** Repository tests cover risk, semantic matching, some pipeline components, API auth/CORS, and input validation. Source search found no direct tests for `/api/ai/chat`, `/api/ai/voice`, `/api/ai/context`, `/api/ai/metrics`, suggestions, action validation, conversation retention, or WebSocket authorization.
 
 ## 2. Capability truth map
@@ -88,7 +88,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P0.
 - **User value:** operators can tell what is current, unavailable, stale, or degraded.
-- **Likely files/services:** new `aegis/intelligence/context_service.py`; `aegis/api/routes/intelligence_context.py`; `aegis/ai/context.py`; `frontend/src/lib/ai-api.ts`; `frontend/src/hooks/useIntelligence.ts`.
+- **Likely files/services:** new `hirzexa/intelligence/context_service.py`; `hirzexa/api/routes/intelligence_context.py`; `hirzexa/ai/context.py`; `frontend/src/lib/ai-api.ts`; `frontend/src/hooks/useIntelligence.ts`.
 - **Backend/data-model changes:** versioned response described in section 5; source timestamps, data provenance, degraded reasons, capability flags; use `CameraManager` runtime state rather than config registry for online counts.
 - **Frontend UX:** replace arbitrary score/status copy with check-level state, timestamp, and empty/error/offline panels.
 - **Tests required:** contract tests for no pipeline, no database, Redis fallback, offline cameras, stale data, and schema compatibility.
@@ -110,7 +110,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P0.
 - **User value:** evidence does not disappear or conflict after restarts.
-- **Likely files/services:** `aegis/pipeline/alerting.py`, `aegis/ai/tools.py`, `aegis/database/*`, `aegis/db/*`, `alembic/*`.
+- **Likely files/services:** `hirzexa/pipeline/alerting.py`, `hirzexa/ai/tools.py`, `hirzexa/database/*`, `hirzexa/db/*`, `alembic/*`.
 - **Backend/data-model changes:** select one SQLAlchemy base/models/repository layer; replace the invalid `create_event` call; use `with get_db_session() as session`; add camera ID/evidence/ref fields and transaction boundaries.
 - **Frontend UX:** distinguish live buffer from persisted record; show persistence failure/degraded status.
 - **Tests required:** integration test processes a risk event, restarts/recreates state, then retrieves the same event/alert/track evidence; migration tests for SQLite and PostgreSQL.
@@ -121,7 +121,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P0.
 - **User value:** faster, trustworthy live updates without stale polling and without exposing operational data.
-- **Likely files/services:** `aegis/api/websocket.py`, `aegis/api/routes/cameras.py`, `aegis/core/events.py`, frontend query/socket hooks.
+- **Likely files/services:** `hirzexa/api/websocket.py`, `hirzexa/api/routes/cameras.py`, `hirzexa/core/events.py`, frontend query/socket hooks.
 - **Backend/data-model changes:** authenticated WebSocket handshake/session, event envelope (`event_id`, `type`, `occurred_at`, `source`, `schema_version`), subscriptions/cursors, Redis stream consumer bridge, no full-state 500 ms broadcasts.
 - **Frontend UX:** connection state, last event time, reconnection/replay indicator, offline fallback to bounded polling.
 - **Tests required:** auth rejection, reconnect/cursor replay, event order/deduplication, backpressure, no cross-user subscription leakage.
@@ -132,7 +132,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P0.
 - **User value:** protects operator and camera data while making failures visible.
-- **Likely files/services:** `frontend/src/lib/config.ts`, `.env.example`, `aegis/api/security.py`, API test suite.
+- **Likely files/services:** `frontend/src/lib/config.ts`, `.env.example`, `hirzexa/api/security.py`, API test suite.
 - **Backend/data-model changes:** production session/JWT or same-origin gateway; remove requirement for privileged `NEXT_PUBLIC_*` API keys; rate limits/audit context for AI endpoints.
 - **Frontend UX:** explicit unauthenticated/forbidden/degraded messages and sign-in/session state.
 - **Tests required:** no production browser key configuration, endpoint authorisation, WebSocket authorisation, client error state, API contract validation.
@@ -145,7 +145,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P0 for safety, P1 sequencing after P0 data contract.
 - **User value:** answers point to records an operator can inspect.
-- **Likely files/services:** `aegis/ai/{context,orchestrator,tools,schemas}.py`, semantic service, event/track/recording repositories, new evidence API.
+- **Likely files/services:** `hirzexa/ai/{context,orchestrator,tools,schemas}.py`, semantic service, event/track/recording repositories, new evidence API.
 - **Backend/data-model changes:** retrieve authorised events, alerts, tracks, detections, recordings and health snapshots by stable IDs; create citation objects with camera ID, timestamp, recording/frame URL, freshness, and permission scope.
 - **Frontend UX:** citation chips open evidence panels; “insufficient evidence” state; show answer provenance rather than a global confidence score.
 - **Tests required:** retrieval precision/recall fixtures, citation resolver test, prohibited unsupported-answer tests, authorisation filtering test.
@@ -156,7 +156,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P0 safety / P1 delivery.
 - **User value:** operators can use assistance without LLM-controlled navigation or system changes.
-- **Likely files/services:** `aegis/ai/orchestrator.py`, new `aegis/ai/action_registry.py`, `schemas.py`, frontend action renderer, audit model/migration.
+- **Likely files/services:** `hirzexa/ai/orchestrator.py`, new `hirzexa/ai/action_registry.py`, `schemas.py`, frontend action renderer, audit model/migration.
 - **Backend/data-model changes:** typed tool/action union for `get_context`, `open_evidence`, `filter_events`, `open_camera`, and `draft_report`; RBAC check and audit record for each invocation.
 - **Frontend UX:** actions are labelled proposals with cited impact; read actions may execute, sensitive actions require confirmation.
 - **Tests required:** allowlist/denylist, target validation, RBAC, audit persistence, adversarial LLM action payloads.
@@ -167,7 +167,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P1.
 - **User value:** quick search of verified operational evidence without overstating computer vision semantics.
-- **Likely files/services:** `aegis/semantic/query_engine.py`, semantic routes, repositories/index job, `frontend/src/app/semantic`, Intelligence links.
+- **Likely files/services:** `hirzexa/semantic/query_engine.py`, semantic routes, repositories/index job, `frontend/src/app/semantic`, Intelligence links.
 - **Backend/data-model changes:** persist searchable evidence, attach recording/frame references, result source/freshness fields, query audit records, and a clear `live_evidence` capability state.
 - **Frontend UX:** expose Search & Semantic node as a route to semantic search; show evaluated scope, citations, no-match, engine-disabled, and stale-data states.
 - **Tests required:** time-window/camera filters, durable evidence fixture, citation preservation, multilingual/unknown-term false-positive tests.
@@ -180,7 +180,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P1.
 - **User value:** turns alerts into operator-owned investigations rather than decorative “incident management.”
-- **Likely files/services:** new `aegis/investigations/*`, migrations/models, alert/event/recording routes, `frontend/src/app/investigations/*`.
+- **Likely files/services:** new `hirzexa/investigations/*`, migrations/models, alert/event/recording routes, `frontend/src/app/investigations/*`.
 - **Backend/data-model changes:** `Incident`, `Investigation`, `EvidenceLink`, `OperatorNote`, owner/status/timeline/retention fields; link only operator-selected alerts/tracks/events/recordings.
 - **Frontend UX:** timeline, related tracks, camera/recording evidence, notes, evidence bundle, explicit ownership/status; no automatic escalation.
 - **Tests required:** lifecycle transitions, RBAC, evidence link integrity, note audit history, retention/export permissions.
@@ -191,7 +191,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 
 - **Priority:** P1.
 - **User value:** operators can understand why a risk is ranked and assess whether data supports it.
-- **Likely files/services:** `aegis/risk/*`, `pipeline/risk_scoring.py`, persistence models, events/tracks APIs, investigation UI.
+- **Likely files/services:** `hirzexa/risk/*`, `pipeline/risk_scoring.py`, persistence models, events/tracks APIs, investigation UI.
 - **Backend/data-model changes:** persist factor raw/weighted values, zone/temporal adjustments, thresholds, rules/model versions, input timestamps, calibration version, and verification state.
 - **Frontend UX:** expandable “why this risk” panel with factors, limitations, source data, stale/unsupported notices, and no person-level conclusions beyond observed evidence.
 - **Tests required:** deterministic explanation snapshot tests, version migration, calibration-report checks, unsupported capability regression tests.
@@ -244,7 +244,7 @@ The strongest implemented foundations are: camera/frame ingestion, active in-mem
 - **Definition of done / acceptance criteria:** no privileged browser secret, TLS everywhere, tested retention controls, documented data flows, and production auth/session management.
 - **Implementation risk:** high deployment and compliance risk.
 
-## 4. Privacy-aware hands-free “Hi, Aegis” design — do not implement yet
+## 4. Privacy-aware hands-free “Hi, Hirzexa” design — do not implement yet
 
 ### Design position
 
@@ -256,7 +256,7 @@ The current continuous `SpeechRecognition` control is a development prototype, n
 flowchart LR
     Operator[Authorised operator] --> Toggle[Explicit hands-free toggle]
     Toggle --> Permission[One-time browser microphone permission]
-    Permission --> LocalWake[Local-only wake-word engine\n"Hi, Aegis"]
+    Permission --> LocalWake[Local-only wake-word engine\n"Hi, Hirzexa"]
     LocalWake -->|wake word only| Ack[Local acknowledgement\n"How can I help?"]
     Ack --> CommandCapture[Bounded command capture\n8-10 s silence timeout]
     CommandCapture --> LocalSTT[Local/approved command STT]
@@ -533,4 +533,4 @@ The backend should derive this from runtime camera state, APIState, durable repo
 
 ## Audit conclusion
 
-AegisAI should position the current Intelligence page as an **experimental operations view** until Phase 0 is complete. The system can assist authorised operators by presenting detected, tracked, and risk-scored evidence, but it must not imply that decorative modules, LLM confidence, continuous voice listening, incident management, knowledge graphs, patrol, or automation are operational. Operator review, explicit confirmation for impactful actions, truthful degraded states, and evidence citations are the path from visual prototype to a useful intelligence copilot.
+Hirzexa should position the current Intelligence page as an **experimental operations view** until Phase 0 is complete. The system can assist authorised operators by presenting detected, tracked, and risk-scored evidence, but it must not imply that decorative modules, LLM confidence, continuous voice listening, incident management, knowledge graphs, patrol, or automation are operational. Operator review, explicit confirmation for impactful actions, truthful degraded states, and evidence citations are the path from visual prototype to a useful intelligence copilot.

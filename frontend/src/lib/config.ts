@@ -5,11 +5,11 @@ function trimTrailingSlash(value: string) {
 }
 
 export const appConfig = {
-  // Requests flow through the Next.js server proxy. This keeps AEGIS_API_KEY
+  // Requests flow through the Next.js server proxy. This keeps HIRZEXA_API_KEY
   // server-side instead of embedding it in the browser bundle.
   apiUrl: DASHBOARD_API_PROXY,
-  wsUrl: process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_AEGIS_WS_URL
-    ? trimTrailingSlash(process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_AEGIS_WS_URL || "")
+  wsUrl: process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_HIRZEXA_WS_URL
+    ? trimTrailingSlash(process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_HIRZEXA_WS_URL || "")
     : "",
   requestTimeoutMs: 10000
 };
@@ -58,7 +58,7 @@ function websocketBase(): URL | null {
 
 /**
  * Obtain an ephemeral backend-issued WebSocket credential. The browser never
- * receives the long-lived AEGIS_API_KEY; the Next server proxy performs that
+ * receives the long-lived HIRZEXA_API_KEY; the Next server proxy performs that
  * authenticated exchange.
  */
 export async function createAuthenticatedWebSocket(url: string): Promise<WebSocket> {

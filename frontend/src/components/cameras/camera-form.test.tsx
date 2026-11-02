@@ -4,7 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 
 import messages from "../../../messages/en.json";
 
-vi.mock("@/hooks/use-aegis-api", async () => {
+vi.mock("@/hooks/use-hirzexa-api", async () => {
   const React = await import("react");
   const successfulTest = {
     ok: true,

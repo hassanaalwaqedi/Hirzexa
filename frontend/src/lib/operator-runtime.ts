@@ -1,5 +1,5 @@
 import type { OperatorExecution } from "./operator-api";
-import type { AegisVoiceSessionState, VoiceState } from "./live-voice";
+import type { HirzexaVoiceSessionState, VoiceState } from "./live-voice";
 
 /**
  * The one authoritative state of the embodied operator.  These values are
@@ -69,7 +69,7 @@ export type OperatorTarget = "cameras" | "events" | "risk" | "tracking" | "evide
 
 export type OperatorRuntimeInput = {
   voiceState: VoiceState;
-  voiceSessionState?: AegisVoiceSessionState;
+  voiceSessionState?: HirzexaVoiceSessionState;
   microphoneActive: boolean;
   commandPending: boolean;
   toolPending: boolean;

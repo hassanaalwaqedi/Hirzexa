@@ -1,4 +1,4 @@
-from aegis.semantic.query_engine import SemanticQueryEngine
+from hirzexa.semantic.query_engine import SemanticQueryEngine
 
 
 def test_weapon_person_query_requires_an_association():

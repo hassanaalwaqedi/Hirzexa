@@ -5,7 +5,7 @@ import { Camera as CameraIcon, Loader2, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getErrorMessage } from "@/lib/errors";
-import { useBrowserFrameMutation } from "@/hooks/use-aegis-api";
+import { useBrowserFrameMutation } from "@/hooks/use-hirzexa-api";
 import type { Camera, Track } from "@/types";
 
 const ANALYSIS_INTERVAL_MS = 200;

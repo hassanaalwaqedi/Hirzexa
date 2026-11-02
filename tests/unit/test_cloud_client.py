@@ -1,5 +1,5 @@
 """
-AegisAI - Cloud Client Unit Tests
+Hirzexa - Cloud Client Unit Tests
 
 Tests the cloud communication layer including circuit breaker,
 event queuing, and verdict handling.
@@ -9,9 +9,9 @@ import time
 import pytest
 from unittest.mock import patch, MagicMock
 
-from aegis.cloud.cloud_client import CloudClient, CircuitBreaker
-from aegis.cloud.cloud_types import CloudVerdict
-from aegis.edge.event_types import SuspiciousEvent
+from hirzexa.cloud.cloud_client import CloudClient, CircuitBreaker
+from hirzexa.cloud.cloud_types import CloudVerdict
+from hirzexa.edge.event_types import SuspiciousEvent
 from config import CloudConfig
 
 

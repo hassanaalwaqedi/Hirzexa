@@ -1,11 +1,11 @@
-# AegisAI — Current Engineering Status
+# Hirzexa — Current Engineering Status
 
 **Reviewed:** 2026-09-29
 **Scope:** Repository inspection, not a completed field evaluation or fresh production audit.
 
 ## What exists
 
-AegisAI is an operator-assistance prototype. It connects camera sources, detects and tracks objects, derives contextual risk signals, persists events and evidence, and exposes REST/WebSocket data to a Next.js dashboard. Optional semantic search and Gemini-based text/voice workflows depend on their configuration and services. Risk scores prioritize human review; they do not establish intent or authorize an automated response.
+Hirzexa is an operator-assistance prototype. It connects camera sources, detects and tracks objects, derives contextual risk signals, persists events and evidence, and exposes REST/WebSocket data to a Next.js dashboard. Optional semantic search and Gemini-based text/voice workflows depend on their configuration and services. Risk scores prioritize human review; they do not establish intent or authorize an automated response.
 
 The current implementation uses Ultralytics YOLO components and ByteTrack-compatible tracking as its principal lightweight path. DeepSORT remains in the repository as another tracking component. The backend uses FastAPI and SQLAlchemy; SQLite is the local default, with PostgreSQL and Redis deployment paths documented. The frontend is a Next.js application.
 

@@ -4,8 +4,8 @@ from types import SimpleNamespace
 import numpy as np
 
 from config import DetectionConfig
-from aegis.analysis.analysis_types import BehaviorFlags, CrowdMetrics, MotionState, TrackAnalysis
-from aegis.video.camera_sources import FrameIngestionService
+from hirzexa.analysis.analysis_types import BehaviorFlags, CrowdMetrics, MotionState, TrackAnalysis
+from hirzexa.video.camera_sources import FrameIngestionService
 
 
 def _person_track() -> SimpleNamespace:

@@ -41,16 +41,21 @@ function localRootEnvValue(name: string): string | undefined {
   return undefined;
 }
 
-function serverEnvValue(name: "AEGIS_API_URL" | "AEGIS_API_KEY") {
-  return process.env[name] || localRootEnvValue(name);
+function serverEnvValue(name: "HIRZEXA_API_URL" | "HIRZEXA_API_KEY") {
+  const legacyName = name.replace("HIRZEXA_", "AEGIS_");
+  return process.env[name] || localRootEnvValue(name) || process.env[legacyName] || localRootEnvValue(legacyName);
 }
 
 function dashboardProxySignature(apiKey: string) {
+  return createHmac("sha256", apiKey).update("hirzexa-dashboard-proxy-v1").digest("hex");
+}
+
+function legacyDashboardProxySignature(apiKey: string) {
   return createHmac("sha256", apiKey).update("aegis-dashboard-proxy-v1").digest("hex");
 }
 
 function getBackendUrl(path: string[], search: string) {
-  const configuredUrl = serverEnvValue("AEGIS_API_URL") || "http://127.0.0.1:8080";
+  const configuredUrl = serverEnvValue("HIRZEXA_API_URL") || "http://127.0.0.1:8080";
   const base = new URL(configuredUrl);
   const normalizedPath = path.map(encodeURIComponent).join("/");
   base.pathname = `${base.pathname.replace(/\/$/, "")}/${normalizedPath}`;
@@ -59,7 +64,7 @@ function getBackendUrl(path: string[], search: string) {
 }
 
 async function proxy(request: NextRequest, context: RouteContext) {
-  const apiKey = serverEnvValue("AEGIS_API_KEY");
+  const apiKey = serverEnvValue("HIRZEXA_API_KEY");
   if (!apiKey) {
     return NextResponse.json(
       { detail: "Dashboard API proxy is not configured with a server-side API credential." },
@@ -71,7 +76,8 @@ async function proxy(request: NextRequest, context: RouteContext) {
   const target = getBackendUrl(path, new URL(request.url).search);
   const headers = new Headers();
   headers.set("X-API-Key", apiKey);
-  headers.set("X-Aegis-Internal-Proxy", dashboardProxySignature(apiKey));
+  headers.set("X-Hirzexa-Internal-Proxy", dashboardProxySignature(apiKey));
+  headers.set("X-Aegis-Internal-Proxy", legacyDashboardProxySignature(apiKey));
 
   const accept = request.headers.get("accept");
   const contentType = request.headers.get("content-type");

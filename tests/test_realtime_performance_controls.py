@@ -2,8 +2,8 @@
 
 import pytest
 
-from aegis.api.routes.cameras import camera_preview_interval_seconds, latest_frame_detections
-from aegis.camera.manager import configured_inference_workers
+from hirzexa.api.routes.cameras import camera_preview_interval_seconds, latest_frame_detections
+from hirzexa.camera.manager import configured_inference_workers
 
 
 @pytest.mark.parametrize(
@@ -12,9 +12,9 @@ from aegis.camera.manager import configured_inference_workers
 )
 def test_camera_inference_workers_are_bounded(monkeypatch, value, expected):
     if value is None:
-        monkeypatch.delenv("AEGIS_CAMERA_INFERENCE_WORKERS", raising=False)
+        monkeypatch.delenv("HIRZEXA_CAMERA_INFERENCE_WORKERS", raising=False)
     else:
-        monkeypatch.setenv("AEGIS_CAMERA_INFERENCE_WORKERS", value)
+        monkeypatch.setenv("HIRZEXA_CAMERA_INFERENCE_WORKERS", value)
 
     assert configured_inference_workers() == expected
 
@@ -25,9 +25,9 @@ def test_camera_inference_workers_are_bounded(monkeypatch, value, expected):
 )
 def test_camera_preview_interval_is_bounded(monkeypatch, value, expected):
     if value is None:
-        monkeypatch.delenv("AEGIS_CAMERA_STREAM_FPS", raising=False)
+        monkeypatch.delenv("HIRZEXA_CAMERA_STREAM_FPS", raising=False)
     else:
-        monkeypatch.setenv("AEGIS_CAMERA_STREAM_FPS", value)
+        monkeypatch.setenv("HIRZEXA_CAMERA_STREAM_FPS", value)
 
     assert camera_preview_interval_seconds() == pytest.approx(expected)
 

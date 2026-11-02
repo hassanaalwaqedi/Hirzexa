@@ -1,5 +1,5 @@
 """
-AegisAI - Pipeline Integration Tests
+Hirzexa - Pipeline Integration Tests
 
 Tests for end-to-end pipeline data flow.
 
@@ -7,7 +7,7 @@ Sprint 1: Security & Testing Foundation
 """
 
 import pytest
-from aegis.analysis import (
+from hirzexa.analysis import (
     TrackHistoryManager,
     MotionAnalyzer,
     MotionAnalyzerConfig,
@@ -17,14 +17,14 @@ from aegis.analysis import (
     CrowdAnalyzerConfig,
     TrackAnalysis
 )
-from aegis.risk import (
+from hirzexa.risk import (
     RiskEngine,
     RiskEngineConfig,
     RiskWeights,
     RiskThresholds,
     TemporalConfig
 )
-from aegis.alerts import (
+from hirzexa.alerts import (
     AlertManager,
     AlertManagerConfig,
     AlertLevel

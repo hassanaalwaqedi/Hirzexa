@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from aegis.api.routes.cameras import _current_camera_detections
+from hirzexa.api.routes.cameras import _current_camera_detections
 
 
 def test_current_camera_detections_uses_latest_frame_and_unique_tracks():

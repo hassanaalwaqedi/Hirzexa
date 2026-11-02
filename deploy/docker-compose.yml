@@ -1,4 +1,4 @@
-# AegisAI Production Deployment
+# Hirzexa Production Deployment
 # Docker Compose with nginx HTTPS termination
 
 version: "3.8"
@@ -9,7 +9,7 @@ services:
   # ===========================================
   nginx:
     image: nginx:alpine
-    container_name: aegis-nginx
+    container_name: hirzexa-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -17,11 +17,11 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
     depends_on:
-      - aegisai
+      - hirzexa
       - frontend
     restart: unless-stopped
     networks:
-      - aegis-network
+      - hirzexa-network
     healthcheck:
       test: [ "CMD", "nginx", "-t" ]
       interval: 30s
@@ -29,27 +29,27 @@ services:
       retries: 3
 
   # ===========================================
-  # AegisAI Backend (API + Processing)
+  # Hirzexa Backend (API + Processing)
   # ===========================================
-  aegisai:
+  hirzexa:
     build:
       context: ..
       dockerfile: Dockerfile
-    container_name: aegis-backend
+    container_name: hirzexa-backend
     environment:
-      - AEGIS_API_HOST=0.0.0.0
-      - AEGIS_API_PORT=8080
-      - AEGIS_API_KEY=${AEGIS_API_KEY:?AEGIS_API_KEY must be set}
-      - AEGIS_DEBUG=false
-      - DATABASE_URL=sqlite:////app/data/aegis.db
+      - HIRZEXA_API_HOST=0.0.0.0
+      - HIRZEXA_API_PORT=8080
+      - HIRZEXA_API_KEY=${HIRZEXA_API_KEY:?HIRZEXA_API_KEY must be set}
+      - HIRZEXA_DEBUG=false
+      - DATABASE_URL=sqlite:////app/data/hirzexa.db
     volumes:
-      - aegis-data:/app/data
-      - aegis-models:/app/models
+      - hirzexa-data:/app/data
+      - hirzexa-models:/app/models
     expose:
       - "8080"
     restart: unless-stopped
     networks:
-      - aegis-network
+      - hirzexa-network
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')" ]
       interval: 30s
@@ -61,38 +61,38 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
-    container_name: aegis-frontend
+    container_name: hirzexa-frontend
     environment:
       - NODE_ENV=production
-      - AEGIS_API_URL=http://aegisai:8080
-      - AEGIS_API_KEY=${AEGIS_API_KEY:?AEGIS_API_KEY must be set}
+      - HIRZEXA_API_URL=http://hirzexa:8080
+      - HIRZEXA_API_KEY=${HIRZEXA_API_KEY:?HIRZEXA_API_KEY must be set}
     expose:
       - "3000"
     restart: unless-stopped
     networks:
-      - aegis-network
+      - hirzexa-network
     depends_on:
-      - aegisai
+      - hirzexa
   # ===========================================
   # PostgreSQL (optional - for production scale)
   # ===========================================
   # Uncomment for PostgreSQL instead of SQLite
   # postgres:
   #   image: postgres:15-alpine
-  #   container_name: aegis-postgres
+  #   container_name: hirzexa-postgres
   #   environment:
-  #     - POSTGRES_USER=${POSTGRES_USER:-aegis}
-  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-aegis_secret}
-  #     - POSTGRES_DB=${POSTGRES_DB:-aegisai}
+  #     - POSTGRES_USER=${POSTGRES_USER:-hirzexa}
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-hirzexa_secret}
+  #     - POSTGRES_DB=${POSTGRES_DB:-hirzexa}
   #   volumes:
   #     - postgres-data:/var/lib/postgresql/data
   #   expose:
   #     - "5432"
   #   restart: unless-stopped
   #   networks:
-  #     - aegis-network
+  #     - hirzexa-network
   #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U aegis"]
+  #     test: ["CMD-SHELL", "pg_isready -U hirzexa"]
   #     interval: 10s
   #     timeout: 5s
   #     retries: 5
@@ -102,14 +102,14 @@ services:
   # ===========================================
   # redis:
   #   image: redis:7-alpine
-  #   container_name: aegis-redis
+  #   container_name: hirzexa-redis
   #   volumes:
   #     - redis-data:/data
   #   expose:
   #     - "6379"
   #   restart: unless-stopped
   #   networks:
-  #     - aegis-network
+  #     - hirzexa-network
   #   healthcheck:
   #     test: ["CMD", "redis-cli", "ping"]
   #     interval: 10s
@@ -120,9 +120,9 @@ services:
   # Volumes
   # ===========================================
 volumes:
-  aegis-data:
+  hirzexa-data:
     driver: local
-  aegis-models:
+  hirzexa-models:
     driver: local
   # postgres-data:
   #   driver: local
@@ -133,5 +133,5 @@ volumes:
   # Networks
   # ===========================================
 networks:
-  aegis-network:
+  hirzexa-network:
     driver: bridge

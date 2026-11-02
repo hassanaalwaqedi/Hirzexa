@@ -8,7 +8,7 @@ import { Camera, ChevronLeft, ChevronRight, Database, ExternalLink, FileSearch, 
 import { cn, formatTime } from "@/lib/utils";
 import { appConfig } from "@/lib/config";
 import { getErrorMessage } from "@/lib/errors";
-import { useCamerasQuery, useEvidenceSearchDetailQuery, useEvidenceSearchQuery, useEvidenceSearchStatusQuery, useStatusQuery } from "@/hooks/use-aegis-api";
+import { useCamerasQuery, useEvidenceSearchDetailQuery, useEvidenceSearchQuery, useEvidenceSearchStatusQuery, useStatusQuery } from "@/hooks/use-hirzexa-api";
 import type { EvidenceSearchRequest, EvidenceSearchResponse } from "@/types";
 
 const quickQueryKeys = ["quickPerson", "quickWeapon", "quickRisk", "quickCrowd", "quickVehicle", "quickUnattended"] as const;
@@ -78,7 +78,7 @@ export function EvidenceSearchWorkspace() {
     {index.isError ? <ErrorNotice message={getErrorMessage(index.error)} /> : null}
     <div className="semantic-layout">
       <aside className="semantic-command">
-        <div className="semantic-command-heading"><span><Sparkles aria-hidden /></span><div><h2>{t("askAegis")}</h2><p>{t("naturalLanguageHint")}</p></div></div>
+        <div className="semantic-command-heading"><span><Sparkles aria-hidden /></span><div><h2>{t("askHirzexa")}</h2><p>{t("naturalLanguageHint")}</p></div></div>
         <form onSubmit={(event) => { event.preventDefault(); submit(); }} className="semantic-search-form"><label className="sr-only" htmlFor="evidence-query">{t("searchPlaceholder")}</label><Search aria-hidden /><input id="evidence-query" value={draft} onChange={(event) => setDraft(event.target.value)} placeholder={t("searchInputPlaceholder")}/><button type="submit" disabled={draft.trim().length < 3 || search.isFetching}>{search.isFetching ? <LoaderCircle className="animate-spin" /> : <Search />}<span>{search.isFetching ? t("searchingBtn") : t("searchBtn")}</span></button></form>
         <p className="semantic-small-label">{t("quickQueries")}</p><div className="semantic-quick-queries">{quickQueries.map((query) => <button key={query} type="button" onClick={() => submit(query)}>{query}</button>)}</div>
         <SearchFilters request={request} range={searchParams.get("time") ?? "all"} cameras={cameras.data?.cameras ?? []} eventTypes={index.data?.event_types ?? []} disabled={cameras.isError || index.isError} onChange={setParams} onReset={reset} />

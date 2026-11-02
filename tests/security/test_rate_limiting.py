@@ -1,5 +1,5 @@
 """
-AegisAI - Security Tests: Rate Limiting
+Hirzexa - Security Tests: Rate Limiting
 
 Tests for rate limiting enforcement.
 """
@@ -18,7 +18,7 @@ class TestRateLimiting:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
-        from aegis.api.app import create_app
+        from hirzexa.api.app import create_app
         
         app = create_app()
         return TestClient(app)
@@ -29,9 +29,9 @@ class TestRateLimiting:
         return {"X-API-Key": "test-key"}
     
     @patch.dict("os.environ", {
-        "AEGIS_API_KEY": "test-key",
-        "AEGIS_RATE_LIMIT": "5",
-        "AEGIS_RATE_LIMIT_WINDOW": "60"
+        "HIRZEXA_API_KEY": "test-key",
+        "HIRZEXA_RATE_LIMIT": "5",
+        "HIRZEXA_RATE_LIMIT_WINDOW": "60"
     })
     def test_rate_limit_headers_present(self, client, valid_headers):
         """Response should include rate limit headers."""
@@ -42,9 +42,9 @@ class TestRateLimiting:
         assert response.status_code in [200, 401, 429]
     
     @patch.dict("os.environ", {
-        "AEGIS_API_KEY": "test-key",
-        "AEGIS_RATE_LIMIT": "3",  # Very low limit
-        "AEGIS_RATE_LIMIT_WINDOW": "60"
+        "HIRZEXA_API_KEY": "test-key",
+        "HIRZEXA_RATE_LIMIT": "3",  # Very low limit
+        "HIRZEXA_RATE_LIMIT_WINDOW": "60"
     })
     def test_rate_limit_exceeded_returns_429(self, client, valid_headers):
         """Exceeding rate limit should return 429 Too Many Requests."""
@@ -62,7 +62,7 @@ class TestRateLimiting:
         """Rate limits should be per IP address."""
         # This test verifies the rate limiting is IP-based
         # In practice, test client uses same IP, so we verify config
-        with patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"}):
+        with patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"}):
             response = client.get(
                 "/status",
                 headers={"X-API-Key": "test-key", "X-Forwarded-For": "1.2.3.4"}
@@ -71,7 +71,7 @@ class TestRateLimiting:
     
     def test_different_endpoints_share_limit(self, client):
         """All endpoints should share the same rate limit."""
-        with patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"}):
+        with patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"}):
             headers = {"X-API-Key": "test-key"}
             
             # Hit different endpoints
@@ -84,15 +84,15 @@ class TestRateLimiting:
             assert True  # Smoke test
 
     @patch.dict("os.environ", {
-        "AEGIS_API_KEY": "test-key",
-        "AEGIS_RATE_LIMIT": "1",
-        "AEGIS_RATE_LIMIT_WINDOW": "60",
+        "HIRZEXA_API_KEY": "test-key",
+        "HIRZEXA_RATE_LIMIT": "1",
+        "HIRZEXA_RATE_LIMIT_WINDOW": "60",
     })
     def test_signed_dashboard_proxy_does_not_share_the_loopback_client_bucket(self, client):
         """Dashboard polling is authenticated server-to-server, not anonymous IP traffic."""
         signature = hmac.new(
-            b"test-key", b"aegis-dashboard-proxy-v1", hashlib.sha256
+            b"test-key", b"hirzexa-dashboard-proxy-v1", hashlib.sha256
         ).hexdigest()
-        headers = {"X-API-Key": "test-key", "X-Aegis-Internal-Proxy": signature}
+        headers = {"X-API-Key": "test-key", "X-Hirzexa-Internal-Proxy": signature}
         assert client.get("/status", headers=headers).status_code == 200
         assert client.get("/status", headers=headers).status_code == 200

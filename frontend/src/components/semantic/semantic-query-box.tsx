@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { useSemanticQueryMutation } from "@/hooks/use-aegis-api";
+import { useSemanticQueryMutation } from "@/hooks/use-hirzexa-api";
 import type { Camera } from "@/types";
 import type { SemanticFilters } from "@/components/semantic/semantic-results";
 
@@ -47,7 +47,7 @@ export function SemanticQueryBox({ cameras, camerasUnavailable, filters, onFilte
     <section className="glass-panel rounded-xl p-5 sm:p-6" aria-labelledby="semantic-command-title">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-signal-cyan">{t("askAegis")}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-signal-cyan">{t("askHirzexa")}</p>
           <h2 id="semantic-command-title" className="mt-1 text-xl font-semibold tracking-tight text-white">{t("searchVerified")}</h2>
         </div>
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-signal-cyan/25 bg-signal-cyan/[0.07] text-signal-cyan"><Search className="h-4 w-4" aria-hidden /></span>

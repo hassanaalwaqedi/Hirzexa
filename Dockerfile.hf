@@ -1,18 +1,18 @@
-# AegisAI - Hugging Face Spaces Docker Build
+# Hirzexa - Hugging Face Spaces Docker Build
 # Adapted for HF Spaces (port 7860, non-root user)
 FROM python:3.10-slim
 
 # Set labels
-LABEL maintainer="AegisAI Team"
+LABEL maintainer="Hirzexa Team"
 LABEL description="Smart City Risk Intelligence System - HuggingFace Space"
 LABEL version="4.0.0"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV AEGIS_DEBUG=true
-ENV AEGIS_API_HOST=0.0.0.0
-ENV AEGIS_API_PORT=7860
+ENV HIRZEXA_DEBUG=true
+ENV HIRZEXA_API_HOST=0.0.0.0
+ENV HIRZEXA_API_PORT=7860
 ENV YOLO_CONFIG_DIR=/tmp/Ultralytics
 ENV PYTHONWARNINGS=ignore
 
@@ -61,4 +61,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:7860/')" || exit 1
 
 # Start the API server on HF port
-CMD ["python", "-m", "uvicorn", "aegis.api.app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python", "-m", "uvicorn", "hirzexa.api.app:app", "--host", "0.0.0.0", "--port", "7860"]

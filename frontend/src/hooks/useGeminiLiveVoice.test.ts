@@ -9,7 +9,7 @@ import {
   resampleMonoToPcm16,
   shouldRestartSpeechRecognition,
   useGeminiLiveVoice,
-  AEGIS_VOICE_SESSION_CONFIG,
+  HIRZEXA_VOICE_SESSION_CONFIG,
   VOICE_CONVERSATION_IDLE_TIMEOUT_MS,
   wakePhraseCommand,
 } from "./useGeminiLiveVoice";
@@ -265,15 +265,15 @@ describe("click-to-listen session guards", () => {
   });
 
   it("uses one configurable follow-up window instead of scattered command timers", () => {
-    expect(VOICE_CONVERSATION_IDLE_TIMEOUT_MS).toBe(AEGIS_VOICE_SESSION_CONFIG.followUpWindowMs);
+    expect(VOICE_CONVERSATION_IDLE_TIMEOUT_MS).toBe(HIRZEXA_VOICE_SESSION_CONFIG.followUpWindowMs);
     expect(VOICE_CONVERSATION_IDLE_TIMEOUT_MS).toBeGreaterThanOrEqual(15_000);
     expect(VOICE_CONVERSATION_IDLE_TIMEOUT_MS).toBeLessThanOrEqual(30_000);
   });
 
-  it("does not send ambient speech to Aegis until a wake phrase is recognized", () => {
+  it("does not send ambient speech to Hirzexa until a wake phrase is recognized", () => {
     expect(wakePhraseCommand("ordinary room conversation")).toBeNull();
-    expect(wakePhraseCommand("Hey Aegis")).toBe("");
-    expect(wakePhraseCommand("Aegis, open camera two")).toBe("open camera two");
+    expect(wakePhraseCommand("Hey Hirzexa")).toBe("");
+    expect(wakePhraseCommand("Hirzexa, open camera two")).toBe("open camera two");
   });
 
   it("does not submit empty or one-character recognition results", () => {

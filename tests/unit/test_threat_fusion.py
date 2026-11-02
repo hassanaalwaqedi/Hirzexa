@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from aegis.fusion.threat_fusion import ThreatFusionConfig, ThreatFusionEngine
+from hirzexa.fusion.threat_fusion import ThreatFusionConfig, ThreatFusionEngine
 
 
 def person(track_id, bbox):
@@ -79,7 +79,7 @@ def test_track_loss_becomes_stale_and_diagnostics_are_truthful():
 
 
 def test_tracking_stage_emits_sidecar_evidence_without_marking_threat_as_weapon(monkeypatch):
-    from aegis.pipeline.tracking import TrackingStage
+    from hirzexa.pipeline.tracking import TrackingStage
 
     stage = TrackingStage()
     active_person = person(7, (0, 0, 100, 220))

@@ -10,7 +10,7 @@ import { CameraForm } from "@/components/cameras/camera-form";
 import { CameraInventory } from "@/components/cameras/camera-inventory";
 import { CameraDetailsDrawer, CameraWall, type CameraWallView } from "@/components/cameras/camera-wall";
 import { Button } from "@/components/ui/button";
-import { useCamerasQuery, useEventsQuery, useStatusQuery } from "@/hooks/use-aegis-api";
+import { useCamerasQuery, useEventsQuery, useStatusQuery } from "@/hooks/use-hirzexa-api";
 import type { Camera } from "@/types";
 
 export default function CamerasPage() {

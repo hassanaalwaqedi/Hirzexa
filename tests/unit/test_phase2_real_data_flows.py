@@ -11,7 +11,7 @@ import pytest
 
 @pytest.fixture
 def isolated_database(monkeypatch: pytest.MonkeyPatch, tmp_path):
-    from aegis.database import connection
+    from hirzexa.database import connection
 
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'phase2.db'}")
     monkeypatch.setattr(connection, "_engine", None)
@@ -23,8 +23,8 @@ def isolated_database(monkeypatch: pytest.MonkeyPatch, tmp_path):
 
 
 def test_persisted_alert_exposes_camera_event_incident_and_evidence_links(isolated_database) -> None:
-    from aegis.alerts import AlertChannel, AlertManager, AlertManagerConfig
-    from aegis.database.repositories import EventRepository
+    from hirzexa.alerts import AlertChannel, AlertManager, AlertManagerConfig
+    from hirzexa.database.repositories import EventRepository
 
     with isolated_database.get_db_session() as session:
         EventRepository(session).create_or_get_evidence(
@@ -55,8 +55,8 @@ def test_persisted_alert_exposes_camera_event_incident_and_evidence_links(isolat
 
 
 def test_persisted_evidence_endpoint_returns_retrievable_snapshot_metadata(isolated_database) -> None:
-    from aegis.api.routes.events import get_persisted_evidence
-    from aegis.database.repositories import EventRepository
+    from hirzexa.api.routes.events import get_persisted_evidence
+    from hirzexa.database.repositories import EventRepository
 
     with isolated_database.get_db_session() as session:
         EventRepository(session).create_or_get_evidence(
@@ -76,8 +76,8 @@ def test_persisted_evidence_endpoint_returns_retrievable_snapshot_metadata(isola
 
 
 def test_semantic_search_marks_durable_store_unavailable_without_fabricating(monkeypatch: pytest.MonkeyPatch) -> None:
-    from aegis.api.routes import semantic
-    from aegis.semantic.query_engine import SemanticQueryEngine
+    from hirzexa.api.routes import semantic
+    from hirzexa.semantic.query_engine import SemanticQueryEngine
 
     class State:
         def get_events(self, limit: int):
@@ -93,9 +93,9 @@ def test_semantic_search_marks_durable_store_unavailable_without_fabricating(mon
 
 
 def test_agent_refuses_operational_answer_when_required_source_is_unavailable(monkeypatch: pytest.MonkeyPatch) -> None:
-    import aegis.ai.orchestrator as orchestrator_module
-    from aegis.ai.orchestrator import AIOrchestrator
-    from aegis.ai.schemas import ChatRequest
+    import hirzexa.ai.orchestrator as orchestrator_module
+    from hirzexa.ai.orchestrator import AIOrchestrator
+    from hirzexa.ai.schemas import ChatRequest
 
     monkeypatch.setattr(
         orchestrator_module,
@@ -120,7 +120,7 @@ def test_agent_refuses_operational_answer_when_required_source_is_unavailable(mo
 
 
 def test_idle_websocket_sends_heartbeat_instead_of_empty_simulated_update() -> None:
-    from aegis.api.websocket import build_live_state_message
+    from hirzexa.api.websocket import build_live_state_message
 
     state = SimpleNamespace(
         get_status=lambda: {"running": True},
@@ -139,9 +139,9 @@ def test_idle_websocket_sends_heartbeat_instead_of_empty_simulated_update() -> N
 def test_readiness_reports_missing_detector_weights_as_unavailable(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
     from fastapi import Response
     import config
-    from aegis.api.routes import health
-    from aegis.database import connection
-    from aegis.api.routes import cameras
+    from hirzexa.api.routes import health
+    from hirzexa.database import connection
+    from hirzexa.api.routes import cameras
 
     class DetectionConfig:
         model_path = str(tmp_path / "missing-base.pt")

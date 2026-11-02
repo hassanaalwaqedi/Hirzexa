@@ -1,5 +1,5 @@
 """
-AegisAI — API Smoke Tests
+Hirzexa — API Smoke Tests
 
 Validates that all critical API endpoints respond correctly.
 These tests use FastAPI's TestClient (no live server needed).
@@ -13,9 +13,9 @@ import sys
 import types
 import pytest
 
-# Set test environment before importing anything from aegis
-os.environ["AEGIS_API_KEY"] = "test-key-12345"
-os.environ["AEGIS_DEBUG"] = "true"
+# Set test environment before importing anything from hirzexa
+os.environ["HIRZEXA_API_KEY"] = "test-key-12345"
+os.environ["HIRZEXA_DEBUG"] = "true"
 
 # Mock heavy ML dependencies that aren't needed for API tests
 _mock_modules = [
@@ -27,7 +27,7 @@ for mod_name in _mock_modules:
     if mod_name not in sys.modules:
         sys.modules[mod_name] = types.ModuleType(mod_name)
 
-from aegis.api.app import create_app
+from hirzexa.api.app import create_app
 from fastapi.testclient import TestClient
 
 
@@ -44,7 +44,7 @@ def restore_heavy_dependency_modules():
 
 @pytest.fixture(scope="module")
 def client():
-    """Create a test client for the AegisAI API."""
+    """Create a test client for the Hirzexa API."""
     app = create_app()
     with TestClient(app) as test_client:
         yield test_client

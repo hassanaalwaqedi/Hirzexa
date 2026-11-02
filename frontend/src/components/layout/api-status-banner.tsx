@@ -76,7 +76,7 @@ export function ApiStatusBanner({ endpoints, websocketState, websocketError }: A
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-3">
           <CheckCircle2 className="h-5 w-5 text-emerald-300" aria-hidden />
-          <p className="text-sm font-semibold text-emerald-100">Connected to AegisAI</p>
+          <p className="text-sm font-semibold text-emerald-100">Connected to Hirzexa</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Badge variant="success">Live information ready</Badge>

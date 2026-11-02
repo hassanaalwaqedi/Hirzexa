@@ -6,13 +6,13 @@ from types import SimpleNamespace
 
 import pytest
 
-from aegis.ai.language import (
+from hirzexa.ai.language import (
     ResponseLanguage,
     detect_response_language,
     live_turn_with_language,
 )
-from aegis.ai.orchestrator import AIOrchestrator
-from aegis.ai.schemas import ChatRequest, Intent
+from hirzexa.ai.orchestrator import AIOrchestrator
+from hirzexa.ai.schemas import ChatRequest, Intent
 
 
 @pytest.mark.parametrize(
@@ -43,7 +43,7 @@ class _CapturingProvider:
 
 
 def _patch_non_official_context(monkeypatch) -> None:
-    import aegis.ai.orchestrator as orchestrator_module
+    import hirzexa.ai.orchestrator as orchestrator_module
 
     knowledge = SimpleNamespace(
         retrieve=lambda _message, *, locale: SimpleNamespace(
@@ -74,7 +74,7 @@ def test_orchestrator_stores_language_and_injects_mandatory_instruction(monkeypa
 
 def test_local_fallback_keeps_arabic_response_when_provider_is_unavailable(monkeypatch) -> None:
     monkeypatch.setattr(
-        "aegis.ai.tools.get_active_alerts",
+        "hirzexa.ai.tools.get_active_alerts",
         lambda limit: [{"event_id": "risk-1", "risk_level": "HIGH", "camera_id": "north-gate"}],
     )
 

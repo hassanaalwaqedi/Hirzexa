@@ -1,4 +1,4 @@
-class AegisPcmCaptureProcessor extends AudioWorkletProcessor {
+class HirzexaPcmCaptureProcessor extends AudioWorkletProcessor {
   constructor(options) {
     super();
     this.targetRate = options?.processorOptions?.targetSampleRate || 16000;
@@ -25,4 +25,4 @@ class AegisPcmCaptureProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("aegis-pcm-capture", AegisPcmCaptureProcessor);
+registerProcessor("hirzexa-pcm-capture", HirzexaPcmCaptureProcessor);

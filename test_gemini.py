@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AegisAI - Gemini API Test Script
+Hirzexa - Gemini API Test Script
 
 Tests the Gemini integration to verify it works correctly.
 
@@ -22,7 +22,7 @@ load_dotenv()
 def test_gemini():
     """Test Gemini API integration."""
     print("=" * 50)
-    print("AegisAI - Gemini API Test")
+    print("Hirzexa - Gemini API Test")
     print("=" * 50)
     
     # Check API key
@@ -35,7 +35,7 @@ def test_gemini():
     print(f"✓ API Key found: {api_key[:10]}...")
     
     try:
-        from aegis.ai.gemini_client import GeminiClient, GeminiConfig
+        from hirzexa.ai.gemini_client import GeminiClient, GeminiConfig
         
         config = GeminiConfig(
             api_key=api_key,
@@ -55,8 +55,8 @@ def test_gemini():
         # Test 2: System prompt
         print("\n--- Test 2: With System Prompt ---")
         response = client.generate(
-            prompt="What does AegisAI do?",
-            system_prompt="You are AegisAI, a surveillance analytics system. Be brief."
+            prompt="What does Hirzexa do?",
+            system_prompt="You are Hirzexa, a surveillance analytics system. Be brief."
         )
         print(f"Response: {response.text[:200]}...")
         

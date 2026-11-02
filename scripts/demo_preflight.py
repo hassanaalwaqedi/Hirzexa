@@ -1,4 +1,4 @@
-"""Authenticated, non-destructive pre-flight check for a live Aegis demo."""
+"""Authenticated, non-destructive pre-flight check for a live Hirzexa demo."""
 from __future__ import annotations
 
 import argparse
@@ -18,7 +18,7 @@ def request_json(url: str, key: str | None) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default="http://127.0.0.1:8080")
-    parser.add_argument("--api-key", default=os.getenv("AEGIS_API_KEY"))
+    parser.add_argument("--api-key", default=os.getenv("HIRZEXA_API_KEY"))
     args = parser.parse_args()
     base = args.base_url.rstrip("/")
     try:

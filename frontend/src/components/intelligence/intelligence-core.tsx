@@ -3,7 +3,7 @@
 import type { Availability } from "@/lib/intelligence-context";
 import type { OperatorAssetStatus, OperatorRuntime, ProjectionAnchor, ProjectionAnchorName } from "@/lib/operator-runtime";
 import { defaultProjectionAnchors } from "@/lib/operator-runtime";
-import { AegisCoreVisualization } from "./aegis-core-visualization";
+import { HirzexaCoreVisualization } from "./hirzexa-core-visualization";
 import { useEffect } from "react";
 
 const DEFAULT_ANCHORS = defaultProjectionAnchors();
@@ -18,7 +18,7 @@ type IntelligenceCoreProps = {
 };
 
 /**
- * Visual shell around the abstract Aegis Intelligence Core.
+ * Visual shell around the abstract Hirzexa Intelligence Core.
  * Replaces the previous humanoid robot with a non-human central
  * intelligence visualization.
  */
@@ -42,7 +42,7 @@ export function IntelligenceCore({ runtime, status, statusLabel, stateLabel, onA
       data-presence={runtime.state.toLowerCase()}
       data-domain={runtime.intent}
     >
-      <AegisCoreVisualization
+      <HirzexaCoreVisualization
         runtime={runtime}
         status={status}
         statusLabel={statusLabel}

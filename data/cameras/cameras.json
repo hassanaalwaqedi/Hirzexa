@@ -1,43 +1,60 @@
 {
   "cameras": [
     {
-      "camera_id": "http-stream-tiwfw7",
+      "camera_id": "http-stream-tliycs",
       "source_type": "HTTP_STREAM",
       "name": "HTTP Stream",
-      "location": null,
+      "location": "Gate North",
       "enabled": true,
-      "url": "https://www.youtube.com/watch?v=eO19UTm93GQ",
+      "url": "https://www.youtube.com/watch",
       "device_index": null,
       "video_id": null,
       "connection_timeout": 5.0,
       "max_retries": 10,
+      "auto_start": true,
+      "verification_status": "unverified",
+      "last_connection_test": {},
       "metadata": {
         "source_resolver": "yt-dlp",
-        "source_page_url": "https://www.youtube.com/watch?v=eO19UTm93GQ",
-        "resolved_title": "Sysvideo 4K 8 Megapixel  IP Camera Demo traffic car",
-        "resolved_format_id": "136",
+        "decoder": "opencv-file",
+        "resolved_title": "Here's What Happens in Midtown NYC Before 9AM | Park Avenue to Central Park 4K",
         "resolved_height": 720,
-        "resolved_fps": 25
+        "resolved_fps": 60,
+        "resolved_format_id": "298"
       },
-      "created_at": "2026-07-28T19:09:47.294438",
-      "updated_at": "2026-07-28T19:09:47.315044",
-      "upload_path": null
+      "created_at": "2026-09-17T20:22:14.889503",
+      "updated_at": "2026-09-17T20:22:14.927580",
+      "upload_path": null,
+      "credential_ref": "camera-http-stream-tliycs-4dd44ef72706444eb238565129756729",
+      "stream_identity": "youtube-video:HMWUygIW0o0"
     },
     {
-      "camera_id": "local-device-tj0134",
-      "source_type": "LOCAL_DEVICE",
-      "name": "Local Device",
-      "location": null,
+      "camera_id": "http-stream-tlizt3",
+      "source_type": "HTTP_STREAM",
+      "name": "HTTP Stream",
+      "location": "Fighting  fars",
       "enabled": true,
-      "url": null,
-      "device_index": 0,
+      "url": "https://www.youtube.com/watch",
+      "device_index": null,
       "video_id": null,
       "connection_timeout": 5.0,
       "max_retries": 10,
-      "metadata": {},
-      "created_at": "2026-07-30T17:40:17.366817",
-      "updated_at": "2026-07-30T17:40:17.367195",
-      "upload_path": null
+      "auto_start": true,
+      "verification_status": "unverified",
+      "last_connection_test": {},
+      "metadata": {
+        "source_resolver": "yt-dlp",
+        "decoder": "opencv-file",
+        "resolved_title": "Knife Expert: Real Knife Defense Is TERRIFYING",
+        "resolved_height": 720,
+        "resolved_fps": 30,
+        "resolved_format_id": "136"
+      },
+      "created_at": "2026-09-17T20:34:40.195798",
+      "updated_at": "2026-09-17T20:34:40.223610",
+      "upload_path": null,
+      "credential_ref": "camera-http-stream-tlizt3-5c7f668ea4594e19ba32bf6c97327a8e",
+      "stream_identity": "youtube-video:ISk5sGT-Ryc"
     }
   ]
 }

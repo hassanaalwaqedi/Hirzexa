@@ -1,6 +1,6 @@
-from aegis.video import camera_sources
-from aegis.video.camera_sources import CameraConfig, CameraSourceType, HTTPCameraSource
-from aegis.video.youtube_resolver import ResolvedYouTubeStream, is_youtube_url
+from hirzexa.video import camera_sources
+from hirzexa.video.camera_sources import CameraConfig, CameraSourceType, HTTPCameraSource
+from hirzexa.video.youtube_resolver import ResolvedYouTubeStream, is_youtube_url
 
 
 class _FakeCapture:

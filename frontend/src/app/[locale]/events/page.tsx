@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ActivityAlertsWorkspace } from "@/components/events/activity-alerts-workspace";
 import { AppShell } from "@/components/layout/app-shell";
-import { useAlertsQuery, useCamerasQuery, useEventsQuery } from "@/hooks/use-aegis-api";
+import { useAlertsQuery, useCamerasQuery, useEventsQuery } from "@/hooks/use-hirzexa-api";
 
 export default function EventsPage() {
   return (

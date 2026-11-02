@@ -1,5 +1,5 @@
 """
-AegisAI - Alert Manager Unit Tests
+Hirzexa - Alert Manager Unit Tests
 
 Tests for alert generation, deduplication, and cooldown logic.
 
@@ -8,7 +8,7 @@ Sprint 1: Security & Testing Foundation
 
 import pytest
 import time
-from aegis.alerts import (
+from hirzexa.alerts import (
     AlertManager,
     AlertManagerConfig,
     AlertChannel,

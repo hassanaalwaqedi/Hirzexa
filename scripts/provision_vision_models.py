@@ -41,21 +41,21 @@ def provision_checkpoint(checkpoint_name: str, model_class) -> Path:
 
 
 def threat_prompts() -> list[str]:
-    prompts = json.loads(os.environ["AEGIS_THREAT_CLASSES_JSON"])
+    prompts = json.loads(os.environ["HIRZEXA_THREAT_CLASSES_JSON"])
     if not isinstance(prompts, list) or not prompts or not all(isinstance(item, str) and item for item in prompts):
-        raise ValueError("AEGIS_THREAT_CLASSES_JSON must be a non-empty JSON string list")
+        raise ValueError("HIRZEXA_THREAT_CLASSES_JSON must be a non-empty JSON string list")
     return prompts
 
 
 def threat_embedding_path(checkpoint: Path) -> Path:
-    if checkpoint.name == Path(os.environ["AEGIS_THREAT_MODEL_PATH"]).name:
-        return Path(os.environ["AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH"])
+    if checkpoint.name == Path(os.environ["HIRZEXA_THREAT_MODEL_PATH"]).name:
+        return Path(os.environ["HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH"])
     return MODEL_DIRECTORY / f"{checkpoint.stem}.threat-prompts.npz"
 
 
 def provision_yoloe() -> None:
     prompts = threat_prompts()
-    for checkpoint_name in names("AEGIS_THREAT_MODEL_PATH", "AEGIS_THREAT_BENCHMARK_MODEL_NAMES"):
+    for checkpoint_name in names("HIRZEXA_THREAT_MODEL_PATH", "HIRZEXA_THREAT_BENCHMARK_MODEL_NAMES"):
         checkpoint = provision_checkpoint(checkpoint_name, YOLOE)
         embeddings = threat_embedding_path(checkpoint)
         if embeddings.is_file() and embeddings.stat().st_size > 0:
@@ -74,7 +74,7 @@ def provision_yoloe() -> None:
 def main() -> None:
     MODEL_DIRECTORY.mkdir(parents=True, exist_ok=True)
     os.chdir(MODEL_DIRECTORY)
-    for checkpoint_name in names("AEGIS_DETECTION_MODEL_PATH", "AEGIS_BENCHMARK_MODEL_NAMES"):
+    for checkpoint_name in names("HIRZEXA_DETECTION_MODEL_PATH", "HIRZEXA_BENCHMARK_MODEL_NAMES"):
         provision_checkpoint(checkpoint_name, YOLO)
     provision_yoloe()
 

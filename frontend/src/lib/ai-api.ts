@@ -1,5 +1,5 @@
 /**
- * AegisAI - AI API Client
+ * Hirzexa - AI API Client
  *
  * Connects the frontend to the AI orchestrator backend.
  * All AI interactions go through: Frontend → FastAPI → Gemini → Frontend

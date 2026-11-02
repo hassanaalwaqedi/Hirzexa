@@ -1,7 +1,7 @@
 """Deterministic Phase 6 evidence-based situation assessment tests."""
 from types import SimpleNamespace
 
-from aegis.risk.situation_intelligence import SituationIntelligence
+from hirzexa.risk.situation_intelligence import SituationIntelligence
 
 
 def person(track_id, box):

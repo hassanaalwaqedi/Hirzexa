@@ -10,7 +10,7 @@ import * as THREE from "three";
 import { defaultProjectionAnchors, type OperatorAssetStatus, type OperatorRuntime, type ProjectionAnchor, type ProjectionAnchorName } from "@/lib/operator-runtime";
 
 const DEFAULT_ANCHORS = defaultProjectionAnchors();
-const PORTRAIT_URL = "/images/aegis-operator-storyboard-sprite.png";
+const PORTRAIT_URL = "/images/hirzexa-operator-storyboard-sprite.png";
 
 export function CinematicOperatorCanvas({
   runtime,
@@ -43,27 +43,27 @@ export function CinematicOperatorCanvas({
         dpr={[1, 1.75]}
         camera={{ fov: 28, position: [0, 0.8, 5.8] }}
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-        fallback={<div className="operator-webgl-unavailable">WebGL is required for the Aegis operator runtime.</div>}
+        fallback={<div className="operator-webgl-unavailable">WebGL is required for the Hirzexa operator runtime.</div>}
       >
         <SceneLighting />
         <OperatorFloor />
       </Canvas> : null}
-      <AegisOperatorPortrait runtime={runtime} />
+      <HirzexaOperatorPortrait runtime={runtime} />
     </div>
   );
 }
 
-function AegisOperatorPortrait({ runtime }: { runtime: OperatorRuntime }) {
+function HirzexaOperatorPortrait({ runtime }: { runtime: OperatorRuntime }) {
   const target = targetPoint(runtime);
   const actionState = runtime.state === "EXECUTING" || runtime.state === "PRESENTING";
   const pose = actionState && target && target.x < 45 ? "left"
     : actionState && target && target.x > 55 ? "right"
       : runtime.state === "WARNING" || runtime.state === "ERROR" ? "left"
         : "center";
-  return <div className="aegis-operator-portrait" data-operator-state={runtime.state} data-operator-pose={pose} data-operator-target={runtime.target ?? "core"} role="img" aria-label={`Aegis AI operator. ${runtime.state.toLowerCase()}.`}>
-    <i className="aegis-operator-portrait-aura" aria-hidden />
-    <i className="aegis-operator-life-signal" aria-hidden />
-    {(["left", "center", "right"] as const).map((name) => <span key={name} className={`aegis-operator-pose aegis-operator-pose-${name}`} aria-hidden>
+  return <div className="hirzexa-operator-portrait" data-operator-state={runtime.state} data-operator-pose={pose} data-operator-target={runtime.target ?? "core"} role="img" aria-label={`Hirzexa operator. ${runtime.state.toLowerCase()}.`}>
+    <i className="hirzexa-operator-portrait-aura" aria-hidden />
+    <i className="hirzexa-operator-life-signal" aria-hidden />
+    {(["left", "center", "right"] as const).map((name) => <span key={name} className={`hirzexa-operator-pose hirzexa-operator-pose-${name}`} aria-hidden>
       <Image src={PORTRAIT_URL} alt="" width={1877} height={838} sizes="(max-width: 800px) 88vw, 45vw" priority />
     </span>)}
   </div>;
@@ -104,7 +104,7 @@ function OperatorFloor() {
 /* ─── DOM fallback when no WebGL ─────────────────────────────────────── */
 
 function HolographicOperatorDomFallback() {
-  return <div className="operator-dom-fallback" role="img" aria-label="Holographic Aegis operator">
+  return <div className="operator-dom-fallback" role="img" aria-label="Holographic Hirzexa operator">
     <i className="operator-dom-halo" />
     <i className="operator-dom-head" />
     <i className="operator-dom-visor" />
@@ -121,11 +121,11 @@ class OperatorModelBoundary extends Component<{ children: ReactNode; runtime: Op
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(_error: Error, _info: ErrorInfo) { this.props.onFailure(); }
-  render() { return this.state.failed ? <ProceduralAegisRobot runtime={this.props.runtime} onAnchors={() => {}} /> : this.props.children; }
+  render() { return this.state.failed ? <ProceduralHirzexaRobot runtime={this.props.runtime} onAnchors={() => {}} /> : this.props.children; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   PROCEDURAL AEGIS ROBOT — Full coherent white AI operator
+   PROCEDURAL HIRZEXA ROBOT — Full coherent white AI operator
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ─── Materials ──────────────────────────────────────────────────────── */
@@ -271,7 +271,7 @@ function RobotHand({ armor, flex, fingersRef }: { armor: THREE.Material; flex: T
 
 /* ─── The complete robot ─────────────────────────────────────────────── */
 
-function ProceduralAegisRobot({ runtime, onAnchors }: {
+function ProceduralHirzexaRobot({ runtime, onAnchors }: {
   runtime: OperatorRuntime;
   onAnchors: (anchors: Record<ProjectionAnchorName, ProjectionAnchor>) => void;
 }) {
@@ -522,7 +522,7 @@ function ProceduralAegisRobot({ runtime, onAnchors }: {
             <primitive object={flex} attach="material" />
           </mesh>
 
-          {/* Shield / emblem — the AegisAI identity mark */}
+          {/* Shield / emblem — the Hirzexa identity mark */}
           <mesh ref={shieldMesh} position={[0, 0.32, 0.225]}>
             <circleGeometry args={[0.048, 6]} />
             <primitive object={glowTeal} attach="material" />
@@ -742,7 +742,7 @@ function ProceduralAegisRobot({ runtime, onAnchors }: {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   GLB RIGGED OPERATOR — used when aegis-operator.glb is present
+   GLB RIGGED OPERATOR — used when hirzexa-operator.glb is present
    ═══════════════════════════════════════════════════════════════════════ */
 
 const clipTerms: Record<string, string[]> = {
@@ -771,7 +771,7 @@ function matchingClip(clips: THREE.AnimationClip[], gesture: OperatorRuntime["ac
 }
 
 type MorphTarget = { mesh: THREE.Mesh; index: number };
-type HolographicMaterial = THREE.Material & { userData: { aegisHologramShader?: { uniforms: Record<string, { value: number }> } } };
+type HolographicMaterial = THREE.Material & { userData: { hirzexaHologramShader?: { uniforms: Record<string, { value: number }> } } };
 
 function holographicMaterial(source: THREE.Material): HolographicMaterial {
   const material = source.clone() as HolographicMaterial & THREE.MeshStandardMaterial;
@@ -785,19 +785,19 @@ function holographicMaterial(source: THREE.Material): HolographicMaterial {
   if ("metalness" in material) material.metalness = 0.42;
   if ("roughness" in material) material.roughness = 0.34;
   material.onBeforeCompile = (shader) => {
-    shader.uniforms.aegisTime = { value: 0 };
-    shader.vertexShader = `varying vec3 aegisViewNormal;\n${shader.vertexShader}`.replace(
+    shader.uniforms.hirzexaTime = { value: 0 };
+    shader.vertexShader = `varying vec3 hirzexaViewNormal;\n${shader.vertexShader}`.replace(
       "#include <beginnormal_vertex>",
-      "#include <beginnormal_vertex>\n aegisViewNormal = normalize(normalMatrix * objectNormal);",
+      "#include <beginnormal_vertex>\n hirzexaViewNormal = normalize(normalMatrix * objectNormal);",
     );
-    shader.fragmentShader = `uniform float aegisTime;\nvarying vec3 aegisViewNormal;\n${shader.fragmentShader}`.replace(
+    shader.fragmentShader = `uniform float hirzexaTime;\nvarying vec3 hirzexaViewNormal;\n${shader.fragmentShader}`.replace(
       "#include <output_fragment>",
-      `float aegisRim = pow(1.0 - abs(aegisViewNormal.z), 2.4);
-       float aegisScan = 0.84 + 0.16 * sin(vViewPosition.y * 42.0 + aegisTime * 2.0);
-       outgoingLight += vec3(0.08, 0.65, 0.9) * aegisRim * aegisScan;
+      `float hirzexaRim = pow(1.0 - abs(hirzexaViewNormal.z), 2.4);
+       float hirzexaScan = 0.84 + 0.16 * sin(vViewPosition.y * 42.0 + hirzexaTime * 2.0);
+       outgoingLight += vec3(0.08, 0.65, 0.9) * hirzexaRim * hirzexaScan;
        #include <output_fragment>`,
     );
-    material.userData.aegisHologramShader = shader;
+    material.userData.hirzexaHologramShader = shader;
   };
   material.needsUpdate = true;
   return material;
@@ -814,7 +814,7 @@ function findNode(root: THREE.Object3D, names: string[]) {
   return match;
 }
 
-function RiggedAegisOperator({ modelUrl, runtime, onAnchors }: { modelUrl: string; runtime: OperatorRuntime; onAnchors: (anchors: Record<ProjectionAnchorName, ProjectionAnchor>) => void }) {
+function RiggedHirzexaOperator({ modelUrl, runtime, onAnchors }: { modelUrl: string; runtime: OperatorRuntime; onAnchors: (anchors: Record<ProjectionAnchorName, ProjectionAnchor>) => void }) {
   const gltf = useLoader(GLTFLoader, modelUrl);
   const group = useRef<THREE.Group>(null);
   const lastAnchorFrameRef = useRef(0);
@@ -899,8 +899,8 @@ function RigController({
   useFrame((frame, delta) => {
     mixer.update(delta);
     holographicMaterials.current.forEach((material) => {
-      const shader = material.userData.aegisHologramShader;
-      if (shader) shader.uniforms.aegisTime.value = frame.clock.getElapsedTime();
+      const shader = material.userData.hirzexaHologramShader;
+      if (shader) shader.uniforms.hirzexaTime.value = frame.clock.getElapsedTime();
     });
     const target = runtime.state === "SPEAKING" ? Math.min(1, runtime.speakingLevel * 1.65) : 0;
     mouthLevel.current = THREE.MathUtils.damp(mouthLevel.current, target, 18, delta);

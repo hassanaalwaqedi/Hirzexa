@@ -13,12 +13,12 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from aegis.api.security import verify_api_key
-from aegis.database.connection import Base
-from aegis.database.models import Incident
-from aegis.database.repositories import EventRepository
-from aegis.video.camera_sources import EventSnapshot, FrameIngestionService
-import aegis.database.models  # noqa: F401 - register event mappings
+from hirzexa.api.security import verify_api_key
+from hirzexa.database.connection import Base
+from hirzexa.database.models import Incident
+from hirzexa.database.repositories import EventRepository
+from hirzexa.video.camera_sources import EventSnapshot, FrameIngestionService
+import hirzexa.database.models  # noqa: F401 - register event mappings
 
 
 @pytest.fixture()
@@ -108,7 +108,7 @@ def test_frame_ingestion_persists_one_high_alert_with_all_evidence_fields(monkey
         with Session.begin() as session:
             yield session
 
-    import aegis.database.connection as connection
+    import hirzexa.database.connection as connection
 
     monkeypatch.setattr(connection, "get_db_session", session_provider)
     service = FrameIngestionService()
@@ -160,7 +160,7 @@ def test_weapon_alert_persists_person_weapon_boxes_and_incident_links(monkeypatc
         with Session.begin() as session:
             yield session
 
-    import aegis.database.connection as connection
+    import hirzexa.database.connection as connection
 
     monkeypatch.setattr(connection, "get_db_session", session_provider)
     event = {
@@ -277,11 +277,11 @@ def test_persisted_evidence_api_supports_recent_event_and_alert_lookups(monkeypa
         with Session.begin() as session:
             yield session
 
-    import aegis.database.connection as connection
-    from aegis.api.routes import events as event_routes
+    import hirzexa.database.connection as connection
+    from hirzexa.api.routes import events as event_routes
 
     monkeypatch.setattr(connection, "get_db_session", session_provider)
-    monkeypatch.setenv("AEGIS_API_KEY", "evidence-key")
+    monkeypatch.setenv("HIRZEXA_API_KEY", "evidence-key")
     app = FastAPI()
     app.include_router(event_routes.router, dependencies=[Depends(verify_api_key)])
     client = TestClient(app)

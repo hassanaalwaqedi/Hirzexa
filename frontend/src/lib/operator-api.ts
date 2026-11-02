@@ -49,8 +49,8 @@ export async function executeOperatorCommand(
     body: JSON.stringify({ message, ...context }),
     signal,
   });
-  if (!response.ok) throw new Error(`Aegis operator request failed with HTTP ${response.status}.`);
+  if (!response.ok) throw new Error(`Hirzexa operator request failed with HTTP ${response.status}.`);
   const payload = operatorExecutionSchema.safeParse(await response.json());
-  if (!payload.success) throw new Error("Aegis operator returned an invalid response.");
+  if (!payload.success) throw new Error("Hirzexa operator returned an invalid response.");
   return payload.data;
 }

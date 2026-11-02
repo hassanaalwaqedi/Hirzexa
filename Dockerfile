@@ -1,33 +1,33 @@
-# AegisAI Docker Build
+# Hirzexa Docker Build
 FROM python:3.10-slim
 
 # Set labels
-LABEL maintainer="AegisAI Team"
+LABEL maintainer="Hirzexa Team"
 LABEL description="Smart City Risk Intelligence System"
 LABEL version="4.1.0"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV AEGIS_DEBUG=false
-ENV AEGIS_API_HOST=0.0.0.0
-ENV AEGIS_API_PORT=8080
+ENV HIRZEXA_DEBUG=false
+ENV HIRZEXA_API_HOST=0.0.0.0
+ENV HIRZEXA_API_PORT=8080
 ENV YOLO_CONFIG_DIR=/tmp/Ultralytics
-ARG AEGIS_DETECTION_MODEL_PATH=/app/models/yolo11n.pt
-ENV AEGIS_DETECTION_MODEL_PATH=${AEGIS_DETECTION_MODEL_PATH}
-ARG AEGIS_BENCHMARK_MODEL_NAMES="yolo26n.pt yolo26s.pt"
-ENV AEGIS_BENCHMARK_MODEL_NAMES=${AEGIS_BENCHMARK_MODEL_NAMES}
-ARG AEGIS_THREAT_MODEL_PATH=/app/models/yoloe-26n-seg.pt
-ENV AEGIS_THREAT_MODEL_PATH=${AEGIS_THREAT_MODEL_PATH}
-ARG AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH=/app/models/yoloe-26n-seg.threat-prompts.npz
-ENV AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH=${AEGIS_THREAT_PROMPT_EMBEDDINGS_PATH}
-ARG AEGIS_THREAT_BENCHMARK_MODEL_NAMES="yoloe-26n-seg.pt yoloe-26s-seg.pt"
-ENV AEGIS_THREAT_BENCHMARK_MODEL_NAMES=${AEGIS_THREAT_BENCHMARK_MODEL_NAMES}
-ENV AEGIS_THREAT_CLASSES_JSON='["handgun","pistol","revolver","rifle","shotgun","knife","machete","baseball bat","crowbar"]'
+ARG HIRZEXA_DETECTION_MODEL_PATH=/app/models/yolo11n.pt
+ENV HIRZEXA_DETECTION_MODEL_PATH=${HIRZEXA_DETECTION_MODEL_PATH}
+ARG HIRZEXA_BENCHMARK_MODEL_NAMES="yolo26n.pt yolo26s.pt"
+ENV HIRZEXA_BENCHMARK_MODEL_NAMES=${HIRZEXA_BENCHMARK_MODEL_NAMES}
+ARG HIRZEXA_THREAT_MODEL_PATH=/app/models/yoloe-26n-seg.pt
+ENV HIRZEXA_THREAT_MODEL_PATH=${HIRZEXA_THREAT_MODEL_PATH}
+ARG HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH=/app/models/yoloe-26n-seg.threat-prompts.npz
+ENV HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH=${HIRZEXA_THREAT_PROMPT_EMBEDDINGS_PATH}
+ARG HIRZEXA_THREAT_BENCHMARK_MODEL_NAMES="yoloe-26n-seg.pt yoloe-26s-seg.pt"
+ENV HIRZEXA_THREAT_BENCHMARK_MODEL_NAMES=${HIRZEXA_THREAT_BENCHMARK_MODEL_NAMES}
+ENV HIRZEXA_THREAT_CLASSES_JSON='["handgun","pistol","revolver","rifle","shotgun","knife","machete","baseball bat","crowbar"]'
 
 # Create non-root user
-RUN groupadd --gid 1000 aegis && \
-    useradd --uid 1000 --gid aegis --shell /bin/bash --create-home aegis
+RUN groupadd --gid 1000 hirzexa && \
+    useradd --uid 1000 --gid hirzexa --shell /bin/bash --create-home hirzexa
 
 # Set working directory
 WORKDIR /app
@@ -57,21 +57,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir git+https://github.com/ultralytics/CLIP.git@a13192f8cb767260d7dfd98c843b0716593169e7
 
 # Copy application code
-COPY --chown=aegis:aegis . .
+COPY --chown=hirzexa:hirzexa . .
 
 # Provision the configured detector and explicitly named benchmark candidates
 # at image-build time. Application runtime only accepts local checkpoints and
 # never downloads or substitutes one.
 RUN mkdir -p /app/models && \
     python scripts/provision_vision_models.py && \
-    chown -R aegis:aegis /app/models
+    chown -R hirzexa:hirzexa /app/models
 
 # Create data directories
 RUN mkdir -p /app/data/input /app/data/output && \
-    chown -R aegis:aegis /app/data
+    chown -R hirzexa:hirzexa /app/data
 
 # Switch to non-root user
-USER aegis
+USER hirzexa
 
 # Expose API port
 EXPOSE 8080
@@ -81,4 +81,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/healthz')" || exit 1
 
 # Default command - API server only
-CMD ["python", "-m", "uvicorn", "aegis.api.app:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["python", "-m", "uvicorn", "hirzexa.api.app:app", "--host", "0.0.0.0", "--port", "8080"]

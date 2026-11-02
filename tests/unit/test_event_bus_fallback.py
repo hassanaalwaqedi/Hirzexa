@@ -5,7 +5,7 @@ from __future__ import annotations
 import threading
 import time
 
-from aegis.core.events import EventBus
+from hirzexa.core.events import EventBus
 
 
 def _offline_bus(monkeypatch) -> EventBus:

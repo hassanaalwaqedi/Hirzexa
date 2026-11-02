@@ -1,6 +1,6 @@
 # SSL Certificate Setup Guide
 
-This guide covers SSL certificate setup for AegisAI HTTPS deployment.
+This guide covers SSL certificate setup for Hirzexa HTTPS deployment.
 
 ---
 
@@ -16,8 +16,8 @@ mkdir -p ssl
 
 # Generate self-signed certificate (valid 365 days)
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout ssl/aegis.key \
-  -out ssl/aegis.crt \
+  -keyout ssl/hirzexa.key \
+  -out ssl/hirzexa.crt \
   -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 ```
 
@@ -44,8 +44,8 @@ docker-compose stop nginx
 certbot certonly --standalone -d yourdomain.com
 
 # Copy certificates
-cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem deploy/ssl/aegis.crt
-cp /etc/letsencrypt/live/yourdomain.com/privkey.pem deploy/ssl/aegis.key
+cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem deploy/ssl/hirzexa.crt
+cp /etc/letsencrypt/live/yourdomain.com/privkey.pem deploy/ssl/hirzexa.key
 
 # Restart nginx
 docker-compose up -d nginx
@@ -83,7 +83,7 @@ After setup, verify your certificate:
 
 ```bash
 # Check certificate details
-openssl x509 -in deploy/ssl/aegis.crt -text -noout
+openssl x509 -in deploy/ssl/hirzexa.crt -text -noout
 
 # Test HTTPS connection
 curl -v https://localhost --insecure

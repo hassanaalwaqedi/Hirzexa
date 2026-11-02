@@ -5,8 +5,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from types import SimpleNamespace
 
-from aegis.camera.manager import MultiCameraPipelineManager
-from aegis.camera.types import CameraSourceType
+from hirzexa.camera.manager import MultiCameraPipelineManager
+from hirzexa.camera.types import CameraSourceType
 
 
 def test_browser_frame_acknowledges_before_background_inference(monkeypatch):
@@ -51,7 +51,7 @@ def test_browser_frame_acknowledges_before_background_inference(monkeypatch):
 
     source = Source()
     manager._sources = {"browser-cam": source}
-    monkeypatch.setattr("aegis.camera.manager.decode_base64_frame", lambda _: object())
+    monkeypatch.setattr("hirzexa.camera.manager.decode_base64_frame", lambda _: object())
 
     try:
         started_at = time.monotonic()

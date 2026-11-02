@@ -1,4 +1,4 @@
-export type AegisErrorCode =
+export type HirzexaErrorCode =
   | "BACKEND_UNAVAILABLE"
   | "UNAUTHORIZED"
   | "INVALID_RESPONSE_SCHEMA"
@@ -7,14 +7,14 @@ export type AegisErrorCode =
   | "WEBSOCKET_DISCONNECTED"
   | "UNKNOWN_API_ERROR";
 
-export class AegisClientError extends Error {
-  code: AegisErrorCode;
+export class HirzexaClientError extends Error {
+  code: HirzexaErrorCode;
   status?: number;
   details?: unknown;
 
-  constructor(message: string, code: AegisErrorCode, status?: number, details?: unknown) {
+  constructor(message: string, code: HirzexaErrorCode, status?: number, details?: unknown) {
     super(message);
-    this.name = "AegisClientError";
+    this.name = "HirzexaClientError";
     this.code = code;
     this.status = status;
     this.details = details;
@@ -22,7 +22,7 @@ export class AegisClientError extends Error {
 }
 
 export function getErrorMessage(error: unknown) {
-  if (error instanceof AegisClientError) {
+  if (error instanceof HirzexaClientError) {
     switch (error.code) {
       case "UNAUTHORIZED":
         return "Access is not configured correctly.";
@@ -45,6 +45,6 @@ export function getErrorMessage(error: unknown) {
 }
 
 export function getErrorCode(error: unknown) {
-  if (error instanceof AegisClientError) return error.code;
+  if (error instanceof HirzexaClientError) return error.code;
   return "UNKNOWN_API_ERROR";
 }

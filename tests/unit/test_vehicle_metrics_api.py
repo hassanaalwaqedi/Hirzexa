@@ -7,12 +7,12 @@ import os
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
 
-from aegis.api.routes.metrics import router
-from aegis.api.security import verify_api_key
+from hirzexa.api.routes.metrics import router
+from hirzexa.api.security import verify_api_key
 
 
 def test_metrics_endpoint_requires_api_key(monkeypatch) -> None:
-    monkeypatch.setenv("AEGIS_API_KEY", "metrics-test-key")
+    monkeypatch.setenv("HIRZEXA_API_KEY", "metrics-test-key")
     app = FastAPI()
     app.include_router(router, dependencies=[Depends(verify_api_key)])
     client = TestClient(app)

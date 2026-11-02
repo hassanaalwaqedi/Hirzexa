@@ -5,19 +5,19 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Activity, Bot, Camera, Keyboard, Mic, Radio, ShieldAlert, type LucideIcon } from "lucide-react";
 
-import { AegisIntelligenceNetwork, type AegisNetworkNodeId } from "@/components/intelligence/aegis-intelligence-network";
+import { HirzexaIntelligenceNetwork, type HirzexaNetworkNodeId } from "@/components/intelligence/hirzexa-intelligence-network";
 import { IntelligenceCore } from "@/components/intelligence/intelligence-core";
 import { ProjectionLayer } from "@/components/intelligence/projection-layer";
 import VoiceCopilot from "@/components/intelligence/VoiceCopilot";
 import { useOperatorController } from "@/hooks/use-operator-controller";
 import { useOperatorScene } from "@/hooks/use-operator-scene";
 import { defaultProjectionAnchors, stateLabelKey, type OperatorAssetStatus, type ProjectionAnchor, type ProjectionAnchorName } from "@/lib/operator-runtime";
-import { useEvidenceSearchStatusQuery } from "@/hooks/use-aegis-api";
+import { useEvidenceSearchStatusQuery } from "@/hooks/use-hirzexa-api";
 import { useSystemMonitor } from "@/hooks/use-system-monitor";
 import type { IntelligenceContextState } from "@/hooks/useIntelligenceContext";
 import { appConfig } from "@/lib/config";
 import type { Availability } from "@/lib/intelligence-context";
-import type { AegisVoiceSessionState, SafeUICommand, VoiceState } from "@/lib/live-voice";
+import type { HirzexaVoiceSessionState, SafeUICommand, VoiceState } from "@/lib/live-voice";
 const SAFE_TARGET = /^\/(dashboard|cameras|events|semantic|tracks|analytics|intelligence)(?:[/?]|$)/;
 
 function countRisk(state: IntelligenceContextState, levels: string[]) {
@@ -39,7 +39,7 @@ function riskSignal(level?: string | null) {
   return .12;
 }
 
-function nodeForCommand(message: string): AegisNetworkNodeId | null {
+function nodeForCommand(message: string): HirzexaNetworkNodeId | null {
   const command = message.toLowerCase();
   if (/camera|cam\b/.test(command)) return "cameras";
   if (/risk|alert|threat/.test(command)) return "risk";
@@ -61,14 +61,14 @@ export function IntelligenceCommandCenter({ state }: { state: IntelligenceContex
   const [textModeOpen, setTextModeOpen] = useState(false);
   const [textCommand, setTextCommand] = useState("");
   const [voiceState, setVoiceState] = useState<VoiceState>("off");
-  const [voiceSessionState, setVoiceSessionState] = useState<AegisVoiceSessionState>("DISABLED");
+  const [voiceSessionState, setVoiceSessionState] = useState<HirzexaVoiceSessionState>("DISABLED");
   const [listeningLevel, setListeningLevel] = useState(0);
   const [speakingLevel, setSpeakingLevel] = useState(0);
   const [capturing, setCapturing] = useState(false);
   const [toolPending, setToolPending] = useState(false);
   const [projectionAnchors, setProjectionAnchors] = useState(defaultProjectionAnchors);
   const [operatorAssetStatus, setOperatorAssetStatus] = useState<OperatorAssetStatus>("checking");
-  const [networkRequestNode, setNetworkRequestNode] = useState<AegisNetworkNodeId | null>(null);
+  const [networkRequestNode, setNetworkRequestNode] = useState<HirzexaNetworkNodeId | null>(null);
   const [bootStep, setBootStep] = useState(0);
   const spokenRequest = useRef("");
   const projectedVoiceTurn = useRef(false);
@@ -119,13 +119,13 @@ export function IntelligenceCommandCenter({ state }: { state: IntelligenceContex
   const showOperatorContext = runtime.state !== "IDLE";
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("aegis:domain-focus", {
+    window.dispatchEvent(new CustomEvent("hirzexa:domain-focus", {
       detail: { domain: showOperatorContext ? runtime.target : null, state: runtime.state },
     }));
   }, [runtime.state, runtime.target, showOperatorContext]);
 
   useEffect(() => () => {
-    window.dispatchEvent(new CustomEvent("aegis:domain-focus", { detail: { domain: null, state: "IDLE" } }));
+    window.dispatchEvent(new CustomEvent("hirzexa:domain-focus", { detail: { domain: null, state: "IDLE" } }));
   }, []);
 
   const handleVoiceCommand = useCallback((command: SafeUICommand) => {
@@ -158,7 +158,7 @@ export function IntelligenceCommandCenter({ state }: { state: IntelligenceContex
     void runCommand(command);
   }, [pending, runCommand, textCommand]);
 
-  const handleVoiceActivity = useCallback((activity: { state: VoiceState; sessionState: AegisVoiceSessionState; inputLevel: number; outputLevel: number; isCapturing: boolean }) => {
+  const handleVoiceActivity = useCallback((activity: { state: VoiceState; sessionState: HirzexaVoiceSessionState; inputLevel: number; outputLevel: number; isCapturing: boolean }) => {
     setVoiceState(activity.state);
     setVoiceSessionState(activity.sessionState);
     setCapturing(activity.isCapturing);
@@ -228,16 +228,16 @@ export function IntelligenceCommandCenter({ state }: { state: IntelligenceContex
     {/* Main stage */}
     <div className="cinematic-stage" data-boot-step={bootStep}>
       {/* Intelligence network (nodes + SVG connections) */}
-      <AegisIntelligenceNetwork runtime={runtime} activeDomain={activeDomain} metrics={networkMetrics} statuses={networkStatuses} signals={networkSignals} cameraPreviewUrl={cameraPreviewUrl} bootStep={bootStep} requestedNode={operatorTarget} onCommand={(command, node) => { setNetworkRequestNode(node); void runCommand(command === "Open camera" ? `Open camera ${firstCamera?.cameraId || ""}` : command); }} />
+      <HirzexaIntelligenceNetwork runtime={runtime} activeDomain={activeDomain} metrics={networkMetrics} statuses={networkStatuses} signals={networkSignals} cameraPreviewUrl={cameraPreviewUrl} bootStep={bootStep} requestedNode={operatorTarget} onCommand={(command, node) => { setNetworkRequestNode(node); void runCommand(command === "Open camera" ? `Open camera ${firstCamera?.cameraId || ""}` : command); }} />
 
-      {/* Central Aegis Core visualization */}
+      {/* Central Hirzexa Core visualization */}
       <div className="cinematic-center">
         <IntelligenceCore runtime={runtime} status={systemStatus} statusLabel={context ? statusText(systemStatus) : t("unavailable")} stateLabel={coreStateLabel} onAnchors={updateProjectionAnchors} onAssetStatus={setOperatorAssetStatus} />
       </div>
 
       {/* Foreground energy elements */}
-      <div className="aegis-foreground-core" data-state={runtime.state} aria-hidden>
-        <i className="aegis-foreground-core-ring" /><i className="aegis-foreground-core-ring" /><i className="aegis-foreground-core-sphere" />
+      <div className="hirzexa-foreground-core" data-state={runtime.state} aria-hidden>
+        <i className="hirzexa-foreground-core-ring" /><i className="hirzexa-foreground-core-ring" /><i className="hirzexa-foreground-core-sphere" />
         <span>{Array.from({ length: 10 }, (_, coreParticle) => <i key={coreParticle} style={{ "--core-particle": coreParticle } as React.CSSProperties} />)}</span>
       </div>
 
@@ -245,7 +245,7 @@ export function IntelligenceCommandCenter({ state }: { state: IntelligenceContex
       <ProjectionLayer execution={execution} pending={pending} domain={activeDomain} anchorName={runtime.projectionAnchor} anchor={projectionAnchors[runtime.projectionAnchor]} selectedId={scene.selectedId} onSelect={scene.select} onDismiss={dismissScene} onOpen={openTarget} onFindSimilar={(id) => void runCommand(t("findSimilarCommand"), id)} onRelated={() => void runCommand("Show related evidence")} />
 
       {/* Interaction dock */}
-      <div className="aegis-interaction-dock">
+      <div className="hirzexa-interaction-dock">
         {/* Monitor notice */}
         <div className="operator-monitor-notice" data-state={monitor.kind} role={monitorUrgent ? "alert" : "status"} aria-live={monitorUrgent ? "assertive" : "polite"}>
           <Radio aria-hidden />
@@ -264,15 +264,15 @@ export function IntelligenceCommandCenter({ state }: { state: IntelligenceContex
         </div>
 
         {/* Text input toggle */}
-        <button type="button" className="aegis-dock-text-toggle" aria-expanded={textModeOpen} aria-controls="operator-text-mode" onClick={() => setTextModeOpen((open) => !open)}>
+        <button type="button" className="hirzexa-dock-text-toggle" aria-expanded={textModeOpen} aria-controls="operator-text-mode" onClick={() => setTextModeOpen((open) => !open)}>
           <Keyboard aria-hidden />
           <span>{textModeOpen ? "Close" : "Type your request..."}</span>
         </button>
 
         {/* Text input form */}
-        {textModeOpen ? <form id="operator-text-mode" className="aegis-dock-text-form" onSubmit={(event) => { event.preventDefault(); submitTextCommand(); }}>
-          <label className="sr-only" htmlFor="operator-text-command">Type a command for Aegis</label>
-          <input id="operator-text-command" aria-label="Type a command for Aegis" value={textCommand} onChange={(event) => setTextCommand(event.target.value)} placeholder="Type a short command..." disabled={pending} autoComplete="off" />
+        {textModeOpen ? <form id="operator-text-mode" className="hirzexa-dock-text-form" onSubmit={(event) => { event.preventDefault(); submitTextCommand(); }}>
+          <label className="sr-only" htmlFor="operator-text-command">Type a command for Hirzexa</label>
+          <input id="operator-text-command" aria-label="Type a command for Hirzexa" value={textCommand} onChange={(event) => setTextCommand(event.target.value)} placeholder="Type a short command..." disabled={pending} autoComplete="off" />
           <button type="submit" disabled={pending || textCommand.trim().length < 2}>{pending ? "Working..." : "Send"}</button>
         </form> : null}
 

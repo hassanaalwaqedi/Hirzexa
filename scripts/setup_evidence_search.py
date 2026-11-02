@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from huggingface_hub import snapshot_download
-from aegis.semantic.embedding import MODEL, REVISION
+from hirzexa.semantic.embedding import MODEL, REVISION
 
 if __name__ == "__main__":
     snapshot_download(MODEL, revision=REVISION, allow_patterns=[

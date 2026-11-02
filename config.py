@@ -1,8 +1,8 @@
 """
-AegisAI - Smart City Risk Intelligence System
+Hirzexa - Smart City Risk Intelligence System
 Configuration Management Module
 
-This module centralizes all configuration parameters for AegisAI.
+This module centralizes all configuration parameters for Hirzexa.
 Covers Phase 1 (Perception) and Phase 2 (Analysis) configurations.
 Designed for production deployment with environment-aware settings.
 """
@@ -27,7 +27,7 @@ def _vision_settings():
     ``DetectionConfig`` remains as a compatibility adapter for the camera and
     pipeline code. It must not introduce model defaults of its own.
     """
-    from aegis.settings import get_settings
+    from hirzexa.settings import get_settings
 
     return get_settings().detection
 
@@ -109,10 +109,10 @@ class DetectionConfig:
     # be configured independently in tests and short-lived worker processes.
     # They do not select or substitute a checkpoint.
     weapon_model_class_names: dict = field(default_factory=lambda: _int_string_map_env(
-        "AEGIS_WEAPON_CLASS_NAMES_JSON", {0: "knife", 1: "pistol"}
+        "HIRZEXA_WEAPON_CLASS_NAMES_JSON", {0: "knife", 1: "pistol"}
     ))
     weapon_internal_class_ids: dict = field(default_factory=lambda: _int_int_map_env(
-        "AEGIS_WEAPON_INTERNAL_CLASS_IDS_JSON", {0: 1000, 1: 1001}
+        "HIRZEXA_WEAPON_INTERNAL_CLASS_IDS_JSON", {0: 1000, 1: 1001}
     ))
     weapon_debug_enabled: bool = field(default_factory=lambda: _vision_settings().weapon_debug_enabled)
     weapon_detector_enabled: bool = field(default_factory=lambda: _vision_settings().weapon_detector_enabled)
@@ -194,7 +194,7 @@ class VideoConfig:
     output_codec: str = "mp4v"
     output_fps: Optional[float] = None
     display_window: bool = True
-    window_name: str = "AegisAI - Perception Layer"
+    window_name: str = "Hirzexa - Perception Layer"
     resize_width: Optional[int] = None
     resize_height: Optional[int] = None
 
@@ -391,7 +391,7 @@ class DatabaseConfig:
         auto_cleanup: Whether to auto-cleanup old records on startup
     """
     enabled: bool = True
-    url: str = "sqlite:///data/aegis.db"
+    url: str = "sqlite:///data/hirzexa.db"
     retention_days: int = 30
     snapshot_retention_days: int = 7
     auto_cleanup: bool = True
@@ -504,7 +504,7 @@ class ProximityRiskConfigData:
 
 
 @dataclass
-class AegisConfig:
+class HirzexaConfig:
     """
     Master Configuration Container.
     
@@ -547,10 +547,10 @@ class AegisConfig:
 
 
 # Default configuration instance for convenience
-DEFAULT_CONFIG = AegisConfig()
+DEFAULT_CONFIG = HirzexaConfig()
 
 
-def load_config(config_path: Optional[str] = None) -> AegisConfig:
+def load_config(config_path: Optional[str] = None) -> HirzexaConfig:
     """
     Load configuration from file or return defaults.
     
@@ -558,7 +558,7 @@ def load_config(config_path: Optional[str] = None) -> AegisConfig:
         config_path: Optional path to YAML/JSON config file
         
     Returns:
-        AegisConfig instance with loaded or default values
+        HirzexaConfig instance with loaded or default values
         
     Note:
         Future enhancement: Add YAML/JSON file loading support

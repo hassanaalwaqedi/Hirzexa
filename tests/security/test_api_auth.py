@@ -1,5 +1,5 @@
 """
-AegisAI - Security Tests: API Authentication
+Hirzexa - Security Tests: API Authentication
 
 Tests for API key authentication enforcement.
 """
@@ -15,7 +15,7 @@ class TestAPIAuthentication:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
-        from aegis.api.app import create_app
+        from hirzexa.api.app import create_app
         
         app = create_app()
         return TestClient(app)
@@ -46,7 +46,7 @@ class TestAPIAuthentication:
         response = client.get("/statistics")
         assert response.status_code == 401
     
-    @patch.dict("os.environ", {"AEGIS_API_KEY": "test-api-key-12345"})
+    @patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-api-key-12345"})
     def test_status_with_valid_api_key_returns_200(self, client, valid_api_key):
         """Request with valid API key should return 200 OK."""
         response = client.get(
@@ -66,7 +66,7 @@ class TestAPIAuthentication:
     
     def test_api_key_case_sensitive(self, client):
         """API key should be case-sensitive."""
-        with patch.dict("os.environ", {"AEGIS_API_KEY": "TestKey123"}):
+        with patch.dict("os.environ", {"HIRZEXA_API_KEY": "TestKey123"}):
             response = client.get(
                 "/status",
                 headers={"X-API-Key": "testkey123"}  # lowercase
@@ -83,7 +83,7 @@ class TestAPIAuthentication:
     
     def test_api_key_header_name(self, client):
         """Only X-API-Key header should be accepted."""
-        with patch.dict("os.environ", {"AEGIS_API_KEY": "test-key"}):
+        with patch.dict("os.environ", {"HIRZEXA_API_KEY": "test-key"}):
             # Wrong header name
             response = client.get(
                 "/status",
@@ -105,22 +105,22 @@ class TestDebugModeEndpoints:
     def client(self):
         """Create test client."""
         from fastapi.testclient import TestClient
-        from aegis.api.app import create_app
+        from hirzexa.api.app import create_app
         
         app = create_app()
         return TestClient(app)
     
-    @patch.dict("os.environ", {"AEGIS_DEBUG": "false"})
+    @patch.dict("os.environ", {"HIRZEXA_DEBUG": "false"})
     def test_docs_disabled_in_production(self, client):
-        """OpenAPI docs should be disabled when AEGIS_DEBUG=false."""
+        """OpenAPI docs should be disabled when HIRZEXA_DEBUG=false."""
         # Note: This test may need fresh app creation after env patch
         response = client.get("/docs")
         # In production mode, /docs should return 404
         assert response.status_code in [404, 200]  # Depends on when app was created
     
-    @patch.dict("os.environ", {"AEGIS_DEBUG": "true"})
+    @patch.dict("os.environ", {"HIRZEXA_DEBUG": "true"})
     def test_docs_enabled_in_debug(self, client):
-        """OpenAPI docs should be enabled when AEGIS_DEBUG=true."""
+        """OpenAPI docs should be enabled when HIRZEXA_DEBUG=true."""
         response = client.get("/docs")
         # In debug mode, /docs should return 200
         assert response.status_code in [200, 404]

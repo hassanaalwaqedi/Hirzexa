@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from aegis.camera import CameraConfig, CameraSourceType
-from aegis.camera import CameraConnectionStatus
-from aegis.camera.base import OpenCVLoopCameraSource
-import aegis.camera.base as camera_base
+from hirzexa.camera import CameraConfig, CameraSourceType
+from hirzexa.camera import CameraConnectionStatus
+from hirzexa.camera.base import OpenCVLoopCameraSource
+import hirzexa.camera.base as camera_base
 
 
 class _Capture:

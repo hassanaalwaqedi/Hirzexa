@@ -1,8 +1,8 @@
-# Aegis AI — Technical Evaluation Report
+# Hirzexa — Technical Evaluation Report
 
 > **Historical report:** This document records earlier architecture and estimates. For the current implementation and evidence limits, use [Current Engineering Status](STATUS_REPORT.md). In particular, performance figures here are not a current end-to-end benchmark, and the listed future cloud models are not validated production capabilities.
 
-**System**: Aegis AI – Real-Time Intelligent Surveillance System  
+**System**: Hirzexa – Real-Time Intelligent Surveillance System  
 **Version**: 4.0.0  
 **Date**: April 24, 2026  
 **Classification**: Engineering Technical Report  
@@ -29,9 +29,9 @@
 
 ### 1.1 System Description
 
-Aegis AI is a real-time intelligent surveillance system designed for smart city environments. The system ingests live video feeds, detects objects of interest (persons, vehicles, weapons), tracks them across frames with stable identifiers, and evaluates contextual risk through a combination of spatial, temporal, and behavioral signals.
+Hirzexa is a real-time intelligent surveillance system designed for smart city environments. The system ingests live video feeds, detects objects of interest (persons, vehicles, weapons), tracks them across frames with stable identifiers, and evaluates contextual risk through a combination of spatial, temporal, and behavioral signals.
 
-Unlike conventional surveillance systems that simply detect objects, Aegis AI is designed to understand **situations** — identifying when a detected weapon is in proximity to a person, whether that pairing is stable across time, and whether the combination warrants an alert.
+Unlike conventional surveillance systems that simply detect objects, Hirzexa is designed to understand **situations** — identifying when a detected weapon is in proximity to a person, whether that pairing is stable across time, and whether the combination warrants an alert.
 
 ### 1.2 Initial Limitations
 
@@ -75,18 +75,18 @@ Phase 6 (Hybrid Edge/Cloud) →  ByteTrack + ProximityRisk + cloud escalation
 
 | Component | Module | Status | Description |
 |---|---|---|---|
-| **Object Detection** | `aegis.detection` | ✅ Implemented | YOLO11n (nano) with lazy loading, CPU-optimized |
-| **Multi-Object Tracking** | `aegis.tracking` | ✅ Implemented | ByteTrack (IoU-based, no embeddings) — primary; DeepSORT — legacy |
-| **Proximity Risk Engine** | `aegis.risk.proximity_risk` | ✅ Implemented | Rule-based: person+weapon proximity, temporal stability |
-| **Advanced Risk Engine** | `aegis.risk.risk_engine` | ✅ Implemented | Weighted multi-signal: loitering, speed, crowd, zone context |
-| **Behavioral Analysis** | `aegis.analysis` | ✅ Implemented | Motion analysis, behavior detection, crowd metrics |
-| **Edge Pipeline** | `aegis.edge` | ✅ Implemented | Frame→Detect→Track→Risk→Escalate orchestrator |
-| **Cloud Client** | `aegis.cloud.cloud_client` | ✅ Implemented | Async HTTP with circuit breaker, event queue, JPEG compression |
-| **Cloud Server** | `aegis.cloud.cloud_server` | ⚙️ Scaffold | FastAPI endpoint ready; model integration pending |
-| **Risk Fusion Engine** | `aegis.fusion` | ⚙️ Scaffold | Multi-model fusion logic scaffolded; awaits GPU models |
-| **REST API** | `aegis.api` | ✅ Implemented | 14+ endpoints with API key auth, rate limiting, CORS |
-| **Dashboard** | `aegis.dashboard` | ✅ Implemented | HTML/JS monitoring interface |
-| **Abstract Interfaces** | `aegis.core.interfaces` | ✅ Implemented | 8 base classes for all pluggable AI modules |
+| **Object Detection** | `hirzexa.detection` | ✅ Implemented | YOLO11n (nano) with lazy loading, CPU-optimized |
+| **Multi-Object Tracking** | `hirzexa.tracking` | ✅ Implemented | ByteTrack (IoU-based, no embeddings) — primary; DeepSORT — legacy |
+| **Proximity Risk Engine** | `hirzexa.risk.proximity_risk` | ✅ Implemented | Rule-based: person+weapon proximity, temporal stability |
+| **Advanced Risk Engine** | `hirzexa.risk.risk_engine` | ✅ Implemented | Weighted multi-signal: loitering, speed, crowd, zone context |
+| **Behavioral Analysis** | `hirzexa.analysis` | ✅ Implemented | Motion analysis, behavior detection, crowd metrics |
+| **Edge Pipeline** | `hirzexa.edge` | ✅ Implemented | Frame→Detect→Track→Risk→Escalate orchestrator |
+| **Cloud Client** | `hirzexa.cloud.cloud_client` | ✅ Implemented | Async HTTP with circuit breaker, event queue, JPEG compression |
+| **Cloud Server** | `hirzexa.cloud.cloud_server` | ⚙️ Scaffold | FastAPI endpoint ready; model integration pending |
+| **Risk Fusion Engine** | `hirzexa.fusion` | ⚙️ Scaffold | Multi-model fusion logic scaffolded; awaits GPU models |
+| **REST API** | `hirzexa.api` | ✅ Implemented | 14+ endpoints with API key auth, rate limiting, CORS |
+| **Dashboard** | `hirzexa.dashboard` | ✅ Implemented | HTML/JS monitoring interface |
+| **Abstract Interfaces** | `hirzexa.core.interfaces` | ✅ Implemented | 8 base classes for all pluggable AI modules |
 
 ### 2.3 What Is Planned (Not Yet Implemented)
 
@@ -100,7 +100,7 @@ Phase 6 (Hybrid Edge/Cloud) →  ByteTrack + ProximityRisk + cloud escalation
 | Multi-camera tracking | — | Phase 3 (Enterprise) |
 | Behavior prediction | — | Phase 3 (Enterprise) |
 
-**Key distinction**: All planned modules have abstract interfaces defined in `aegis/core/interfaces.py`. The pipeline architecture supports plug-and-play integration without structural changes.
+**Key distinction**: All planned modules have abstract interfaces defined in `hirzexa/core/interfaces.py`. The pipeline architecture supports plug-and-play integration without structural changes.
 
 ---
 
@@ -288,9 +288,9 @@ The system addresses false positives through multiple layers:
 
 ### 6.1 From Object Detection to Situation Understanding
 
-The fundamental advancement of Aegis AI is the shift from **"what is in the frame"** to **"what is happening in the frame"**:
+The fundamental advancement of Hirzexa is the shift from **"what is in the frame"** to **"what is happening in the frame"**:
 
-| Capability | Basic System | Aegis AI |
+| Capability | Basic System | Hirzexa |
 |---|---|---|
 | Object detection | ✅ | ✅ |
 | Object tracking | ❌ | ✅ Stable IDs across frames |
@@ -413,7 +413,7 @@ The escalation threshold (0.6 by default) is configurable. Events below the thre
 
 ### 9.1 Hybrid Edge/Cloud Architecture
 
-Most surveillance AI systems are either fully edge-based (limited intelligence) or fully cloud-based (high bandwidth cost, privacy risk). Aegis AI implements a **hybrid model**:
+Most surveillance AI systems are either fully edge-based (limited intelligence) or fully cloud-based (high bandwidth cost, privacy risk). Hirzexa implements a **hybrid model**:
 
 - **Edge**: Handles 100% of frames locally with fast, lightweight models
 - **Cloud**: Receives only suspicious frames (estimated <5% of total frames)
@@ -475,7 +475,7 @@ The system includes production-grade engineering patterns:
 
 ### 10.2 Honest Assessment
 
-**Strengths**: Aegis AI has a strong, well-designed architecture that is genuinely production-oriented. The modular interface system, hybrid edge/cloud design, and event-based escalation logic are architecturally sound and would scale well in a real deployment. The code quality — typing, documentation, error handling, configuration management — exceeds typical prototype standards.
+**Strengths**: Hirzexa has a strong, well-designed architecture that is genuinely production-oriented. The modular interface system, hybrid edge/cloud design, and event-based escalation logic are architecturally sound and would scale well in a real deployment. The code quality — typing, documentation, error handling, configuration management — exceeds typical prototype standards.
 
 **Weaknesses**: The system's primary gap is on the **data and validation side**, not the code side. The custom weapon dataset is too small for reliable detection in diverse real-world conditions. The cloud layer, while architecturally complete, has not been deployed or tested. No systematic benchmarking on domain-specific data has been conducted.
 
@@ -492,4 +492,4 @@ The highest-ROI next steps, in order:
 
 ---
 
-*This report was generated based on direct analysis of the AegisAI codebase (v4.0.0, 23 sub-packages, ~15,000+ lines of Python).*
+*This report was generated based on direct analysis of the Hirzexa codebase (v4.0.0, 23 sub-packages, ~15,000+ lines of Python).*

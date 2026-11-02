@@ -42,11 +42,11 @@ describe("AIOrb", () => {
       />,
     ));
 
-    const orb = screen.getByTestId("aegis-voice-orb");
+    const orb = screen.getByTestId("hirzexa-voice-orb");
     await waitFor(() => expect(orb).toHaveAttribute("data-reduced-motion", "true"));
     expect(orb).toHaveAttribute("data-voice-state", "listening");
     expect(orb).toHaveAttribute("data-active-capability", "cameras");
-    expect(screen.getByRole("button", { name: /Aegis Voice Core/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Hirzexa Voice Core/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ask" })).toBeInTheDocument();
   });
 

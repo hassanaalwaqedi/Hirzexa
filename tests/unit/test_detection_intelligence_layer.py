@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from aegis.api.state import APIState
-from aegis.video.camera_sources import FrameIngestionService
+from hirzexa.api.state import APIState
+from hirzexa.video.camera_sources import FrameIngestionService
 
 
 def test_api_state_registry_preserves_first_seen_and_counts_updates():
@@ -41,7 +41,7 @@ def test_api_state_registry_preserves_first_seen_and_counts_updates():
 
 def test_detection_event_for_low_confidence_weapon_is_candidate_not_critical(monkeypatch):
     service = FrameIngestionService()
-    monkeypatch.setattr("aegis.video.camera_sources.get_state", lambda: APIState())
+    monkeypatch.setattr("hirzexa.video.camera_sources.get_state", lambda: APIState())
     timestamp = datetime.fromisoformat("2026-06-24T00:00:00")
     track_payload = {
         "track_id": "cam-1:3",
@@ -67,7 +67,7 @@ def test_detection_event_for_low_confidence_weapon_is_candidate_not_critical(mon
 
 def test_detection_event_is_emitted_once_per_track_and_class(monkeypatch):
     service = FrameIngestionService()
-    monkeypatch.setattr("aegis.video.camera_sources.get_state", lambda: APIState())
+    monkeypatch.setattr("hirzexa.video.camera_sources.get_state", lambda: APIState())
     timestamp = datetime.fromisoformat("2026-06-24T00:00:00")
     track_payload = {
         "track_id": "cam-1:9",

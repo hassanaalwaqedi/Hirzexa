@@ -44,8 +44,8 @@ describe("Operator result evidence rationale", () => {
       </NextIntlClientProvider>,
     );
 
-    const rationale = screen.getByLabelText("Why Aegis flagged this");
-    expect(within(rationale).getByText("Why Aegis flagged this")).toBeInTheDocument();
+    const rationale = screen.getByLabelText("Why Hirzexa flagged this");
+    expect(within(rationale).getByText("Why Hirzexa flagged this")).toBeInTheDocument();
     expect(within(rationale).getByText("Repeated close-contact movement was observed.")).toBeInTheDocument();
     expect(within(rationale).getByText("Verification: Confirmed")).toBeInTheDocument();
     expect(within(rationale).getByText("Close contact repeated")).toBeInTheDocument();

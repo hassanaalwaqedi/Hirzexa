@@ -55,6 +55,14 @@
       "size_bytes": 4753100,
       "path": "data\\uploads\\064db0869be84ffc997d532179c73a49.mp4",
       "uploaded_at": "2026-06-23T21:00:44.013285"
+    },
+    "8d65f5768aa24f8ea3fab402c289906f": {
+      "video_id": "8d65f5768aa24f8ea3fab402c289906f",
+      "filename": "pexels-sparring-test.mp4",
+      "content_type": "video/mp4",
+      "size_bytes": 35451216,
+      "path": "data/uploads/8d65f5768aa24f8ea3fab402c289906f.mp4",
+      "uploaded_at": "2026-10-01T07:57:35.742895"
     }
   }
 }

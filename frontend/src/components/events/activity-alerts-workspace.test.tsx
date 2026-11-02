@@ -49,7 +49,7 @@ describe("ActivityAlertsWorkspace", () => {
     expect(screen.getAllByText("Vehicle activity needs review")).toHaveLength(2);
     expect(screen.queryByText("model-private-name")).not.toBeInTheDocument();
     expect(screen.queryByText("RAW_REASON_CODE")).not.toBeInTheDocument();
-    const details = screen.getByText("Why did Aegis flag this?").closest("details") as HTMLDetailsElement;
+    const details = screen.getByText("Why did Hirzexa flag this?").closest("details") as HTMLDetailsElement;
     details.open = true;
     fireEvent(details, new Event("toggle", { bubbles: true }));
     expect(screen.getByText("model-private-name")).toBeInTheDocument();

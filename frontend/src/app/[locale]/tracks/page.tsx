@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { LiveTrackingWorkspace } from "@/components/tracks/live-tracking-workspace";
-import { useCamerasQuery, useTracksQuery } from "@/hooks/use-aegis-api";
+import { useCamerasQuery, useTracksQuery } from "@/hooks/use-hirzexa-api";
 
 export default function TracksPage() {
   return <Suspense fallback={<div className="min-h-[40vh]" aria-busy="true" />}><TracksPageContent /></Suspense>;

@@ -11,10 +11,10 @@ def _client(monkeypatch: pytest.MonkeyPatch, api_key: str | None) -> TestClient:
     if api_key is None:
         # The shared test bootstrap provides a key. An explicit empty value
         # exercises the same missing-configuration path without reloading it.
-        monkeypatch.setenv("AEGIS_API_KEY", "")
+        monkeypatch.setenv("HIRZEXA_API_KEY", "")
     else:
-        monkeypatch.setenv("AEGIS_API_KEY", api_key)
-    from aegis.api.app import create_app
+        monkeypatch.setenv("HIRZEXA_API_KEY", api_key)
+    from hirzexa.api.app import create_app
 
     return TestClient(create_app())
 

@@ -6,7 +6,7 @@ import pytest
 
 from datetime import datetime, timedelta
 
-from aegis.api.state import APIState
+from hirzexa.api.state import APIState
 
 
 def _runtime() -> dict:
@@ -61,7 +61,7 @@ def test_tracks_only_return_current_observations_and_keep_behavior_labels():
 
 @pytest.mark.asyncio
 async def test_status_endpoint_reflects_instantiated_detector(monkeypatch):
-    from aegis.api.routes import status as status_module
+    from hirzexa.api.routes import status as status_module
 
     state = APIState()
     runtime = _runtime()
@@ -71,6 +71,7 @@ async def test_status_endpoint_reflects_instantiated_detector(monkeypatch):
         weapon_detector={"runtime": {"configured": True, "ready": False, "error": "missing"}},
     )
     monkeypatch.setattr(status_module, "get_state", lambda: state)
+    monkeypatch.setattr("hirzexa.api.routes.cameras.get_camera_manager", lambda: type("Manager", (), {"ingestion": None})())
 
     payload = await status_module.get_status()
 
@@ -81,7 +82,7 @@ async def test_status_endpoint_reflects_instantiated_detector(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_status_reports_enabled_threat_detector_truthfully(monkeypatch):
-    from aegis.api.routes import status as status_module
+    from hirzexa.api.routes import status as status_module
 
     state = APIState()
     state.update_status(
@@ -99,6 +100,7 @@ async def test_status_reports_enabled_threat_detector_truthfully(monkeypatch):
         },
     )
     monkeypatch.setattr(status_module, "get_state", lambda: state)
+    monkeypatch.setattr("hirzexa.api.routes.cameras.get_camera_manager", lambda: type("Manager", (), {"ingestion": None})())
 
     payload = await status_module.get_status()
 
